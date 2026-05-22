@@ -1,0 +1,142 @@
+version: 0.1
+project: ancora
+status: initial-governance
+description: AI-native learning platform with grounded flashcards, adaptive quizzes, RAG tutoring, evals, and observability.
+
+global_rules:
+  root_guidance: AGENTS.md
+  domain_context: CONTEXT.md
+  architecture_decisions: docs/adr
+  implementation_plan: docs/implementation/ancora-project-plan-v0.2.md
+  privacy_boundary: Account-owned source text is private and must not leak into logs, traces, fixtures, docs, or commits.
+
+shards:
+  - path: apps/web
+    owner: frontend
+    role: Next.js client UI for accounts, sources, decks, reviews, quizzes, tutor workflows, and dashboards.
+    status: planned
+    allowed_work:
+      - Next.js routes and UI
+      - client-side product workflows
+      - typed API clients
+      - accessibility and responsive behavior
+    out_of_scope:
+      - owning v1 product API behavior
+      - direct database access
+      - LLM provider calls from the browser
+
+  - path: services/ai-runtime
+    owner: backend-ai
+    role: FastAPI service that owns the v1 product API and AI API.
+    status: planned
+    allowed_work:
+      - auth-aware product API endpoints
+      - source chunking and retrieval workflows
+      - RAG tutor behavior
+      - flashcard generation and grading workflows
+      - OpenAI provider integration
+      - Langfuse and OpenTelemetry instrumentation
+    out_of_scope:
+      - standalone Node product API
+      - Kubernetes or Terraform ownership
+
+  - path: services/workers
+    owner: backend-ai
+    role: Python workers for async jobs after the core synchronous vertical slice is proven.
+    status: planned
+    allowed_work:
+      - embedding jobs
+      - card generation jobs
+      - eval jobs
+      - cleanup and maintenance jobs
+    out_of_scope:
+      - Redis dependency before an ADR approves it
+      - uploaded file ingestion before the core vertical slice works
+
+  - path: services/eval-runner
+    owner: evals
+    role: Offline and CI-oriented eval runner for retrieval, generation, grading, and agent workflows.
+    status: planned
+    allowed_work:
+      - eval execution code
+      - score aggregation
+      - report generation
+      - prompt and model comparisons
+    out_of_scope:
+      - production request serving
+
+  - path: packages
+    owner: shared
+    role: Shared internal types, schemas, UI primitives, and configuration.
+    status: planned
+    allowed_work:
+      - shared schemas
+      - typed contracts
+      - UI primitives
+      - configuration helpers
+    out_of_scope:
+      - hidden business logic that belongs to services or apps
+
+  - path: prompts
+    owner: ai-product
+    role: Versioned prompts, rubrics, schemas, and prompt metadata.
+    status: planned
+    allowed_work:
+      - prompt versions
+      - output schemas
+      - rubrics
+      - metadata files
+    out_of_scope:
+      - private user source text
+      - unversioned production prompts
+
+  - path: evals
+    owner: evals
+    role: Evaluation datasets, rubrics, fixtures, and reports.
+    status: planned
+    allowed_work:
+      - synthetic datasets
+      - rubrics
+      - smoke eval fixtures
+      - eval reports
+    out_of_scope:
+      - real private user content
+
+  - path: infra
+    owner: platform
+    role: Local Docker and observability configuration for the accepted v1 stack.
+    status: planned
+    allowed_work:
+      - Docker Compose
+      - PostgreSQL with pgvector
+      - Langfuse local setup
+      - Grafana, Prometheus, and OpenTelemetry local setup
+    out_of_scope:
+      - Kubernetes
+      - Terraform
+      - cloud deployment modules
+
+  - path: docs
+    owner: architecture
+    role: Architecture, ADRs, product notes, implementation plans, diagrams, and agent guidance.
+    status: active
+    allowed_work:
+      - ADRs
+      - implementation plans
+      - domain documentation
+      - diagrams
+      - agent manifests
+    out_of_scope:
+      - executable application code
+
+  - path: scripts
+    owner: developer-experience
+    role: Automation for development, database, evals, and local infrastructure.
+    status: planned
+    allowed_work:
+      - local dev commands
+      - database helpers
+      - eval helpers
+      - infrastructure helpers
+    out_of_scope:
+      - replacing documented Make targets without updating governance
