@@ -1,0 +1,37 @@
+name: ai-runtime
+status: planned
+primary_paths:
+  - services/ai-runtime
+related_paths:
+  - packages/schemas
+  - prompts
+read_first:
+  - CONTEXT.md
+  - docs/adr/0002-fastapi-owns-v1-product-and-ai-api.md
+  - docs/adr/0003-auth-and-account-are-v1-scope.md
+  - docs/adr/0004-use-openai-as-default-llm-provider.md
+  - docs/adr/0005-use-postgresql-pgvector-for-v1.md
+role: FastAPI service that owns the v1 product API and AI API.
+allowed_work:
+  - auth-aware product API endpoints
+  - account-scoped source and source chunk workflows
+  - retrieval and pgvector integration
+  - RAG tutor behavior
+  - grounded flashcard generation and grading workflows
+  - OpenAI provider integration behind service boundaries
+  - prompt versions, trace references, and LLM observability metadata
+out_of_scope:
+  - standalone Node product API
+  - browser-owned LLM calls
+  - Kubernetes or Terraform ownership
+  - uploaded file ingestion before an ADR approves it
+privacy_rules:
+  - Treat source material as private and untrusted input.
+  - Do not log raw source material, prompts containing private text, or generated outputs that reveal private text unless explicitly required for local debugging and kept out of commits.
+  - Make external provider use explicit when OpenAI receives account-owned content.
+validation:
+  expected_commands:
+    - make lint
+    - make test
+    - make eval-smoke
+  fallback: If commands do not exist, inspect available scripts and report the gap.

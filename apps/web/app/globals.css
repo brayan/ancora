@@ -1,0 +1,163 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f5f0;
+  --panel: #ffffff;
+  --ink: #17201b;
+  --muted: #5f6a64;
+  --line: #d7ded8;
+  --teal: #176b68;
+  --amber: #b26b12;
+  --coral: #b84a3b;
+  --blue: #2f5f98;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.workspaceHeader {
+  align-items: end;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  margin: 0 auto 24px;
+  max-width: 1120px;
+}
+
+.eyebrow {
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 0;
+  max-width: 640px;
+}
+
+.statusBadge {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-height: 34px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.statusBadge[data-tone="ready"] {
+  background: #eaf7f4;
+  border-color: #b7dcd3;
+  color: var(--teal);
+}
+
+.workspaceGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 auto;
+  max-width: 1120px;
+}
+
+.lane {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 190px;
+  padding: 18px;
+}
+
+.lane h2 {
+  font-size: 1rem;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+.lane p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+
+.laneMeta {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  display: flex;
+  font-size: 0.82rem;
+  justify-content: space-between;
+  padding-top: 12px;
+}
+
+.laneMeta strong {
+  color: var(--ink);
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding: 24px;
+  }
+
+  .workspaceHeader {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .workspaceGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding: 18px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  .workspaceGrid {
+    grid-template-columns: 1fr;
+  }
+}

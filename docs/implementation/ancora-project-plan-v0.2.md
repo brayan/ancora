@@ -5,6 +5,8 @@
 **Status:** Implementation planning  
 **Date:** 2026-05-22
 
+**Governance note:** This plan is retained as implementation context. Current repo governance is defined by `AGENTS.md`, `docs/agents/repo-manifest.yaml`, the project shards, and accepted ADRs. Uploaded file ingestion, a standalone Node API, Kubernetes, Terraform, Redis, and PyTorch remain deferred until the core vertical slice works and an ADR changes the scope.
+
 ---
 
 ## 1. Project thesis
@@ -123,6 +125,7 @@ ancora/
   services/
     ai-runtime/
     workers/
+  tools/
     eval-runner/
 
   packages/
@@ -144,15 +147,17 @@ ancora/
     reports/
     fixtures/
 
+  config/
+
+  docker/
+    docker-compose.yml
+
   infra/
-    docker/
     observability/
       langfuse/
       grafana/
       prometheus/
       opentelemetry/
-    kubernetes/
-    terraform/
 
   docs/
     architecture/
@@ -177,10 +182,13 @@ ancora/
 |---|---|
 | `apps/` | User-facing applications such as the web app and future mobile app |
 | `services/` | Independently runnable backend/AI services |
+| `tools/` | Internal CLIs and artifact boundaries |
 | `packages/` | Shared internal libraries and configuration |
 | `prompts/` | Versioned prompts, rubrics, model instructions, and schemas |
 | `evals/` | Datasets, rubrics, fixtures, and evaluation reports |
-| `infra/` | Docker, observability, Kubernetes, Terraform, and runtime dependencies |
+| `config/` | Repository-level non-secret configuration artifacts |
+| `docker/` | Local Docker Compose foundation |
+| `infra/` | Observability configuration placeholders |
 | `docs/` | Architecture, product decisions, ADRs, diagrams, implementation plans |
 | `scripts/` | Automation scripts for development, database, evals, and infrastructure |
 | `.github/` | CI/CD workflows |
@@ -190,7 +198,7 @@ ancora/
 - Use `apps/web` instead of `frontend` because the repo may later include `apps/mobile`, `apps/admin`, or `apps/docs`.
 - Use `services/ai-runtime` instead of `backend` because the FastAPI service has a specific role: RAG, LLMs, agents, and AI workflows.
 - Use `services/workers` for background jobs such as ingestion, embeddings, async card generation, and eval jobs.
-- Use `services/eval-runner` because evals are a first-class engineering concern.
+- Use `tools/eval-runner` because evals are a first-class internal CLI and artifact boundary, not a deployable service.
 - Use `prompts/` as a top-level folder because prompts are product artifacts, not incidental strings hidden in code.
 - Use `evals/` as a top-level folder because AI quality measurement is central to the project.
 - Put Langfuse and Grafana under `infra/observability/` because they are operational dependencies, not Ancora business services.
@@ -236,7 +244,7 @@ services/workers
 | `apps/web` | Decks, sources, review sessions, quiz UI, tutor UI, dashboards |
 | `services/ai-runtime` | RAG, LLM calls, LangChain, LangGraph, card generation, answer grading |
 | `services/workers` | Async ingestion, embeddings, generation jobs, eval jobs |
-| `services/eval-runner` | Offline evals, prompt comparisons, report generation |
+| `tools/eval-runner` | Offline evals, prompt comparisons, report generation |
 | PostgreSQL + pgvector | Users, sources, chunks, embeddings, decks, cards, reviews, eval results |
 | Langfuse | LLM traces, prompt versions, datasets, eval scores, cost, latency |
 | Grafana | System health, product metrics, service latency, errors, job metrics |
@@ -748,7 +756,7 @@ make docker-down
 .env.example
 apps/web/.env.example
 services/ai-runtime/.env.example
-infra/docker/.env.example
+docker/postgres.env.example
 ```
 
 ---
@@ -960,21 +968,19 @@ Ancora should be described as:
 
 ---
 
-## 25. Architecture decision records to create
+## 25. Architecture decision records captured
 
-Create ADRs under `docs/adr/`.
+Accepted ADRs live under `docs/adr/`.
 
 ```txt
 0001-use-monorepo.md
-0002-use-nextjs-for-web.md
-0003-use-fastapi-for-ai-runtime.md
-0004-use-postgresql-pgvector-for-v1.md
-0005-use-langchain-for-rag-components.md
-0006-use-langgraph-for-study-workflows.md
-0007-use-langfuse-for-llm-observability.md
-0008-use-grafana-for-system-observability.md
-0009-defer-standalone-node-service.md
-0010-defer-kubernetes-and-terraform.md
+0002-fastapi-owns-v1-product-and-ai-api.md
+0003-auth-and-account-are-v1-scope.md
+0004-use-openai-as-default-llm-provider.md
+0005-use-postgresql-pgvector-for-v1.md
+0006-defer-standalone-node-api-kubernetes-terraform.md
+0007-place-eval-runner-under-services.md
+0008-use-nextjs-for-v1-client-ui.md
 ```
 
 Each ADR should include:

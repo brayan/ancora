@@ -1,0 +1,32 @@
+name: eval-runner
+status: planned
+primary_paths:
+  - tools/eval-runner
+related_paths:
+  - evals
+  - prompts
+read_first:
+  - CONTEXT.md
+  - docs/adr/0004-use-openai-as-default-llm-provider.md
+  - docs/adr/0007-place-eval-runner-under-services.md
+role: Internal CLI and artifact boundary for retrieval, generation, grading, and agent workflow evals.
+allowed_work:
+  - eval execution code
+  - synthetic datasets and fixtures
+  - rubrics
+  - score aggregation
+  - report generation
+  - prompt and model comparisons
+out_of_scope:
+  - production request serving
+  - deployable service ownership
+  - real private source material in eval datasets, fixtures, reports, or docs
+  - unversioned prompt changes
+privacy_rules:
+  - Eval datasets must be synthetic or explicitly approved sample material.
+  - Reports should use source IDs, chunk IDs, prompt versions, scores, and trace references rather than raw private text.
+validation:
+  expected_commands:
+    - make eval-smoke
+    - make test
+  fallback: If commands do not exist, inspect available scripts and report the gap.

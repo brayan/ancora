@@ -1,0 +1,37 @@
+[project]
+name = "ancora-ai-runtime"
+version = "0.1.0"
+description = "FastAPI product API and AI API boundary for Ancora."
+requires-python = ">=3.9"
+dependencies = [
+  "fastapi>=0.115.0,<1",
+  "uvicorn[standard]>=0.32.0,<1",
+]
+
+[project.scripts]
+ancora-ai-runtime = "ancora_ai_runtime.main:run"
+
+[dependency-groups]
+dev = [
+  "httpx>=0.27.0,<1",
+  "pytest>=8.0.0,<9",
+  "ruff>=0.8.0,<1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ancora_ai_runtime"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

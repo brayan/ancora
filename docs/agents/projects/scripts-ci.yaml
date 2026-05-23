@@ -1,0 +1,53 @@
+name: scripts-ci
+status: planned
+primary_paths:
+  - scripts
+  - .github/workflows
+  - infra
+  - docs/agents
+  - docs/engineering
+  - docs/testing
+  - docs/ops
+  - docs/exec-plans
+related_paths:
+  - Makefile
+  - package.json
+  - pnpm-workspace.yaml
+  - tsconfig.base.json
+  - .gitignore
+  - .env.example
+  - docker
+  - config
+  - packages/config
+read_first:
+  - CONTEXT.md
+  - docs/engineering/documentation-governance.md
+  - docs/engineering/monorepo-conventions.md
+  - docs/testing/change-based-test-coverage-policy.md
+  - docs/ops/solo-dev-guardrails.md
+  - docs/adr/0001-use-monorepo.md
+  - docs/adr/0006-defer-standalone-node-api-kubernetes-terraform.md
+role: Developer-experience, local command, CI, local Docker, and governance metadata boundary.
+allowed_work:
+  - Make command wrappers
+  - local development scripts
+  - database and eval helper scripts
+  - GitHub Actions workflow definitions
+  - Docker Compose for accepted v1 local services
+  - documentation and agent routing metadata
+out_of_scope:
+  - Kubernetes
+  - Terraform
+  - real environment secrets
+  - replacing documented command entry points without updating governance docs
+privacy_rules:
+  - CI logs, artifacts, and screenshots must not include private source material.
+  - Commit `.env.example` only; never commit real `.env` files.
+validation:
+  expected_commands:
+    - make lint
+    - make test
+    - make eval-smoke
+    - make docker-up
+    - make docker-down
+  fallback: If commands do not exist, inspect available scripts and report the gap.

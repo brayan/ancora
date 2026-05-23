@@ -1,0 +1,36 @@
+name: web
+status: planned
+primary_paths:
+  - apps/web
+related_paths:
+  - packages/ui
+  - packages/shared-types
+read_first:
+  - CONTEXT.md
+  - docs/adr/0001-use-monorepo.md
+  - docs/adr/0002-fastapi-owns-v1-product-and-ai-api.md
+  - docs/adr/0003-auth-and-account-are-v1-scope.md
+  - docs/adr/0008-use-nextjs-for-v1-client-ui.md
+  - docs/frontend/nextjs-feature-first-convention.md
+  - docs/frontend/nextjs-naming-convention.md
+role: Next.js client UI for accounts, sources, decks, reviews, quizzes, tutor workflows, and dashboards.
+allowed_work:
+  - Next.js routes and UI
+  - client-side product workflows
+  - typed API clients for FastAPI
+  - accessibility and responsive behavior
+  - UI state for source, deck, card, review, quiz, and tutor workflows
+  - Next.js feature-first and naming convention docs
+out_of_scope:
+  - owning v1 product API behavior
+  - direct database access
+  - direct OpenAI or embedding provider calls from the browser
+  - bypassing account-aware API boundaries
+privacy_rules:
+  - Do not place private source material in screenshots, fixtures, docs, analytics, or client logs.
+  - Use source IDs, chunk IDs, deck IDs, card IDs, and trace references where full text is not required.
+validation:
+  expected_commands:
+    - make lint
+    - make test
+  fallback: If commands do not exist, inspect available scripts and report the gap.

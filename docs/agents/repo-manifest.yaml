@@ -1,142 +1,111 @@
-version: 0.1
+version: 0.2
 project: ancora
 status: initial-governance
 description: AI-native learning platform with grounded flashcards, adaptive quizzes, RAG tutoring, evals, and observability.
 
-global_rules:
+startup:
   root_guidance: AGENTS.md
   domain_context: CONTEXT.md
+  manifest: docs/agents/repo-manifest.yaml
+  project_shards_dir: docs/agents/projects
+  rule: Read the root guidance, domain context, this manifest, relevant ADRs, and only the shard for the touched boundary.
+
+canonical_docs:
   architecture_decisions: docs/adr
+  documentation_governance: docs/engineering/documentation-governance.md
+  git_conventions: docs/engineering/git-conventions.md
+  monorepo_conventions: docs/engineering/monorepo-conventions.md
+  nextjs_feature_first_convention: docs/frontend/nextjs-feature-first-convention.md
+  nextjs_naming_convention: docs/frontend/nextjs-naming-convention.md
+  test_impact_policy: docs/testing/change-based-test-coverage-policy.md
+  solo_dev_guardrails: docs/ops/solo-dev-guardrails.md
+  execution_plans: docs/exec-plans/README.md
   implementation_plan: docs/implementation/ancora-project-plan-v0.2.md
-  privacy_boundary: Account-owned source text is private and must not leak into logs, traces, fixtures, docs, or commits.
 
-shards:
-  - path: apps/web
-    owner: frontend
-    role: Next.js client UI for accounts, sources, decks, reviews, quizzes, tutor workflows, and dashboards.
-    status: planned
-    allowed_work:
-      - Next.js routes and UI
-      - client-side product workflows
-      - typed API clients
-      - accessibility and responsive behavior
-    out_of_scope:
-      - owning v1 product API behavior
-      - direct database access
-      - LLM provider calls from the browser
+accepted_v1_stack:
+  web: Next.js in apps/web
+  api: FastAPI in services/ai-runtime owns the v1 product API and AI API
+  llm_provider: OpenAI is the default v1 LLM and embedding provider
+  database: PostgreSQL with pgvector
+  auth: Auth and account ownership are required v1 product scope
+  local_platform: Docker Compose
 
-  - path: services/ai-runtime
-    owner: backend-ai
-    role: FastAPI service that owns the v1 product API and AI API.
-    status: planned
-    allowed_work:
-      - auth-aware product API endpoints
-      - source chunking and retrieval workflows
-      - RAG tutor behavior
-      - flashcard generation and grading workflows
-      - OpenAI provider integration
-      - Langfuse and OpenTelemetry instrumentation
-    out_of_scope:
-      - standalone Node product API
-      - Kubernetes or Terraform ownership
+deferred_until_adr:
+  - standalone Node API
+  - Kubernetes
+  - Terraform
+  - Redis
+  - PyTorch
+  - uploaded file ingestion
 
-  - path: services/workers
-    owner: backend-ai
-    role: Python workers for async jobs after the core synchronous vertical slice is proven.
-    status: planned
-    allowed_work:
-      - embedding jobs
-      - card generation jobs
-      - eval jobs
-      - cleanup and maintenance jobs
-    out_of_scope:
-      - Redis dependency before an ADR approves it
-      - uploaded file ingestion before the core vertical slice works
+privacy_boundary: Account-owned source material is private and must not leak into logs, traces, fixtures, docs, screenshots, commits, or eval datasets.
 
-  - path: services/eval-runner
-    owner: evals
-    role: Offline and CI-oriented eval runner for retrieval, generation, grading, and agent workflows.
-    status: planned
-    allowed_work:
-      - eval execution code
-      - score aggregation
-      - report generation
-      - prompt and model comparisons
-    out_of_scope:
-      - production request serving
+command_surface:
+  expected:
+    - make dev
+    - make test
+    - make lint
+    - make eval-smoke
+    - make db-migrate
+    - make db-seed
+    - make docker-up
+    - make docker-down
+  rule: Until commands exist, inspect available scripts and report missing commands rather than inventing behavior.
 
-  - path: packages
-    owner: shared
-    role: Shared internal types, schemas, UI primitives, and configuration.
-    status: planned
-    allowed_work:
-      - shared schemas
-      - typed contracts
-      - UI primitives
-      - configuration helpers
-    out_of_scope:
-      - hidden business logic that belongs to services or apps
+project_shards:
+  - name: web
+    file: docs/agents/projects/web.yaml
+    routes:
+      - apps/web/**
+      - packages/ui/**
+      - packages/shared-types/**
+      - docs/frontend/**
 
-  - path: prompts
-    owner: ai-product
-    role: Versioned prompts, rubrics, schemas, and prompt metadata.
-    status: planned
-    allowed_work:
-      - prompt versions
-      - output schemas
-      - rubrics
-      - metadata files
-    out_of_scope:
-      - private user source text
-      - unversioned production prompts
+  - name: ai-runtime
+    file: docs/agents/projects/ai-runtime.yaml
+    routes:
+      - services/ai-runtime/**
+      - packages/schemas/**
+      - prompts/**
 
-  - path: evals
-    owner: evals
-    role: Evaluation datasets, rubrics, fixtures, and reports.
-    status: planned
-    allowed_work:
-      - synthetic datasets
-      - rubrics
-      - smoke eval fixtures
-      - eval reports
-    out_of_scope:
-      - real private user content
+  - name: workers
+    file: docs/agents/projects/workers.yaml
+    routes:
+      - services/workers/**
 
-  - path: infra
-    owner: platform
-    role: Local Docker and observability configuration for the accepted v1 stack.
-    status: planned
-    allowed_work:
-      - Docker Compose
-      - PostgreSQL with pgvector
-      - Langfuse local setup
-      - Grafana, Prometheus, and OpenTelemetry local setup
-    out_of_scope:
-      - Kubernetes
-      - Terraform
-      - cloud deployment modules
+  - name: eval-runner
+    file: docs/agents/projects/eval-runner.yaml
+    routes:
+      - tools/eval-runner/**
+      - evals/**
 
-  - path: docs
-    owner: architecture
-    role: Architecture, ADRs, product notes, implementation plans, diagrams, and agent guidance.
-    status: active
-    allowed_work:
-      - ADRs
-      - implementation plans
-      - domain documentation
-      - diagrams
-      - agent manifests
-    out_of_scope:
-      - executable application code
+  - name: scripts-ci
+    file: docs/agents/projects/scripts-ci.yaml
+    routes:
+      - scripts/**
+      - .github/workflows/**
+      - infra/**
+      - docker/**
+      - config/**
+      - packages/config/**
+      - Makefile
+      - package.json
+      - pnpm-workspace.yaml
+      - tsconfig.base.json
+      - .gitignore
+      - "*.env.example"
+      - docs/agents/**
+      - docs/engineering/**
+      - docs/testing/**
+      - docs/ops/**
+      - docs/exec-plans/**
 
-  - path: scripts
-    owner: developer-experience
-    role: Automation for development, database, evals, and local infrastructure.
-    status: planned
-    allowed_work:
-      - local dev commands
-      - database helpers
-      - eval helpers
-      - infrastructure helpers
-    out_of_scope:
-      - replacing documented Make targets without updating governance
+adr_index:
+  - docs/adr/0001-use-monorepo.md
+  - docs/adr/0002-fastapi-owns-v1-product-and-ai-api.md
+  - docs/adr/0003-auth-and-account-are-v1-scope.md
+  - docs/adr/0004-use-openai-as-default-llm-provider.md
+  - docs/adr/0005-use-postgresql-pgvector-for-v1.md
+  - docs/adr/0006-defer-standalone-node-api-kubernetes-terraform.md
+  - docs/adr/0007-place-eval-runner-under-services.md
+  - docs/adr/0008-use-nextjs-for-v1-client-ui.md
