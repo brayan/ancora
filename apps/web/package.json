@@ -1,0 +1,30 @@
+{
+  "name": "@ancora/web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "pnpm --silent run lint:naming && eslint .",
+    "lint:naming": "node scripts/check-filename-case.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@ancora/config": "workspace:*",
+    "@ancora/shared-types": "workspace:*",
+    "@ancora/ui": "workspace:*",
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "24.0.0",
+    "@types/react": "19.2.6",
+    "@types/react-dom": "19.2.3",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "typescript": "6.0.3"
+  }
+}

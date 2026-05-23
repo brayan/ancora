@@ -10,7 +10,7 @@ Ancora combines a Next.js client, a FastAPI AI/product API, workers, prompt arti
 
 ## Decision
 
-Use a single monorepo for v1. The initial repo areas are `apps/web`, `services/ai-runtime`, `services/workers`, `services/eval-runner`, `packages`, `prompts`, `evals`, `infra`, `docs`, and `scripts`.
+Use a single monorepo for v1. The initial repo areas are `apps/web`, `services/ai-runtime`, `services/workers`, `tools/eval-runner`, `packages`, `prompts`, `evals`, `config`, `docker`, `infra`, `docs`, and `scripts`.
 
 ## Alternatives Considered
 
