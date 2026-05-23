@@ -9,7 +9,9 @@ read_first:
   - CONTEXT.md
   - docs/adr/0004-use-openai-as-default-llm-provider.md
   - docs/adr/0007-place-eval-runner-under-services.md
-role: Internal CLI and artifact boundary for retrieval, generation, grading, and agent workflow evals.
+  - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
+  - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
+role: TypeScript internal CLI and artifact boundary for retrieval, generation, grading, and agent workflow evals.
 allowed_work:
   - eval execution code
   - synthetic datasets and fixtures
@@ -27,6 +29,8 @@ privacy_rules:
   - Reports should use source IDs, chunk IDs, prompt versions, scores, and trace references rather than raw private text.
 validation:
   expected_commands:
-    - make eval-smoke
-    - make test
+    - pnpm eval:smoke
+    - pnpm eval:typecheck
+    - pnpm eval:test
+    - pnpm repo:test:task
   fallback: If commands do not exist, inspect available scripts and report the gap.

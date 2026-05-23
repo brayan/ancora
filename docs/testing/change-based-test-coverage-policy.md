@@ -17,7 +17,7 @@ test -f AGENTS.md
 test -f docs/agents/repo-manifest.yaml
 find docs/agents/projects -type f | sort
 find docs/adr -type f | sort
-rg -n "FastAPI|OpenAI|auth|account|pgvector|source material|defer" AGENTS.md CONTEXT.md docs
+rg -n "Next\\.js|TypeScript|OpenAI|auth|account|pgvector|source material|defer" AGENTS.md CONTEXT.md docs
 ```
 
 ## Web Changes
@@ -26,11 +26,11 @@ Prefer web-specific lint, type, and test commands once `apps/web` exists. The we
 
 ## AI Runtime Changes
 
-Prefer Python lint and tests for `services/ai-runtime`, schema validation, API contract checks, and narrow eval smoke checks when prompts, retrieval, generation, or grading behavior changes.
+Prefer `pnpm web:typecheck`, server-boundary tests, schema validation, API contract checks, and narrow eval smoke checks when prompts, retrieval, generation, or grading behavior changes.
 
 ## Worker Changes
 
-Validate worker job behavior, retry/error paths, account scoping, and logging privacy. Do not introduce Redis or queue infrastructure without an ADR.
+Validate job behavior, retry/error paths, account scoping, and logging privacy inside the TypeScript server boundary. Do not introduce Redis, queue infrastructure, or a separate worker runtime without an ADR.
 
 ## Eval Changes
 

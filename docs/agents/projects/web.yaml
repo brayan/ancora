@@ -8,29 +8,37 @@ related_paths:
 read_first:
   - CONTEXT.md
   - docs/adr/0001-use-monorepo.md
-  - docs/adr/0002-fastapi-owns-v1-product-and-ai-api.md
   - docs/adr/0003-auth-and-account-are-v1-scope.md
+  - docs/adr/0004-use-openai-as-default-llm-provider.md
+  - docs/adr/0005-use-postgresql-pgvector-for-v1.md
   - docs/adr/0008-use-nextjs-for-v1-client-ui.md
+  - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
+  - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
   - docs/frontend/nextjs-feature-first-convention.md
   - docs/frontend/nextjs-naming-convention.md
-role: Next.js client UI for accounts, sources, decks, reviews, quizzes, tutor workflows, and dashboards.
+role: Next.js/Node/TypeScript owner for the v1 client UI, product API, and AI runtime.
 allowed_work:
   - Next.js routes and UI
+  - thin app/api route handlers
+  - server-side product API orchestration under apps/web/server
+  - server-side AI runtime orchestration under apps/web/server
   - client-side product workflows
-  - typed API clients for FastAPI
+  - typed server contracts for account-aware product workflows
   - accessibility and responsive behavior
   - UI state for source, deck, card, review, quiz, and tutor workflows
   - Next.js feature-first and naming convention docs
 out_of_scope:
-  - owning v1 product API behavior
-  - direct database access
-  - direct OpenAI or embedding provider calls from the browser
-  - bypassing account-aware API boundaries
+  - direct database, pgvector, OpenAI, Langfuse secret, or provider calls from browser code
+  - separate backend microservices without an ADR
+  - Python runtime services or workers without an ADR
+  - bypassing account-aware server boundaries
 privacy_rules:
   - Do not place private source material in screenshots, fixtures, docs, analytics, or client logs.
   - Use source IDs, chunk IDs, deck IDs, card IDs, and trace references where full text is not required.
 validation:
   expected_commands:
-    - make lint
-    - make test
+    - pnpm web:lint
+    - pnpm web:typecheck
+    - pnpm web:test
+    - pnpm repo:test:fast
   fallback: If commands do not exist, inspect available scripts and report the gap.

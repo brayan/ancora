@@ -4,6 +4,6 @@ export const healthResponseSchema = {
   required: ["status", "service"],
   properties: {
     status: { const: "ok" },
-    service: { const: "ai-runtime" },
+    service: { const: "web-runtime" },
   },
 } as const;

@@ -1,6 +1,6 @@
 # Monorepo Conventions
 
-Ancora is a planned monorepo. The initial governance model defines boundaries before implementation code exists.
+Ancora is a TypeScript-first monorepo. The governance model defines boundaries before product behavior is implemented.
 
 ## Planned Boundaries
 
@@ -8,9 +8,6 @@ Ancora is a planned monorepo. The initial governance model defines boundaries be
 ancora/
   apps/
     web/
-  services/
-    ai-runtime/
-    workers/
   tools/
     eval-runner/
   packages/
@@ -32,11 +29,9 @@ ancora/
 
 ## Ownership
 
-`apps/web` is the Next.js client UI. It calls FastAPI and does not own product API behavior, database access, or provider calls.
+`apps/web` is the Next.js/Node/TypeScript owner for the v1 client UI, product API, and AI runtime. Server-side product and AI code belongs under `apps/web/server` with thin `app/api/**/route.ts` handlers.
 
-`services/ai-runtime` is the FastAPI boundary for the v1 product API and AI API. It owns account-aware product behavior, RAG, generation, grading, retrieval, provider calls, prompt execution, and trace metadata.
-
-`services/workers` is for Python background work after the synchronous core slice is proven. Redis and uploaded file ingestion remain deferred until an ADR changes that scope.
+Browser code must not access PostgreSQL, pgvector, OpenAI, Langfuse secrets, or private provider credentials directly. Those calls belong in the server boundary.
 
 `tools/eval-runner` is for offline and CI-oriented eval execution. It is an internal CLI and artifact boundary, not a deployable service.
 
@@ -53,7 +48,7 @@ ancora/
 ## Boundary Rules
 
 - Prefer small vertical slices that touch the minimum number of boundaries.
-- Keep shared packages thin. Do not hide business logic in shared utilities when it belongs to FastAPI or the web app.
+- Keep shared packages thin. Do not hide business logic in shared utilities when it belongs to the web server boundary.
 - Make contracts explicit through schemas and typed clients when app and service boundaries interact.
 - Keep account ownership visible in data models, API contracts, tests, and eval metadata.
 - Keep OpenAI provider calls behind service boundaries so later provider changes do not alter product concepts.
@@ -78,4 +73,4 @@ Until these commands exist, agents should inspect available scripts and report g
 
 ## Deferred Scope
 
-Do not add a standalone Node API, Kubernetes, Terraform, Redis, PyTorch, or uploaded file ingestion until the core vertical slice works and an ADR approves the change.
+Do not add separate NestJS or Express microservices, Python runtime services or workers, Kubernetes, Terraform, Redis, PyTorch, or uploaded file ingestion until the core vertical slice works and an ADR approves the change.

@@ -1,6 +1,6 @@
 # Ancora
 
-Ancora is an AI-native learning platform for turning private learning sources into grounded study material. The repo is intentionally scaffolded as a small Python/Next.js monorepo: product API behavior belongs in FastAPI, the browser UI belongs in Next.js, and eval execution belongs in an internal tool boundary.
+Ancora is an AI-native learning platform for turning private learning sources into grounded study material. The repo is intentionally scaffolded as a TypeScript-first monorepo: the browser UI, product API, and AI runtime belong in `apps/web`, and eval execution belongs in an internal TypeScript tool boundary.
 
 ## Start Here
 
@@ -13,8 +13,8 @@ Ancora is an AI-native learning platform for turning private learning sources in
 2. Inspect the current guard lanes:
 
    ```bash
-   scripts/ci/lanes/run-fast-blockers.sh --describe
-   scripts/ci/lanes/run-task-guards.sh --describe
+   pnpm repo:test:fast -- --describe
+   pnpm repo:test:task -- --describe
    ```
 
 3. Run the narrow scaffold checks:
@@ -34,10 +34,9 @@ Ancora is an AI-native learning platform for turning private learning sources in
 
 ## Repo Map
 
-- `apps/web`: Next.js TypeScript client UI.
-- `services/ai-runtime`: FastAPI v1 product API and AI API boundary.
-- `services/workers`: placeholder Python worker boundary for later async jobs.
-- `tools/eval-runner`: internal eval CLI boundary for synthetic smoke checks and future eval suites.
+- `apps/web`: Next.js/Node/TypeScript client UI, product API, and AI runtime boundary.
+- `apps/web/server`: server-side product and AI runtime code; route handlers should stay thin.
+- `tools/eval-runner`: internal TypeScript eval CLI boundary for synthetic smoke checks and future eval suites.
 - `packages`: shared UI, typed contracts, schemas, and config.
 - `prompts`: versioned prompt artifact area.
 - `evals`: synthetic datasets, rubrics, fixtures, and reports.

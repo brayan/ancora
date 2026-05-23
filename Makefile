@@ -1,4 +1,4 @@
-.PHONY: dev lint test eval-smoke db-migrate db-seed docker-up docker-down guards-fast guards-task guards-context guards-pr
+.PHONY: dev lint test eval-smoke db-migrate db-seed docker-up docker-down repo-test-fast repo-test-task repo-test-context repo-test-pr guards-fast guards-task guards-context guards-pr
 
 dev:
 	pnpm dev
@@ -25,13 +25,25 @@ docker-down:
 	pnpm docker:down
 
 guards-fast:
-	pnpm guards:fast
+	pnpm repo:test:fast
 
 guards-task:
-	pnpm guards:task
+	pnpm repo:test:task
 
 guards-context:
-	pnpm guards:context
+	pnpm repo:test:context
 
 guards-pr:
-	pnpm guards:pr
+	pnpm repo:test:pr
+
+repo-test-fast:
+	pnpm repo:test:fast
+
+repo-test-task:
+	pnpm repo:test:task
+
+repo-test-context:
+	pnpm repo:test:context
+
+repo-test-pr:
+	pnpm repo:test:pr

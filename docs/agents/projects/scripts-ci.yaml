@@ -27,6 +27,8 @@ read_first:
   - docs/ops/solo-dev-guardrails.md
   - docs/adr/0001-use-monorepo.md
   - docs/adr/0006-defer-standalone-node-api-kubernetes-terraform.md
+  - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
+  - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
 role: Developer-experience, local command, CI, local Docker, and governance metadata boundary.
 allowed_work:
   - Make command wrappers
@@ -36,6 +38,8 @@ allowed_work:
   - Docker Compose for accepted v1 local services
   - documentation and agent routing metadata
 out_of_scope:
+  - separate backend microservices without an ADR
+  - Python runtime services or workers without an ADR
   - Kubernetes
   - Terraform
   - real environment secrets
@@ -45,9 +49,9 @@ privacy_rules:
   - Commit `.env.example` only; never commit real `.env` files.
 validation:
   expected_commands:
-    - make lint
-    - make test
-    - make eval-smoke
-    - make docker-up
-    - make docker-down
+    - pnpm repo:test:fast
+    - pnpm repo:test:task
+    - pnpm repo:test:context
+    - pnpm eval:smoke
+    - pnpm docker:config
   fallback: If commands do not exist, inspect available scripts and report the gap.

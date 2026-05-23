@@ -37,7 +37,7 @@ Good scopes include a product area, module, package, or tool boundary:
 
 ```txt
 feat(web): Add source workspace shell
-fix(ai-runtime): Preserve health response schema
+fix(web-server): Preserve health response schema
 docs(frontend): Document Next.js naming rules
 chore(guards): Add task context lane
 ```

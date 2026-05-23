@@ -15,9 +15,7 @@ Do not read every shard by default. The manifest maps repo paths to one shard so
 
 ## Routing
 
-- `apps/web`, `packages/ui`, `packages/shared-types`, and `docs/frontend` work starts with `docs/agents/projects/web.yaml`.
-- `services/ai-runtime`, prompt, and schema work starts with `docs/agents/projects/ai-runtime.yaml`.
-- `services/workers` work starts with `docs/agents/projects/workers.yaml`.
+- `apps/web`, `apps/web/server`, prompt, schema, `packages/ui`, `packages/shared-types`, and `docs/frontend` work starts with `docs/agents/projects/web.yaml`.
 - `tools/eval-runner` and `evals` work starts with `docs/agents/projects/eval-runner.yaml`.
 - `scripts`, `.github`, `infra`, and governance-doc work starts with `docs/agents/projects/scripts-ci.yaml`.
 

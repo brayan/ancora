@@ -6,5 +6,5 @@ export type TraceReference = string & { readonly __brand: "TraceReference" };
 
 export type HealthResponse = Readonly<{
   status: "ok";
-  service: "ai-runtime";
+  service: "web-runtime";
 }>;

@@ -12,12 +12,14 @@ Ancora is an AI-native learning platform that turns private learning sources int
 
 ## Architecture Decisions
 
-- FastAPI owns the v1 product API and AI API in `services/ai-runtime`.
+- Next.js/Node/TypeScript owns the v1 product API and AI runtime in the `apps/web` server boundary.
 - Next.js is the v1 client UI in `apps/web`.
+- Vercel AI SDK, OpenAI SDK, Drizzle, Auth.js, Langfuse JS/TS, LangChain.js, and LangGraph.js are the planned TypeScript-first v1 integration stack.
 - OpenAI is the default v1 LLM and embedding provider.
 - PostgreSQL with pgvector is the v1 durable store and vector store.
 - Auth and account ownership are required v1 product scope.
-- Kubernetes, Terraform, a standalone Node API, Redis, PyTorch, and uploaded file ingestion are deferred until the core vertical slice works and an ADR changes the scope.
+- Python runtime services and workers are deferred optional research/tooling scope, not v1 runtime scope.
+- Kubernetes, Terraform, separate NestJS/Express microservices, Redis, PyTorch, and uploaded file ingestion are deferred until the core vertical slice works and an ADR changes the scope.
 
 ## Privacy Rules
 
@@ -53,6 +55,17 @@ The repo should converge on these commands as implementation starts:
 - `make test`
 - `make lint`
 - `make eval-smoke`
+- `pnpm web:lint`
+- `pnpm web:typecheck`
+- `pnpm web:test`
+- `pnpm eval:smoke`
+- `pnpm docker:config`
+- `pnpm docker:up`
+- `pnpm docker:down`
+- `pnpm repo:test:fast`
+- `pnpm repo:test:task`
+- `pnpm repo:test:context`
+- `pnpm repo:test:pr`
 - `make db-migrate`
 - `make db-seed`
 - `make docker-up`
