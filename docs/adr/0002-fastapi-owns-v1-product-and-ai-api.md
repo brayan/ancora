@@ -2,15 +2,19 @@
 
 ## Status
 
-Accepted
+Superseded by [0009: Next.js and TypeScript Own the v1 Product and AI Runtime](0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md) and [0010: Defer Python Runtime to Later Research and Tooling](0010-defer-python-runtime-to-later-research-and-tooling.md).
+
+## Supersession Note
+
+This ADR is retained as decision history only. It no longer defines v1 ownership. New product API, AI runtime, provider, RAG, LangChain.js, LangGraph.js, Langfuse, auth, and database work routes through the `apps/web` server boundary unless a later ADR changes that scope.
 
 ## Context
 
-Ancora's first vertical slice depends on RAG, embeddings, prompt execution, answer grading, LangGraph workflows, Langfuse tracing, and eval hooks. These workflows fit Python's AI ecosystem. The team also wants to defer a standalone Node API until product complexity justifies it.
+At the time of this decision, Ancora's first vertical slice depended on RAG, embeddings, prompt execution, answer grading, LangGraph workflows, Langfuse tracing, and eval hooks. The original plan favored Python's AI ecosystem and deferred a separate JavaScript API service until product complexity justified it.
 
 ## Decision
 
-`services/ai-runtime` will be a Python FastAPI service and will own both the v1 product API and AI API. `apps/web` will call FastAPI over HTTP. Next.js server functionality may support UI delivery, but it must not become a separate v1 product API owner.
+`services/ai-runtime` was originally planned as a Python FastAPI service that would own both the v1 product API and AI API. `apps/web` would have called FastAPI over HTTP. This decision has been superseded by ADR 0009.
 
 ## Alternatives Considered
 
@@ -23,4 +27,4 @@ Ancora's first vertical slice depends on RAG, embeddings, prompt execution, answ
 - Product and AI workflows can share Python models, retrieval code, tracing, and eval integrations.
 - The v1 backend boundary is simpler and easier to observe.
 - The web app must use typed API contracts rather than direct database or provider access.
-- A Node API remains a later option, but requires a new ADR.
+- The TypeScript-first v1 plan replaces this boundary; Python runtime work is deferred by ADR 0010.

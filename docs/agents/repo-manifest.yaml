@@ -1,6 +1,6 @@
-version: 0.2
+version: 0.3
 project: ancora
-status: initial-governance
+status: typescript-first-scaffold
 description: AI-native learning platform with grounded flashcards, adaptive quizzes, RAG tutoring, evals, and observability.
 
 startup:
@@ -24,14 +24,18 @@ canonical_docs:
 
 accepted_v1_stack:
   web: Next.js in apps/web
-  api: FastAPI in services/ai-runtime owns the v1 product API and AI API
+  product_and_ai_runtime: Next.js/Node/TypeScript in apps/web/server owns the v1 product API and AI runtime
+  ai_sdk: Vercel AI SDK with OpenAI SDK
+  persistence: Drizzle with PostgreSQL and pgvector
   llm_provider: OpenAI is the default v1 LLM and embedding provider
-  database: PostgreSQL with pgvector
-  auth: Auth and account ownership are required v1 product scope
+  auth: Auth.js with account ownership is required v1 product scope
+  observability: Langfuse JS/TS for LLM traces and eval metadata
+  workflows: LangChain.js and LangGraph.js for bounded AI workflows
   local_platform: Docker Compose
 
 deferred_until_adr:
-  - standalone Node API
+  - separate NestJS or Express microservices
+  - Python runtime services and workers
   - Kubernetes
   - Terraform
   - Redis
@@ -50,6 +54,17 @@ command_surface:
     - make db-seed
     - make docker-up
     - make docker-down
+    - pnpm web:lint
+    - pnpm web:typecheck
+    - pnpm web:test
+    - pnpm eval:smoke
+    - pnpm docker:config
+    - pnpm docker:up
+    - pnpm docker:down
+    - pnpm repo:test:fast
+    - pnpm repo:test:task
+    - pnpm repo:test:context
+    - pnpm repo:test:pr
   rule: Until commands exist, inspect available scripts and report missing commands rather than inventing behavior.
 
 project_shards:
@@ -59,19 +74,9 @@ project_shards:
       - apps/web/**
       - packages/ui/**
       - packages/shared-types/**
-      - docs/frontend/**
-
-  - name: ai-runtime
-    file: docs/agents/projects/ai-runtime.yaml
-    routes:
-      - services/ai-runtime/**
       - packages/schemas/**
       - prompts/**
-
-  - name: workers
-    file: docs/agents/projects/workers.yaml
-    routes:
-      - services/workers/**
+      - docs/frontend/**
 
   - name: eval-runner
     file: docs/agents/projects/eval-runner.yaml
@@ -109,3 +114,5 @@ adr_index:
   - docs/adr/0006-defer-standalone-node-api-kubernetes-terraform.md
   - docs/adr/0007-place-eval-runner-under-services.md
   - docs/adr/0008-use-nextjs-for-v1-client-ui.md
+  - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
+  - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md

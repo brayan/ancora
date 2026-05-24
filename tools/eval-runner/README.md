@@ -7,10 +7,9 @@ This module is Ancora's internal eval CLI and artifact boundary. It is not a dep
 Useful commands:
 
 ```bash
-cd tools/eval-runner
-uv run --project . --group dev ruff check .
-uv run --project . --group dev pytest
-uv run --project . ancora-eval-runner --smoke
+pnpm --filter @ancora/eval-runner typecheck
+pnpm --filter @ancora/eval-runner test
+pnpm --filter @ancora/eval-runner smoke
 ```
 
 The current smoke command returns a deterministic empty synthetic result. Future eval datasets, rubrics, fixtures, and reports belong under `evals`.

@@ -1,6 +1,10 @@
-import { localPorts } from "@ancora/config";
-
-export const aiRuntimeBaseUrl =
-  process.env.AI_RUNTIME_BASE_URL ??
-  process.env.NEXT_PUBLIC_AI_RUNTIME_BASE_URL ??
-  `http://localhost:${localPorts.aiRuntime}`;
+export const serverEnvironment = {
+  appEnv: process.env.APP_ENV ?? "local",
+  hasAuthSecret: Boolean(process.env.AUTH_SECRET),
+  hasOpenAiApiKey: Boolean(process.env.OPENAI_API_KEY),
+  hasLangfuseConfig: Boolean(
+    process.env.LANGFUSE_PUBLIC_KEY &&
+      process.env.LANGFUSE_SECRET_KEY &&
+      process.env.LANGFUSE_BASE_URL,
+  ),
+} as const;

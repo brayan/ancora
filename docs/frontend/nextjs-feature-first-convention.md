@@ -93,7 +93,7 @@ Do not create empty convention folders. Add `hooks/`, `mappers.ts`, `schemas.ts`
 - Shared service clients, environment access, request parsing, response helpers, telemetry setup, server caches, and auth/session helpers belong in top-level `server/**`.
 - Browser-safe display helpers may live in `lib/**`, but only when they do not import server infrastructure.
 - `app/api/**/route.ts` files should parse framework input, call feature or server functions, and shape the response. Do not hide product workflows in route handlers.
-- The web app must call `services/ai-runtime` over HTTP for product API behavior. It must not access PostgreSQL, pgvector, or OpenAI directly.
+- The web app owns v1 product API and AI runtime behavior in server-side TypeScript. Browser code must not access PostgreSQL, pgvector, OpenAI, Langfuse secrets, or private provider credentials directly.
 
 ## UI Product Stance
 

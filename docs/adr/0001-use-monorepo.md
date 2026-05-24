@@ -6,11 +6,11 @@ Accepted
 
 ## Context
 
-Ancora combines a Next.js client, a FastAPI AI/product API, workers, prompt artifacts, evals, observability configuration, and documentation. The project needs clear boundaries while keeping prompts, schemas, evals, and product code easy to evolve together.
+Ancora combines a Next.js/Node/TypeScript product and AI runtime, prompt artifacts, evals, observability configuration, and documentation. The project needs clear boundaries while keeping prompts, schemas, evals, and product code easy to evolve together.
 
 ## Decision
 
-Use a single monorepo for v1. The initial repo areas are `apps/web`, `services/ai-runtime`, `services/workers`, `tools/eval-runner`, `packages`, `prompts`, `evals`, `config`, `docker`, `infra`, `docs`, and `scripts`.
+Use a single monorepo for v1. The initial repo areas are `apps/web`, `tools/eval-runner`, `packages`, `prompts`, `evals`, `config`, `docker`, `infra`, `docs`, and `scripts`.
 
 ## Alternatives Considered
 
