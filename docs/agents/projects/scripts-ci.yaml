@@ -5,9 +5,13 @@ primary_paths:
   - .github/workflows
   - infra
   - docs/agents
+  - docs/product
+  - docs/architecture
   - docs/engineering
   - docs/testing
+  - docs/evals
   - docs/ops
+  - docs/roadmap
   - docs/exec-plans
 related_paths:
   - Makefile
@@ -22,14 +26,16 @@ related_paths:
 read_first:
   - CONTEXT.md
   - docs/engineering/documentation-governance.md
+  - docs/architecture/system-overview.md
   - docs/engineering/monorepo-conventions.md
   - docs/testing/change-based-test-coverage-policy.md
+  - docs/testing/testing-strategy.md
   - docs/ops/solo-dev-guardrails.md
   - docs/adr/0001-use-monorepo.md
   - docs/adr/0006-defer-standalone-node-api-kubernetes-terraform.md
   - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
   - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
-role: Developer-experience, local command, CI, local Docker, and governance metadata boundary.
+role: Developer-experience, local command, CI, local Docker, documentation, and governance metadata boundary.
 allowed_work:
   - Make command wrappers
   - local development scripts
@@ -37,6 +43,7 @@ allowed_work:
   - GitHub Actions workflow definitions
   - Docker Compose for accepted v1 local services
   - documentation and agent routing metadata
+  - portfolio evidence docs for product, architecture, testing, evals, operations, and roadmap
 out_of_scope:
   - separate backend microservices without an ADR
   - Python runtime services or workers without an ADR

@@ -1,6 +1,15 @@
 # Ancora
 
-Ancora is an AI-native learning platform for turning private learning sources into grounded study material. The repo is intentionally scaffolded as a TypeScript-first monorepo: the browser UI, product API, and AI runtime belong in `apps/web`, and eval execution belongs in an internal TypeScript tool boundary.
+Ancora is a full-stack TypeScript AI product portfolio project for turning private learning sources into grounded study material. The repo is designed to show both implementation and engineering judgment: product problem, architecture decisions, privacy posture, tradeoffs, tests, evals, monitoring, deployment assumptions, cost model, and roadmap.
+
+## Current Status
+
+| Status | Scope |
+|---|---|
+| Implemented | TypeScript-first monorepo scaffold, ADRs, repo governance, command surface, local Docker Compose foundation, and portfolio evidence docs. |
+| In progress | Next.js app boundary, shared packages, TypeScript eval runner boundary, prompts/evals artifacts, and operational documentation. |
+| Planned | Auth.js account ownership, pasted source ingestion, PostgreSQL/pgvector retrieval, grounded tutor answers, flashcard generation, review flows, Langfuse traces, and deterministic eval smoke checks. |
+| Deferred | Uploaded file ingestion, separate backend services, Python runtime services, Redis, Kubernetes, Terraform, PyTorch, dedicated vector DBs, and enterprise scope. |
 
 ## Start Here
 
@@ -32,6 +41,20 @@ Ancora is an AI-native learning platform for turning private learning sources in
    make dev
    ```
 
+## Portfolio Evidence
+
+- [Business problem](docs/product/business-problem.md): learner pain, target user, promise, non-goals, and success criteria.
+- [System overview](docs/architecture/system-overview.md): TypeScript-first architecture, boundaries, data flow, and privacy model.
+- [Architecture diagrams](docs/architecture/diagrams.md): current/planned system, RAG, eval, and observability flows.
+- [Engineering tradeoffs](docs/engineering/tradeoffs.md): runtime, RAG, workflow, storage, auth, and local platform decisions.
+- [Testing strategy](docs/testing/testing-strategy.md): unit, integration, API/server, UI, Playwright, account isolation, privacy, and failure-path expectations.
+- [Eval strategy](docs/evals/eval-strategy.md): deterministic smoke evals, report-only quality evals, citation checks, RAG comparisons, grading, and artifact sanitation.
+- [Failure cases](docs/ops/failure-cases.md): retrieval, citation, prompt injection, provider, auth, account, model output, cost, and trace privacy risks.
+- [Monitoring](docs/ops/monitoring.md): planned Langfuse, OpenTelemetry, Grafana/Prometheus, product metrics, latency, cost, and privacy boundaries.
+- [Deployment](docs/ops/deployment.md): planned topology, environment variables, migrations, secrets, rollback, and deferred hardening.
+- [Cost model](docs/ops/cost-model.md): estimation framework for ingestion, tutor questions, flashcards, study sessions, and demo/monthly usage.
+- [Next improvements](docs/roadmap/next-improvements.md): planned slices, explicit deferred work, and docs that future features should update.
+
 ## Repo Map
 
 - `apps/web`: Next.js/Node/TypeScript client UI, product API, and AI runtime boundary.
@@ -42,9 +65,12 @@ Ancora is an AI-native learning platform for turning private learning sources in
 - `evals`: synthetic datasets, rubrics, fixtures, and reports.
 - `docker`: local Docker Compose foundation.
 - `scripts/ci/lanes`: canonical validation entry points.
+- `docs`: canonical product, architecture, engineering, testing, eval, operations, roadmap, and agent guidance.
 
 ## Conventions
 
+- Architecture decisions: `docs/adr/`.
+- Documentation governance: `docs/engineering/documentation-governance.md`.
 - Git and PR titles: `docs/engineering/git-conventions.md`.
 - Next.js structure: `docs/frontend/nextjs-feature-first-convention.md`.
 - Next.js naming: `docs/frontend/nextjs-naming-convention.md`.

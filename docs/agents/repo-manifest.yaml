@@ -11,14 +11,25 @@ startup:
   rule: Read the root guidance, domain context, this manifest, relevant ADRs, and only the shard for the touched boundary.
 
 canonical_docs:
+  business_problem: docs/product/business-problem.md
+  system_overview: docs/architecture/system-overview.md
+  architecture_diagrams: docs/architecture/diagrams.md
   architecture_decisions: docs/adr
+  engineering_tradeoffs: docs/engineering/tradeoffs.md
   documentation_governance: docs/engineering/documentation-governance.md
   git_conventions: docs/engineering/git-conventions.md
   monorepo_conventions: docs/engineering/monorepo-conventions.md
   nextjs_feature_first_convention: docs/frontend/nextjs-feature-first-convention.md
   nextjs_naming_convention: docs/frontend/nextjs-naming-convention.md
   test_impact_policy: docs/testing/change-based-test-coverage-policy.md
+  testing_strategy: docs/testing/testing-strategy.md
+  eval_strategy: docs/evals/eval-strategy.md
+  failure_cases: docs/ops/failure-cases.md
+  monitoring: docs/ops/monitoring.md
+  deployment: docs/ops/deployment.md
+  cost_model: docs/ops/cost-model.md
   solo_dev_guardrails: docs/ops/solo-dev-guardrails.md
+  next_improvements: docs/roadmap/next-improvements.md
   execution_plans: docs/exec-plans/README.md
   implementation_plan: docs/implementation/ancora-project-plan-v0.2.md
 
@@ -100,9 +111,13 @@ project_shards:
       - .gitignore
       - "*.env.example"
       - docs/agents/**
+      - docs/product/**
+      - docs/architecture/**
       - docs/engineering/**
       - docs/testing/**
+      - docs/evals/**
       - docs/ops/**
+      - docs/roadmap/**
       - docs/exec-plans/**
 
 adr_index:

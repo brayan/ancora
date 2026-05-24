@@ -14,7 +14,7 @@ Ancora uses compact root guidance with canonical long-form docs under `docs/`.
 
 `docs/adr/*.md` owns decisions that change architecture, ownership, storage, provider, auth/account scope, privacy posture, deployment scope, or deferred platform scope.
 
-Long-form operational guidance belongs in `docs/engineering`, `docs/frontend`, `docs/testing`, `docs/ops`, and `docs/exec-plans`.
+Long-form product, architecture, engineering, frontend, testing, eval, operations, roadmap, and execution guidance belongs in `docs/product`, `docs/architecture`, `docs/engineering`, `docs/frontend`, `docs/testing`, `docs/evals`, `docs/ops`, `docs/roadmap`, and `docs/exec-plans`.
 
 ## Update Rules
 
