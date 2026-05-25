@@ -4,6 +4,8 @@
     "target": "ES2022",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "allowJs": false,
+    "declaration": false,
+    "declarationMap": false,
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",

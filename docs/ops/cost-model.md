@@ -4,7 +4,7 @@
 
 | Status | Scope |
 |---|---|
-| Implemented | Cost is identified as an operational concern in the portfolio evidence layer. |
+| Implemented | Cost is identified as an operational concern, and the auth/database foundation defines the first baseline hosting assumptions. |
 | In progress | Initial estimation framework for common workflows. |
 | Planned | Token measurement, provider pricing assumptions, budget guardrails, eval cost reports, and dashboard metrics. |
 | Deferred | Billing, paid plans, enterprise quotas, provider arbitrage, and automated model routing. |
@@ -30,6 +30,15 @@ estimated_cost =
 ```
 
 Reports should include the model names, pricing date, token counts, retry counts, and assumptions.
+
+## Baseline Hosting Assumptions
+
+The implemented auth/database foundation adds non-LLM baseline costs before AI workflows exist:
+
+- A PostgreSQL database with pgvector is required for accounts, users, source/chunk foundations, and trace references.
+- Auth.js credentials auth itself does not add provider cost, but production needs secret management and database-backed user/account records.
+- Source text and chunk storage costs depend on future ingestion limits; no real or private source data is committed for demos or tests.
+- Vector index tuning and storage growth remain planned because retrieval behavior is not implemented yet.
 
 ## Workflow Cost Drivers
 

@@ -43,6 +43,13 @@ body {
   max-width: 1120px;
 }
 
+.headerActions {
+  align-items: end;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .eyebrow {
   color: var(--teal);
   font-size: 0.78rem;
@@ -88,6 +95,131 @@ h1 {
   background: #eaf7f4;
   border-color: #b7dcd3;
   color: var(--teal);
+}
+
+.statusBadge[data-tone="warning"] {
+  background: #fff6e7;
+  border-color: #eccb9d;
+  color: var(--amber);
+}
+
+.authLinks,
+.authStatus {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.authStatus {
+  justify-content: flex-end;
+}
+
+.authStatus div {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.authStatus span {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.authStatus small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.buttonLink {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  text-decoration: none;
+}
+
+.buttonLink:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.buttonLink.primary {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #ffffff;
+}
+
+.buttonLink.secondary {
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.authPage {
+  align-items: center;
+  display: grid;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.authPanel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin: 0 auto;
+  max-width: 460px;
+  padding: 28px;
+  width: 100%;
+}
+
+.authForm {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.authForm label {
+  color: var(--ink);
+  display: grid;
+  font-size: 0.9rem;
+  font-weight: 700;
+  gap: 6px;
+}
+
+.authForm input {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  font: inherit;
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.formError {
+  background: #fff1ef;
+  border: 1px solid #efc1ba;
+  border-radius: 6px;
+  color: var(--coral);
+  font-size: 0.88rem;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.authSwitch {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 18px 0 0;
+}
+
+.authSwitch a {
+  color: var(--teal);
+  font-weight: 700;
 }
 
 .workspaceGrid {
@@ -141,6 +273,19 @@ h1 {
   .workspaceHeader {
     align-items: start;
     flex-direction: column;
+  }
+
+  .headerActions {
+    align-items: start;
+  }
+
+  .authStatus {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .authStatus div {
+    text-align: left;
   }
 
   .workspaceGrid {

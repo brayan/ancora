@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1779633497855,
+      "tag": "0000_account-auth-foundation",
+      "breakpoints": true
+    }
+  ]
+}
