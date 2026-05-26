@@ -24,7 +24,13 @@ export const databaseCredentialsUserStore: CredentialsUserStore = {
         activeAccountId: accountMemberships.accountId,
       })
       .from(users)
-      .leftJoin(accountMemberships, eq(accountMemberships.userId, users.id))
+      .innerJoin(
+        accountMemberships,
+        and(
+          eq(accountMemberships.userId, users.id),
+          eq(accountMemberships.accountId, users.activeAccountId),
+        ),
+      )
       .where(eq(users.email, email))
       .limit(1);
 
@@ -43,6 +49,7 @@ export const databaseCredentialsUserStore: CredentialsUserStore = {
         const [user] = await tx
           .insert(users)
           .values({
+            activeAccountId: createdAccount.id,
             email: input.email,
             name: input.name,
             passwordHash: input.passwordHash,

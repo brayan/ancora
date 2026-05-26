@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -32,12 +33,16 @@ export const users = pgTable(
     id: text("id").primaryKey().$defaultFn(createDatabaseId),
     name: text("name"),
     email: text("email").notNull(),
+    activeAccountId: text("active_account_id").references(() => accounts.id, {
+      onDelete: "set null",
+    }),
     emailVerified: timestamp("email_verified", { withTimezone: true }),
     image: text("image"),
     passwordHash: text("password_hash"),
     ...timestamps(),
   },
   (table) => [
+    index("users_active_account_id_idx").on(table.activeAccountId),
     uniqueIndex("users_email_unique").on(table.email),
   ],
 );
@@ -147,6 +152,7 @@ export const sources = pgTable(
   },
   (table) => [
     index("sources_account_id_idx").on(table.accountId),
+    uniqueIndex("sources_account_id_id_unique").on(table.accountId, table.id),
     uniqueIndex("sources_account_content_sha256_unique").on(table.accountId, table.contentSha256),
   ],
 );
@@ -158,9 +164,7 @@ export const sourceChunks = pgTable(
     accountId: text("account_id")
       .notNull()
       .references(() => accounts.id, { onDelete: "cascade" }),
-    sourceId: text("source_id")
-      .notNull()
-      .references(() => sources.id, { onDelete: "cascade" }),
+    sourceId: text("source_id").notNull(),
     chunkIndex: integer("chunk_index").notNull(),
     content: text("content").notNull(),
     contentSha256: text("content_sha256").notNull(),
@@ -170,8 +174,14 @@ export const sourceChunks = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
+    foreignKey({
+      name: "source_chunks_account_source_fk",
+      columns: [table.accountId, table.sourceId],
+      foreignColumns: [sources.accountId, sources.id],
+    }).onDelete("cascade"),
     index("source_chunks_account_id_idx").on(table.accountId),
     index("source_chunks_source_id_idx").on(table.sourceId),
+    uniqueIndex("source_chunks_account_id_id_unique").on(table.accountId, table.id),
     uniqueIndex("source_chunks_account_source_index_unique").on(
       table.accountId,
       table.sourceId,
