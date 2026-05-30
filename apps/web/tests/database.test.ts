@@ -1,6 +1,17 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { test } from "node:test";
+
+async function readMigrationSql() {
+  const migrationDirectory = new URL("../drizzle/", import.meta.url);
+  const migrationFiles = await readdir(migrationDirectory);
+  const sqlFiles = migrationFiles.filter((file) => file.endsWith(".sql")).sort();
+  const migrations = await Promise.all(
+    sqlFiles.map((file) => readFile(new URL(file, migrationDirectory), "utf8")),
+  );
+
+  return migrations.join("\n");
+}
 
 test("should include auth account and source foundations in the initial migration", async () => {
   const migration = await readFile(
@@ -19,14 +30,7 @@ test("should include auth account and source foundations in the initial migratio
 });
 
 test("should enforce deterministic account ownership in migrations", async () => {
-  const migrations = await Promise.all([
-    readFile(new URL("../drizzle/0000_account-auth-foundation.sql", import.meta.url), "utf8"),
-    readFile(
-      new URL("../drizzle/0001_enforce-account-consistency.sql", import.meta.url),
-      "utf8",
-    ).catch(() => ""),
-  ]);
-  const migrationSql = migrations.join("\n");
+  const migrationSql = await readMigrationSql();
 
   assert.match(migrationSql, /"active_account_id" text/);
   assert.match(migrationSql, /SET "active_account_id" = "membership"."account_id"/);
@@ -34,4 +38,12 @@ test("should enforce deterministic account ownership in migrations", async () =>
   assert.match(migrationSql, /"sources_account_id_id_unique"/);
   assert.match(migrationSql, /"source_chunks_account_source_fk"/);
   assert.match(migrationSql, /FOREIGN KEY \("account_id","source_id"\)/);
+  assert.match(
+    migrationSql,
+    /"llm_trace_refs_account_source_fk" FOREIGN KEY \("account_id","source_id"\) REFERENCES "public"."sources"\("account_id","id"\)/,
+  );
+  assert.match(
+    migrationSql,
+    /"llm_trace_refs_account_source_chunk_fk" FOREIGN KEY \("account_id","source_chunk_id"\) REFERENCES "public"."source_chunks"\("account_id","id"\)/,
+  );
 });

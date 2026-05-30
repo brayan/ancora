@@ -212,6 +212,17 @@ export const llmTraceRefs = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
+    // Column-level refs keep nullable lineage on deletion; these composite refs enforce account scope.
+    foreignKey({
+      name: "llm_trace_refs_account_source_fk",
+      columns: [table.accountId, table.sourceId],
+      foreignColumns: [sources.accountId, sources.id],
+    }),
+    foreignKey({
+      name: "llm_trace_refs_account_source_chunk_fk",
+      columns: [table.accountId, table.sourceChunkId],
+      foreignColumns: [sourceChunks.accountId, sourceChunks.id],
+    }),
     index("llm_trace_refs_account_id_idx").on(table.accountId),
     uniqueIndex("llm_trace_refs_account_trace_ref_unique").on(table.accountId, table.traceRef),
   ],

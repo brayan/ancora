@@ -15,6 +15,13 @@
       "when": 1779763485903,
       "tag": "0001_enforce-account-consistency",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780102398070,
+      "tag": "0002_account-scoped-trace-refs",
+      "breakpoints": true
     }
   ]
 }
