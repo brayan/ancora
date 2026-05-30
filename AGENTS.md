@@ -2,6 +2,10 @@
 
 Ancora is an AI-native learning platform that turns private learning sources into grounded study material. Treat this file as the root operating contract for coding agents.
 
+Use the shared [`engineering-playbook`](https://github.com/brayan/engineering-playbook) as the source of truth for general Sailtech agent workflow and engineering standards. Ancora's `AGENTS.md`, `CONTEXT.md`, `docs/agents/repo-manifest.yaml`, project shards, ADRs, privacy rules, commands, and product docs are local overlays; when they are stricter or more specific, follow the Ancora rules.
+
+The shared baseline is [`docs/agents/shared-agent-workflow.md`](https://github.com/brayan/engineering-playbook/blob/main/docs/agents/shared-agent-workflow.md). A sibling `../engineering-playbook` checkout may be used as an optional offline mirror for reading shared standards, but Ancora validation must not depend on internet access or that checkout.
+
 ## Startup Flow
 
 1. Inspect `git status --short` before editing and preserve unrelated user work.

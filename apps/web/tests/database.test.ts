@@ -36,6 +36,10 @@ test("should enforce deterministic account ownership in migrations", async () =>
   assert.match(migrationSql, /SET "active_account_id" = "membership"."account_id"/);
   assert.match(migrationSql, /"users_active_account_id_idx"/);
   assert.match(migrationSql, /"sources_account_id_id_unique"/);
+  assert.match(
+    migrationSql,
+    /"sources_account_created_by_membership_fk" FOREIGN KEY \("account_id","created_by_user_id"\) REFERENCES "public"."account_memberships"\("account_id","user_id"\)/,
+  );
   assert.match(migrationSql, /"source_chunks_account_source_fk"/);
   assert.match(migrationSql, /FOREIGN KEY \("account_id","source_id"\)/);
   assert.match(

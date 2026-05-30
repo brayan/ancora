@@ -151,6 +151,11 @@ export const sources = pgTable(
     ...timestamps(),
   },
   (table) => [
+    foreignKey({
+      name: "sources_account_created_by_membership_fk",
+      columns: [table.accountId, table.createdByUserId],
+      foreignColumns: [accountMemberships.accountId, accountMemberships.userId],
+    }),
     index("sources_account_id_idx").on(table.accountId),
     uniqueIndex("sources_account_id_id_unique").on(table.accountId, table.id),
     uniqueIndex("sources_account_content_sha256_unique").on(table.accountId, table.contentSha256),

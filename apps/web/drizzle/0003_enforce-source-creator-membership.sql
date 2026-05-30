@@ -1,0 +1,1 @@
+ALTER TABLE "sources" ADD CONSTRAINT "sources_account_created_by_membership_fk" FOREIGN KEY ("account_id","created_by_user_id") REFERENCES "public"."account_memberships"("account_id","user_id") ON DELETE no action ON UPDATE no action;
