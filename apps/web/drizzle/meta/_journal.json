@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1779633497855,
+      "tag": "0000_account-auth-foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779763485903,
+      "tag": "0001_enforce-account-consistency",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780102398070,
+      "tag": "0002_account-scoped-trace-refs",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780104144179,
+      "tag": "0003_enforce-source-creator-membership",
+      "breakpoints": true
+    }
+  ]
+}
