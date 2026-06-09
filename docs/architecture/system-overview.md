@@ -4,9 +4,9 @@
 
 | Status | Scope |
 |---|---|
-| Implemented | TypeScript-first monorepo scaffold, ADRs, command surface, docs governance, and project routing metadata. |
-| In progress | Public architecture narrative and evidence docs. |
-| Planned | Account-aware Next.js product APIs, AI runtime orchestration, Drizzle models, pgvector retrieval, Auth.js, OpenAI calls, eval hooks, and Langfuse trace references. |
+| Implemented | TypeScript-first monorepo scaffold, ADRs, command surface, docs governance, project routing metadata, Auth.js credentials auth, account ownership, and Drizzle migrations for the base data model. |
+| In progress | Next.js product boundary, account-scoped server helpers, and public architecture evidence docs. |
+| Planned | Pasted source ingestion, pgvector retrieval behavior, AI runtime orchestration, OpenAI calls, eval hooks, and Langfuse trace references. |
 | Deferred | Separate backend microservices, Python runtime services, Redis queues, Kubernetes, Terraform, PyTorch, and uploaded file ingestion. |
 
 ## Runtime Ownership
@@ -36,8 +36,11 @@ This decision also keeps shared schemas, prompt artifacts, evals, and trace refe
 
 | Boundary | Status | Responsibility |
 |---|---|---|
-| `apps/web` | In progress | Next.js UI, product API, and server-side AI runtime. |
-| `apps/web/server` | Planned | Account-aware product logic, retrieval, prompt execution, provider calls, trace references, and workflow orchestration. |
+| `apps/web` | In progress | Next.js UI, product API, auth, and server-side AI runtime boundary. |
+| `apps/web/server/auth` | Implemented | Auth.js route integration, local credentials registration/login, password hashing, and session callbacks. |
+| `apps/web/server/accounts` | Implemented | Current account scope helpers and fail-closed account authorization helpers. |
+| `apps/web/server/db` | Implemented | Drizzle schema for accounts, users, Auth.js tables, sources, source chunks, and LLM trace references. |
+| `apps/web/server` | In progress | Account-aware product logic now exists; retrieval, prompt execution, provider calls, trace references, and workflow orchestration remain planned. |
 | `tools/eval-runner` | In progress | Internal TypeScript CLI for synthetic smoke evals and future report-only quality evals. |
 | `packages/ui` | In progress | Shared React UI building blocks without product data access. |
 | `packages/shared-types` | In progress | Shared TypeScript contracts. |
@@ -47,7 +50,19 @@ This decision also keeps shared schemas, prompt artifacts, evals, and trace refe
 | `docker` | In progress | Local PostgreSQL/pgvector foundation through Docker Compose. |
 | `infra/observability` | In progress | Observability configuration placeholders, not production infrastructure. |
 
-## Planned Data Flow
+## Implemented Account and Data Foundation
+
+The current implementation establishes the v1 privacy boundary before RAG or generation workflows:
+
+- Auth.js is mounted at `app/api/auth/[...nextauth]/route.ts`.
+- Local registration creates a `users` row, an `accounts` row, an `account_memberships` owner row, and a credentials provider row.
+- Credentials passwords are hashed with Node `scrypt`; raw passwords are not stored or logged.
+- Credentials sessions use JWT because Auth.js credentials providers do not persist sessions through the adapter.
+- Auth.js provider/session tables are still migrated for future provider-backed flows.
+- Drizzle migrations create `sources`, `source_chunks`, and `llm_trace_refs` with account IDs as required ownership columns.
+- `source_chunks.embedding` is a nullable `vector(1536)` column; retrieval behavior and vector indexes remain planned.
+
+## Planned Product Data Flow
 
 1. A signed-in user works inside an account boundary.
 2. The user creates a source from pasted text.

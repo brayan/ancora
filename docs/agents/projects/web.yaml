@@ -1,5 +1,5 @@
 name: web
-status: planned
+status: in-progress
 primary_paths:
   - apps/web
 related_paths:
@@ -21,6 +21,8 @@ allowed_work:
   - Next.js routes and UI
   - thin app/api route handlers
   - server-side product API orchestration under apps/web/server
+  - Auth.js integration under apps/web/server/auth
+  - Drizzle schema and account-scoped data access under apps/web/server/db
   - server-side AI runtime orchestration under apps/web/server
   - client-side product workflows
   - typed server contracts for account-aware product workflows
@@ -40,5 +42,6 @@ validation:
     - pnpm web:lint
     - pnpm web:typecheck
     - pnpm web:test
+    - pnpm --filter @ancora/web exec drizzle-kit check --config drizzle.config.ts
     - pnpm repo:test:fast
   fallback: If commands do not exist, inspect available scripts and report the gap.

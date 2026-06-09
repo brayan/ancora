@@ -1,9 +1,17 @@
 import { StatusBadge } from "@ancora/ui";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { LaneCard } from "@/components/ui/LaneCard";
+import { AuthStatus } from "@/features/auth/components/AuthStatus";
 import { homeLanes } from "@/features/home/constants";
 
-export function HomeShell() {
+type HomeShellProps = Readonly<{
+  user: {
+    email: string | null | undefined;
+    accountId: string;
+  } | null;
+}>;
+
+export function HomeShell({ user }: HomeShellProps) {
   return (
     <main className="page">
       <header className="workspaceHeader">
@@ -14,9 +22,12 @@ export function HomeShell() {
             Private learning sources, traceable cards, account-aware reviews, and synthetic evals share one product boundary.
           </p>
         </div>
-        <StatusBadge className="statusBadge" tone="ready">
-          Scaffold
-        </StatusBadge>
+        <div className="headerActions">
+          <StatusBadge className="statusBadge" tone={user ? "ready" : "warning"}>
+            {user ? "Authenticated" : "Signed out"}
+          </StatusBadge>
+          <AuthStatus user={user} />
+        </div>
       </header>
 
       <SiteShell>

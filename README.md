@@ -6,9 +6,9 @@ Ancora is a full-stack TypeScript AI product portfolio project for turning priva
 
 | Status | Scope |
 |---|---|
-| Implemented | TypeScript-first monorepo scaffold, ADRs, repo governance, command surface, local Docker Compose foundation, and portfolio evidence docs. |
+| Implemented | TypeScript-first monorepo scaffold, ADRs, repo governance, command surface, local Docker Compose foundation, portfolio evidence docs, Auth.js credentials auth, account ownership, and Drizzle/PostgreSQL schema migrations. |
 | In progress | Next.js app boundary, shared packages, TypeScript eval runner boundary, prompts/evals artifacts, and operational documentation. |
-| Planned | Auth.js account ownership, pasted source ingestion, PostgreSQL/pgvector retrieval, grounded tutor answers, flashcard generation, review flows, Langfuse traces, and deterministic eval smoke checks. |
+| Planned | Pasted source ingestion, PostgreSQL/pgvector retrieval behavior, grounded tutor answers, flashcard generation, review flows, Langfuse traces, and deterministic eval smoke checks. |
 | Deferred | Uploaded file ingestion, separate backend services, Python runtime services, Redis, Kubernetes, Terraform, PyTorch, dedicated vector DBs, and enterprise scope. |
 
 ## Start Here
@@ -38,6 +38,7 @@ Ancora is a full-stack TypeScript AI product portfolio project for turning priva
 
    ```bash
    make docker-up
+   make db-migrate
    make dev
    ```
 
@@ -57,8 +58,9 @@ Ancora is a full-stack TypeScript AI product portfolio project for turning priva
 
 ## Repo Map
 
-- `apps/web`: Next.js/Node/TypeScript client UI, product API, and AI runtime boundary.
-- `apps/web/server`: server-side product and AI runtime code; route handlers should stay thin.
+- `apps/web`: Next.js/Node/TypeScript client UI, product API, auth, and AI runtime boundary.
+- `apps/web/server`: server-side product, auth/account, database, and AI runtime code; route handlers should stay thin.
+- `apps/web/drizzle`: Drizzle migrations for Auth.js, account ownership, source/chunk foundations, and trace references.
 - `tools/eval-runner`: internal TypeScript eval CLI boundary for synthetic smoke checks and future eval suites.
 - `packages`: shared UI, typed contracts, schemas, and config.
 - `prompts`: versioned prompt artifact area.

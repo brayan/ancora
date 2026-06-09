@@ -1,0 +1,2 @@
+ALTER TABLE "llm_trace_refs" ADD CONSTRAINT "llm_trace_refs_account_source_fk" FOREIGN KEY ("account_id","source_id") REFERENCES "public"."sources"("account_id","id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "llm_trace_refs" ADD CONSTRAINT "llm_trace_refs_account_source_chunk_fk" FOREIGN KEY ("account_id","source_chunk_id") REFERENCES "public"."source_chunks"("account_id","id") ON DELETE no action ON UPDATE no action;

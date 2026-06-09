@@ -4,8 +4,8 @@
 
 | Status | Scope |
 |---|---|
-| Implemented | Product language, privacy principles, ADRs, repo boundaries, and TypeScript-first scaffold are documented. |
-| In progress | Portfolio evidence docs define the public product narrative before deeper implementation continues. |
+| Implemented | Product language, privacy principles, ADRs, repo boundaries, TypeScript-first scaffold, auth/account foundation, and database ownership model are documented. |
+| In progress | Portfolio evidence docs define the public product narrative as implementation continues. |
 | Planned | Account-aware source creation, grounded flashcards, adaptive quizzes, tutor workflows, evals, and observability. |
 | Deferred | Uploaded file ingestion, mobile apps, institutional administration, marketplace content, and production-scale learning analytics. |
 
@@ -42,7 +42,7 @@ Ancora turns account-owned learning sources into grounded study material. Each g
 
 | Status | Criteria |
 |---|---|
-| Implemented | The repo states the product thesis, canonical terms, accepted v1 stack, privacy constraints, and deferred platform scope. |
+| Implemented | The repo states the product thesis, canonical terms, accepted v1 stack, privacy constraints, deferred platform scope, and implemented account ownership foundation. |
 | In progress | Documentation links the business problem to architecture, testing, evals, operations, cost, and roadmap expectations. |
 | Planned | A learner can create account-scoped sources, generate grounded cards, ask cited tutor questions, review study material, and inspect trace/eval references. |
 | Planned | Tests and evals cover grounding, citations, account isolation, failure paths, and privacy-sensitive artifacts. |

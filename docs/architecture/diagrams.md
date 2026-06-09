@@ -17,10 +17,10 @@ These diagrams are portfolio evidence, not implementation claims. Labels show wh
 flowchart LR
   User["User<br/>Planned"]
   Browser["Next.js browser UI<br/>In progress"]
-  Routes["app/api route handlers<br/>Planned"]
-  Server["apps/web/server product and AI runtime<br/>Planned"]
-  Auth["Auth.js account boundary<br/>Planned"]
-  DB["PostgreSQL plus pgvector<br/>Planned"]
+  Routes["app/api auth route handlers<br/>Implemented"]
+  Server["apps/web/server product and AI runtime<br/>In progress"]
+  Auth["Auth.js credentials and account boundary<br/>Implemented"]
+  DB["Drizzle PostgreSQL plus pgvector schema<br/>Implemented"]
   OpenAI["OpenAI LLM and embeddings<br/>Planned"]
   Prompts["Versioned prompts<br/>In progress"]
   Evals["TypeScript eval runner<br/>In progress"]
@@ -38,6 +38,29 @@ flowchart LR
   Server --> Langfuse
   Docs -.-> Browser
   Docs -.-> Server
+```
+
+## Implemented Auth and Account Data Foundation
+
+```mermaid
+flowchart LR
+  SignUp["Local sign-up form<br/>Implemented"]
+  AuthRoute["Auth.js routes and register API<br/>Implemented"]
+  UserRow["users<br/>Implemented"]
+  AccountRow["accounts<br/>Implemented"]
+  Membership["account_memberships<br/>Implemented"]
+  AuthTables["auth_provider_accounts and auth_sessions<br/>Implemented"]
+  Scope["fail-closed account helpers<br/>Implemented"]
+  SourceTables["sources, source_chunks, llm_trace_refs<br/>Implemented foundation"]
+
+  SignUp --> AuthRoute
+  AuthRoute --> UserRow
+  AuthRoute --> AccountRow
+  UserRow --> Membership
+  AccountRow --> Membership
+  UserRow --> AuthTables
+  Membership --> Scope
+  Scope --> SourceTables
 ```
 
 ## Planned RAG Flow

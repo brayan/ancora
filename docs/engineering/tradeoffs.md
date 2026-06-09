@@ -5,7 +5,7 @@
 | Status | Scope |
 |---|---|
 | Implemented | ADRs define monorepo, TypeScript-first runtime ownership, OpenAI default provider, Auth/account scope, PostgreSQL/pgvector, and deferred platforms. |
-| In progress | Scaffold and docs keep tradeoffs visible before feature work deepens. |
+| In progress | Scaffold, Auth.js/Drizzle foundation, and docs keep tradeoffs visible before feature work deepens. |
 | Planned | Revisit tradeoffs with tests, evals, cost reports, operational incidents, and user feedback. |
 | Deferred | Provider abstraction, separate runtimes, queue infrastructure, dedicated vector DBs, and production platform automation. |
 
@@ -58,8 +58,8 @@ Auth.js fits the Next.js-first runtime and makes account ownership part of the p
 
 | Choice | Benefit | Risk to Manage |
 |---|---|---|
-| Auth.js | Integrates with the Next.js app boundary and supports v1 account ownership. | Tests must prove account isolation and callback/session behavior. |
-| Drizzle | Keeps SQL shape visible and type-checked. | Migrations and schema changes need disciplined review. |
+| Auth.js | Implemented local credentials auth inside the Next.js server boundary and supports v1 account ownership. | Credentials sessions use JWT by Auth.js design; tests and review must keep callback/session behavior fail-closed. |
+| Drizzle | Implemented visible SQL migrations for accounts, Auth.js tables, sources, chunks, and trace references. | Migrations and schema changes need disciplined review, especially account IDs, vector columns, and source text storage. |
 
 ## Local-First Docker Compose
 
