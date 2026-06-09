@@ -4,7 +4,7 @@
 
 | Status | Scope |
 |---|---|
-| Implemented | Privacy rules, deferred infrastructure constraints, credentials auth negative tests, account-scope fail-closed helpers, and migration foundations are documented. |
+| Implemented | Privacy rules, deferred infrastructure constraints, credentials auth negative tests, account-scope fail-closed helpers, source validation/account-scope tests, and migration foundations are documented. |
 | In progress | Failure catalog defines what later product slices need to handle and test. |
 | Planned | Product error states, retries, eval coverage, privacy-safe tracing, and operational dashboards. |
 | Deferred | Multi-region failover, production incident automation, and enterprise compliance workflows. |
@@ -18,8 +18,9 @@
 | Prompt injection in source text | Planned | Treat source chunks as untrusted input and prevent them from overriding system or developer instructions. |
 | Provider outage | Planned | Return a clear product error, preserve user work, and record privacy-safe failure metadata. |
 | Rate limits | Planned | Use bounded retries, user-visible backoff, and cost/rate telemetry without logging source text. |
+| Pasted source validation | Implemented | Reject empty, over-limit, and malformed pasted text before storage. |
 | Auth leakage | In progress | Implemented session-scope parsing fails closed when user or account context is missing; route-level product enforcement remains planned for each workflow. |
-| Cross-account access | In progress | Implemented account-scoped helper rejects mismatched records; source, chunk, deck, card, review, eval, and trace repository tests remain planned as workflows are added. |
+| Cross-account access | In progress | Implemented account-scoped helper rejects mismatched records and source service tests return no data for another account; chunk, deck, card, review, eval, and trace repository tests remain planned as workflows are added. |
 | Malformed model output | Planned | Validate structured output with schemas and retry or fail safely when parsing fails. |
 | Cost spikes | Planned | Track estimated token/cost per workflow, enforce budget guardrails, and report abnormal increases. |
 | Trace privacy failure | Planned | Redact or omit raw source material from traces; store trace references in product data. |

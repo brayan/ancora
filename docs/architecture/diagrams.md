@@ -63,15 +63,15 @@ flowchart LR
   Scope --> SourceTables
 ```
 
-## Planned RAG Flow
+## RAG Flow
 
 ```mermaid
 flowchart TD
-  Source["Pasted source text<br/>Planned"]
-  Guard["Account and privacy checks<br/>Planned"]
-  Chunk["Chunk source with metadata<br/>Planned"]
+  Source["Pasted source text<br/>Implemented"]
+  Guard["Account and privacy checks<br/>Implemented for source ingestion"]
+  Chunk["Initial pasted source chunk<br/>Implemented"]
   Embed["Generate embeddings<br/>Planned"]
-  Store["Store chunks and vectors<br/>Planned"]
+  Store["Store chunks and vectors<br/>Initial storage implemented, vectors planned"]
   Query["Tutor or generation query<br/>Planned"]
   Retrieve["Retrieve account-scoped chunks<br/>Planned"]
   BuildPrompt["Build prompt with chunk IDs<br/>Planned"]

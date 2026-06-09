@@ -4,9 +4,9 @@
 
 | Status | Scope |
 |---|---|
-| Implemented | TypeScript-first scaffold, governance, ADRs, command surface, portfolio evidence baseline, Auth.js credentials auth, account ownership, and Drizzle data foundation. |
+| Implemented | TypeScript-first scaffold, governance, ADRs, command surface, portfolio evidence baseline, Auth.js credentials auth, account ownership, Drizzle data foundation, and pasted text source creation/listing. |
 | In progress | First product and eval boundaries are being prepared for vertical slices. |
-| Planned | Source ingestion, chunking, embeddings, grounded tutor, flashcards, review loops, evals, tracing, monitoring, and deployment readiness. |
+| Planned | Source chunking, embeddings, grounded tutor, flashcards, review loops, evals, tracing, monitoring, and deployment readiness. |
 | Deferred | Uploaded file ingestion, separate services, Python runtime, Kubernetes, Terraform, Redis, PyTorch, mobile apps, and enterprise controls. |
 
 ## Near-Term Product Slices
@@ -14,7 +14,7 @@
 | Priority | Status | Improvement | Evidence to Update |
 |---|---|---|---|
 | 1 | Implemented | Auth.js session and account ownership baseline. | Architecture, testing, failure cases, deployment. |
-| 2 | Planned | Pasted text source creation with account-scoped storage. | Business problem, testing, monitoring, cost model. |
+| 2 | Implemented | Pasted text source creation with account-scoped storage. | Architecture, testing, failure cases. |
 | 3 | Planned | Source chunking and PostgreSQL/pgvector embeddings. | Architecture diagrams, eval strategy, tradeoffs, cost model. |
 | 4 | Planned | Grounded tutor question flow with citations. | Evals, failure cases, monitoring, README status. |
 | 5 | Planned | Flashcard generation with card versions and citations. | Testing, eval strategy, cost model, product narrative. |

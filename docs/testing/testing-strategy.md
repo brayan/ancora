@@ -4,9 +4,9 @@
 
 | Status | Scope |
 |---|---|
-| Implemented | Change-based test policy, command surface, repository guard scripts, focused credentials auth tests, account-scope helper tests, and migration shape checks. |
+| Implemented | Change-based test policy, command surface, repository guard scripts, focused credentials auth tests, account-scope helper tests, migration shape checks, and pasted source validation/account-scope service tests. |
 | In progress | Portfolio baseline and account-aware server tests are expanding as product behavior deepens. |
-| Planned | Source ingestion, RAG, API/server, UI, Playwright, privacy artifact, eval, and AI failure-path tests. |
+| Planned | RAG, route-handler contract, broader UI, Playwright, privacy artifact, eval, and AI failure-path tests. |
 | Deferred | Large-scale load testing, multi-tenant enterprise test matrices, and production chaos testing. |
 
 ## Principles
@@ -21,9 +21,9 @@
 
 | Layer | Status | Expected Coverage |
 |---|---|---|
-| Unit tests | In progress | Implemented credentials registration/login, duplicate email, invalid credentials, session scope parsing, and account isolation helpers. Planned coverage includes chunking, citation parsing, prompt metadata, cost calculations, and schema validation. |
+| Unit tests | In progress | Implemented credentials registration/login, duplicate email, invalid credentials, session scope parsing, account isolation helpers, and pasted source validation. Planned coverage includes chunking, citation parsing, prompt metadata, cost calculations, and broader schema validation. |
 | Integration tests | Planned | Drizzle repositories, pgvector retrieval, account-scoped joins, prompt assembly, and trace reference persistence against PostgreSQL. |
-| API/server tests | In progress | Auth service behavior is covered through focused server tests; route-handler contract tests remain planned. |
+| API/server tests | In progress | Auth service behavior and source service account filtering are covered through focused server tests; route-handler contract tests remain planned. |
 | UI tests | Planned | Source, deck, card, review, quiz, tutor, empty, loading, and error states. |
 | Playwright tests | Planned | Critical browser workflows with synthetic content and no private screenshots. |
 | Eval smoke tests | In progress | Internal TypeScript eval runner boundary and future deterministic smoke suites. |
@@ -46,6 +46,8 @@ Current focused coverage:
 - Duplicate emails are rejected after normalization.
 - Missing account scope throws a 401-style authorization error.
 - Cross-account records throw a 403-style authorization error.
+- Pasted source validation rejects empty, over-limit, and malformed text before storage.
+- Source list/read service behavior returns no data for another account.
 - The initial Drizzle migration includes Auth.js, account, source, chunk, trace-reference, and pgvector foundations.
 
 ## Privacy Tests

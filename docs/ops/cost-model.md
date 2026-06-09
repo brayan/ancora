@@ -37,14 +37,14 @@ The implemented auth/database foundation adds non-LLM baseline costs before AI w
 
 - A PostgreSQL database with pgvector is required for accounts, users, source/chunk foundations, and trace references.
 - Auth.js credentials auth itself does not add provider cost, but production needs secret management and database-backed user/account records.
-- Source text and chunk storage costs depend on future ingestion limits; no real or private source data is committed for demos or tests.
+- Source text and chunk storage costs depend on source size limits and future chunking/embedding behavior; no real or private source data is committed for demos or tests.
 - Vector index tuning and storage growth remain planned because retrieval behavior is not implemented yet.
 
 ## Workflow Cost Drivers
 
 | Workflow | Status | Primary Cost Drivers | Guardrails |
 |---|---|---|---|
-| Source ingestion | Planned | Source length, chunk count, embedding model, duplicate detection. | Source size limits, chunk caps, deduplication, and batch controls. |
+| Source ingestion | In progress | Source length and duplicate detection are bounded for pasted text; chunk count and embedding model costs remain planned. | Implemented pasted-text size limits and account-level duplicate detection; future chunk caps and batch controls remain planned. |
 | Tutor question | Planned | Retrieved chunk count, prompt length, model, answer length, retries. | Top-k limits, answer length caps, insufficient-evidence fallback. |
 | Flashcard generation | Planned | Number of cards, retrieved context, structured output retries. | Card count limits, schema validation, review-needed state. |
 | Study session | Planned | Number of explanations, grading calls, hints, and adaptive prompts. | Per-session budget, cached card content, bounded hints. |
