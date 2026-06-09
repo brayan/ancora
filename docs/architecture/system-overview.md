@@ -4,9 +4,9 @@
 
 | Status | Scope |
 |---|---|
-| Implemented | TypeScript-first monorepo scaffold, ADRs, command surface, docs governance, project routing metadata, Auth.js credentials auth, account ownership, and Drizzle migrations for the base data model. |
+| Implemented | TypeScript-first monorepo scaffold, ADRs, command surface, docs governance, project routing metadata, Auth.js credentials auth, account ownership, Drizzle migrations for the base data model, and pasted source creation/listing. |
 | In progress | Next.js product boundary, account-scoped server helpers, and public architecture evidence docs. |
-| Planned | Pasted source ingestion, pgvector retrieval behavior, AI runtime orchestration, OpenAI calls, eval hooks, and Langfuse trace references. |
+| Planned | Source chunking beyond the initial pasted text record, pgvector retrieval behavior, AI runtime orchestration, OpenAI calls, eval hooks, and Langfuse trace references. |
 | Deferred | Separate backend microservices, Python runtime services, Redis queues, Kubernetes, Terraform, PyTorch, and uploaded file ingestion. |
 
 ## Runtime Ownership
@@ -39,6 +39,7 @@ This decision also keeps shared schemas, prompt artifacts, evals, and trace refe
 | `apps/web` | In progress | Next.js UI, product API, auth, and server-side AI runtime boundary. |
 | `apps/web/server/auth` | Implemented | Auth.js route integration, local credentials registration/login, password hashing, and session callbacks. |
 | `apps/web/server/accounts` | Implemented | Current account scope helpers and fail-closed account authorization helpers. |
+| `apps/web/server/sources` | Implemented | Pasted text source validation, account-scoped create/list/read service behavior, and Drizzle-backed source persistence. |
 | `apps/web/server/db` | Implemented | Drizzle schema for accounts, users, Auth.js tables, sources, source chunks, and LLM trace references. |
 | `apps/web/server` | In progress | Account-aware product logic now exists; retrieval, prompt execution, provider calls, trace references, and workflow orchestration remain planned. |
 | `tools/eval-runner` | In progress | Internal TypeScript CLI for synthetic smoke evals and future report-only quality evals. |
@@ -61,8 +62,9 @@ The current implementation establishes the v1 privacy boundary before RAG or gen
 - Auth.js provider/session tables are still migrated for future provider-backed flows.
 - Drizzle migrations create `sources`, `source_chunks`, and `llm_trace_refs` with account IDs as required ownership columns.
 - `source_chunks.embedding` is a nullable `vector(1536)` column; retrieval behavior and vector indexes remain planned.
+- Pasted source creation validates empty, over-limit, and malformed text server-side before storing source metadata and the bounded pasted body under the current account.
 
-## Planned Product Data Flow
+## Product Data Flow
 
 1. A signed-in user works inside an account boundary.
 2. The user creates a source from pasted text.

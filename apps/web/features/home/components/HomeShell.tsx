@@ -3,15 +3,18 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { LaneCard } from "@/components/ui/LaneCard";
 import { AuthStatus } from "@/features/auth/components/AuthStatus";
 import { homeLanes } from "@/features/home/constants";
+import { SourcesWorkspace } from "@/features/sources/components/SourcesWorkspace";
+import type { SourceSummary } from "@ancora/shared-types";
 
 type HomeShellProps = Readonly<{
   user: {
     email: string | null | undefined;
     accountId: string;
   } | null;
+  initialSources: readonly SourceSummary[];
 }>;
 
-export function HomeShell({ user }: HomeShellProps) {
+export function HomeShell({ user, initialSources }: HomeShellProps) {
   return (
     <main className="page">
       <header className="workspaceHeader">
@@ -29,6 +32,8 @@ export function HomeShell({ user }: HomeShellProps) {
           <AuthStatus user={user} />
         </div>
       </header>
+
+      <SourcesWorkspace initialSources={initialSources} isAuthenticated={Boolean(user)} />
 
       <SiteShell>
         {homeLanes.map((lane) => (

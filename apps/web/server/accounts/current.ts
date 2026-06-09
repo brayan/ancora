@@ -9,7 +9,13 @@ import {
 import { userBelongsToAccount } from "@/server/auth/repository";
 
 export async function getCurrentAccountScope(): Promise<AccountScope | null> {
-  const scope = getAccountScopeFromSession(await auth());
+  return getAccountScopeFromSessionValue(await auth());
+}
+
+export async function getAccountScopeFromSessionValue(
+  session: unknown,
+): Promise<AccountScope | null> {
+  const scope = getAccountScopeFromSession(session);
 
   if (!scope) {
     return null;
