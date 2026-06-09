@@ -187,6 +187,11 @@ export const sourceChunks = pgTable(
     index("source_chunks_account_id_idx").on(table.accountId),
     index("source_chunks_source_id_idx").on(table.sourceId),
     uniqueIndex("source_chunks_account_id_id_unique").on(table.accountId, table.id),
+    uniqueIndex("source_chunks_account_source_id_id_unique").on(
+      table.accountId,
+      table.sourceId,
+      table.id,
+    ),
     uniqueIndex("source_chunks_account_source_index_unique").on(
       table.accountId,
       table.sourceId,
@@ -227,6 +232,11 @@ export const llmTraceRefs = pgTable(
       name: "llm_trace_refs_account_source_chunk_fk",
       columns: [table.accountId, table.sourceChunkId],
       foreignColumns: [sourceChunks.accountId, sourceChunks.id],
+    }),
+    foreignKey({
+      name: "llm_trace_refs_account_source_chunk_source_fk",
+      columns: [table.accountId, table.sourceId, table.sourceChunkId],
+      foreignColumns: [sourceChunks.accountId, sourceChunks.sourceId, sourceChunks.id],
     }),
     index("llm_trace_refs_account_id_idx").on(table.accountId),
     uniqueIndex("llm_trace_refs_account_trace_ref_unique").on(table.accountId, table.traceRef),

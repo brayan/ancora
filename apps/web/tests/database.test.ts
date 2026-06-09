@@ -50,4 +50,19 @@ test("should enforce deterministic account ownership in migrations", async () =>
     migrationSql,
     /"llm_trace_refs_account_source_chunk_fk" FOREIGN KEY \("account_id","source_chunk_id"\) REFERENCES "public"."source_chunks"\("account_id","id"\)/,
   );
+  assert.match(migrationSql, /"source_chunks_account_source_id_id_unique"/);
+  assert.match(
+    migrationSql,
+    /"llm_trace_refs_account_source_chunk_source_fk" FOREIGN KEY \("account_id","source_id","source_chunk_id"\) REFERENCES "public"."source_chunks"\("account_id","source_id","id"\)/,
+  );
+
+  const traceLineageIndexPosition = migrationSql.indexOf(
+    'CREATE UNIQUE INDEX "source_chunks_account_source_id_id_unique"',
+  );
+  const traceLineageForeignKeyPosition = migrationSql.indexOf(
+    'ALTER TABLE "llm_trace_refs" ADD CONSTRAINT "llm_trace_refs_account_source_chunk_source_fk"',
+  );
+
+  assert.ok(traceLineageIndexPosition >= 0);
+  assert.ok(traceLineageForeignKeyPosition > traceLineageIndexPosition);
 });
