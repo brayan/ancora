@@ -32,3 +32,10 @@ htmlcov/
 # Generated reports
 evals/reports/*
 !evals/reports/.gitkeep
+
+# Synthetic browser artifacts
+playwright-report/
+test-results/
+
+# Generated Next.js environment declarations
+apps/web/next-env.d.ts

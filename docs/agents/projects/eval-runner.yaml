@@ -9,9 +9,8 @@ read_first:
   - CONTEXT.md
   - docs/adr/0004-use-openai-as-default-llm-provider.md
   - docs/adr/0007-place-eval-runner-under-services.md
-  - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
-  - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
-role: TypeScript internal CLI and artifact boundary for retrieval, generation, grading, and agent workflow evals.
+  - docs/adr/0011-focus-on-local-programming-practice.md
+role: TypeScript internal CLI and artifact boundary for synthetic programming-practice evals; the current CLI is an empty scaffold.
 allowed_work:
   - eval execution code
   - synthetic datasets and fixtures
@@ -26,7 +25,7 @@ out_of_scope:
   - unversioned prompt changes
 privacy_rules:
   - Eval datasets must be synthetic or explicitly approved sample material.
-  - Reports should use source IDs, chunk IDs, prompt versions, scores, and trace references rather than raw private text.
+  - Reports should use challenge/revision IDs, prompt versions, scores, and trace references rather than raw private text.
 validation:
   expected_commands:
     - pnpm eval:smoke

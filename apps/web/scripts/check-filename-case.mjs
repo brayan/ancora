@@ -1,4 +1,4 @@
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -66,6 +66,7 @@ function validateFile(filePath) {
 
 const failures = roleRoots
   .map((root) => path.join(appRoot, root))
+  .filter(existsSync)
   .flatMap(collectFiles)
   .filter(shouldCheckFile)
   .map(validateFile)

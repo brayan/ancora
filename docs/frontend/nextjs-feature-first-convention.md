@@ -1,5 +1,7 @@
 # Next.js Feature-First Convention
 
+Current product scope is programming practice under ADR 0011; older feature names below illustrate structure only.
+
 Ancora Next.js work follows a feature-first App Router structure adapted from Sailtech's Console Web conventions. The goal is to keep framework contracts visible, product behavior owned by feature modules, and server-only infrastructure out of client-safe utilities.
 
 Use this with `docs/frontend/nextjs-naming-convention.md`.
@@ -93,7 +95,7 @@ Do not create empty convention folders. Add `hooks/`, `mappers.ts`, `schemas.ts`
 - Shared service clients, environment access, request parsing, response helpers, telemetry setup, server caches, and auth/session helpers belong in top-level `server/**`.
 - Browser-safe display helpers may live in `lib/**`, but only when they do not import server infrastructure.
 - `app/api/**/route.ts` files should parse framework input, call feature or server functions, and shape the response. Do not hide product workflows in route handlers.
-- The web app owns v1 product API and AI runtime behavior in server-side TypeScript. Browser code must not access PostgreSQL, pgvector, OpenAI, Langfuse secrets, or private provider credentials directly.
+- The web app owns product APIs and durable orchestration; the bounded FastAPI/Pydantic AI service owns programming generation under ADR 0011. Browser code must not access PostgreSQL, pgvector, OpenAI, Langfuse secrets, or private provider credentials directly.
 
 ## UI Product Stance
 

@@ -1,81 +1,38 @@
 # Ancora
 
-Ancora is a full-stack TypeScript AI product portfolio project for turning private learning sources into grounded study material. The repo is designed to show both implementation and engineering judgment: product problem, architecture decisions, privacy posture, tradeoffs, tests, evals, monitoring, deployment assumptions, cost model, and roadmap.
+Local Python programming practice. Next.js App Router, React and TypeScript provide the workspace; a separate static origin runs Pyodide in disposable browser workers. FastAPI/Pydantic AI challenge generation is the next service slice.
 
-## Current Status
+## Current slice
 
-| Status | Scope |
-|---|---|
-| Implemented | TypeScript-first monorepo scaffold, ADRs, repo governance, command surface, local Docker Compose foundation, portfolio evidence docs, Auth.js credentials auth, account ownership, and Drizzle/PostgreSQL schema migrations. |
-| In progress | Next.js app boundary, shared packages, TypeScript eval runner boundary, prompts/evals artifacts, and operational documentation. |
-| Planned | Pasted source ingestion, PostgreSQL/pgvector retrieval behavior, grounded tutor answers, flashcard generation, review flows, Langfuse traces, and deterministic eval smoke checks. |
-| Deferred | Uploaded file ingestion, separate backend services, Python runtime services, Redis, Kubernetes, Terraform, PyTorch, dedicated vector DBs, and enterprise scope. |
+One fixed synthetic exercise proves the execution boundary. Run examples, check behavior and list-comprehension technique separately, Stop runaway code, and start another fresh runtime. No login, accounts, source ingestion, decks/cards, database access or live LLM calls. Drafts are not saved in this spike.
 
-## Start Here
+## Local startup
 
-1. Install workspace dependencies:
+Requirements: Node 22+, pnpm 10+, installed Google Chrome for browser checks.
 
-   ```bash
-   pnpm install
-   ```
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
 
-2. Inspect the current guard lanes:
+Open http://127.0.0.1:3000/practice. The runner is http://127.0.0.1:3001. Use the exact loopback hostname; origins are intentionally distinct and restricted. `pnpm web:dev` and `pnpm runner:dev` can start each separately. No .env file, provider key or Docker database is needed for the spike.
 
-   ```bash
-   pnpm repo:test:fast -- --describe
-   pnpm repo:test:task -- --describe
-   ```
+```sh
+pnpm web:lint
+pnpm web:typecheck
+pnpm web:test
+pnpm web:test:browser
+pnpm repo:test:pr
+```
 
-3. Run the narrow scaffold checks:
+PostgreSQL/Drizzle remain selected for later persistence. Historical SQL/snapshots and existing data are retained unchanged. Migration generation/application and seeding are intentionally paused; no database reset is part of this work. Docker helpers remain available for the later persistence slice.
 
-   ```bash
-   pnpm lint
-   pnpm test
-   docker compose -f docker/docker-compose.yml config
-   ```
+## Review and next work
 
-4. Start local services as needed:
+- [Current architecture decision](docs/adr/0011-focus-on-local-programming-practice.md)
+- [Product specification](docs/product/programming-practice.md)
+- [Execution plan](docs/exec-plans/programming-practice.md)
+- [Runner spike and limitations](docs/architecture/runner-spike.md)
+- [Testing strategy](docs/testing/testing-strategy.md)
 
-   ```bash
-   make docker-up
-   make db-migrate
-   make dev
-   ```
-
-## Portfolio Evidence
-
-- [Business problem](docs/product/business-problem.md): learner pain, target user, promise, non-goals, and success criteria.
-- [System overview](docs/architecture/system-overview.md): TypeScript-first architecture, boundaries, data flow, and privacy model.
-- [Architecture diagrams](docs/architecture/diagrams.md): current/planned system, RAG, eval, and observability flows.
-- [Engineering tradeoffs](docs/engineering/tradeoffs.md): runtime, RAG, workflow, storage, auth, and local platform decisions.
-- [Testing strategy](docs/testing/testing-strategy.md): unit, integration, API/server, UI, Playwright, account isolation, privacy, and failure-path expectations.
-- [Eval strategy](docs/evals/eval-strategy.md): deterministic smoke evals, report-only quality evals, citation checks, RAG comparisons, grading, and artifact sanitation.
-- [Failure cases](docs/ops/failure-cases.md): retrieval, citation, prompt injection, provider, auth, account, model output, cost, and trace privacy risks.
-- [Monitoring](docs/ops/monitoring.md): planned Langfuse, OpenTelemetry, Grafana/Prometheus, product metrics, latency, cost, and privacy boundaries.
-- [Deployment](docs/ops/deployment.md): planned topology, environment variables, migrations, secrets, rollback, and deferred hardening.
-- [Cost model](docs/ops/cost-model.md): estimation framework for ingestion, tutor questions, flashcards, study sessions, and demo/monthly usage.
-- [Next improvements](docs/roadmap/next-improvements.md): planned slices, explicit deferred work, and docs that future features should update.
-
-## Repo Map
-
-- `apps/web`: Next.js/Node/TypeScript client UI, product API, auth, and AI runtime boundary.
-- `apps/web/server`: server-side product, auth/account, database, and AI runtime code; route handlers should stay thin.
-- `apps/web/drizzle`: Drizzle migrations for Auth.js, account ownership, source/chunk foundations, and trace references.
-- `tools/eval-runner`: internal TypeScript eval CLI boundary for synthetic smoke checks and future eval suites.
-- `packages`: shared UI, typed contracts, schemas, and config.
-- `prompts`: versioned prompt artifact area.
-- `evals`: synthetic datasets, rubrics, fixtures, and reports.
-- `docker`: local Docker Compose foundation.
-- `scripts/ci/lanes`: canonical validation entry points.
-- `docs`: canonical product, architecture, engineering, testing, eval, operations, roadmap, and agent guidance.
-
-## Conventions
-
-- Architecture decisions: `docs/adr/`.
-- Documentation governance: `docs/engineering/documentation-governance.md`.
-- Git and PR titles: `docs/engineering/git-conventions.md`.
-- Next.js structure: `docs/frontend/nextjs-feature-first-convention.md`.
-- Next.js naming: `docs/frontend/nextjs-naming-convention.md`.
-- Monorepo boundaries: `docs/engineering/monorepo-conventions.md`.
-
-Private source material must stay out of fixtures, eval data, screenshots, logs, docs, and commits. Use IDs and trace references when full source text is not required.
+The runner has no privileged bridge, provider credentials or product actions. Its results are untrusted self-study evidence; reference/test agreement is only internal consistency. Hard browser-process memory quotas and hostile-code attestation are unavailable. See the spike report before extending execution.

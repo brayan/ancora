@@ -1,5 +1,7 @@
 # Eval Strategy
 
+Current scope is local programming practice under [ADR 0011](../adr/0011-focus-on-local-programming-practice.md). Older account/source/RAG guidance below is historical until replaced by the persistence/generation slices. The current eval CLI is an empty synthetic scaffold, not runner evidence.
+
 ## Status Summary
 
 | Status | Scope |

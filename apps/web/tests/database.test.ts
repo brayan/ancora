@@ -13,7 +13,7 @@ async function readMigrationSql() {
   return migrations.join("\n");
 }
 
-test("should include auth account and source foundations in the initial migration", async () => {
+test("should preserve historical table definitions when the legacy runtime is retired", async () => {
   const migration = await readFile(
     new URL("../drizzle/0000_account-auth-foundation.sql", import.meta.url),
     "utf8",
@@ -29,7 +29,7 @@ test("should include auth account and source foundations in the initial migratio
   assert.match(migration, /CREATE TABLE "llm_trace_refs"/);
 });
 
-test("should enforce deterministic account ownership in migrations", async () => {
+test("should preserve historical ownership constraints when existing databases are retained", async () => {
   const migrationSql = await readMigrationSql();
 
   assert.match(migrationSql, /"active_account_id" text/);

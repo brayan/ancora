@@ -1,87 +1,20 @@
 # Testing Strategy
 
-## Status Summary
+Use narrow checks and synthetic code. The current implementation retires auth/sources/cards and proves the browser execution boundary; persistence and model generation remain later slices.
 
-| Status | Scope |
+| Command | Evidence |
 |---|---|
-| Implemented | Change-based test policy, command surface, repository guard scripts, focused credentials auth tests, account-scope helper tests, migration shape checks, and pasted source validation/account-scope service tests. |
-| In progress | Portfolio baseline and account-aware server tests are expanding as product behavior deepens. |
-| Planned | RAG, route-handler contract, broader UI, Playwright, privacy artifact, eval, and AI failure-path tests. |
-| Deferred | Large-scale load testing, multi-tenant enterprise test matrices, and production chaos testing. |
+| pnpm web:lint | Naming conventions and ESLint for app/static delivery. |
+| pnpm web:typecheck | TypeScript contracts and UI/browser tests. |
+| pnpm web:test | Runner protocol limits/bindings and preserved historical migration checks. |
+| pnpm web:test:browser | Installed Google Chrome: real Pyodide execution, UI states, Stop/timeout/output/reset, mutation/technique, stale messages, network canary, static server and retired-route checks. |
+| pnpm packages:typecheck | Shared packages. |
+| pnpm repo:test:context | Governance presence/language only. |
+| pnpm repo:test:task | Existing static/unit/eval scaffold completion lane. |
+| pnpm repo:test:pr | Context + task lanes; run browser suite separately for this change. |
 
-## Principles
+The browser config starts distinct loopback application and runner origins, without reusing existing servers. Install dependencies with `pnpm install --frozen-lockfile`; Google Chrome must be installed. Chrome screenshots in ignored test-results contain only the fixed synthetic exercise. Traces/videos are off so future private code is not captured by default.
 
-- Run the narrowest meaningful validation for the changed boundary.
-- Treat auth and account ownership as product behavior, not a later security layer.
-- Use synthetic or explicitly approved sample material only.
-- Keep private source material out of fixtures, screenshots, logs, eval reports, and committed artifacts.
-- Test grounding and failure behavior, not only happy-path generation.
+No live LLM calls or real database are used. Historical SQL checks protect retained migration invariants; they do not claim the retired product remains active. No Vitest or Python-service test commands exist. Ruff, strict Pyright, pytest and canonical cross-language contract generation belong to the later service slice. The TypeScript eval CLI still returns an empty scaffold result, not challenge quality evidence.
 
-## Test Layers
-
-| Layer | Status | Expected Coverage |
-|---|---|---|
-| Unit tests | In progress | Implemented credentials registration/login, duplicate email, invalid credentials, session scope parsing, account isolation helpers, and pasted source validation. Planned coverage includes chunking, citation parsing, prompt metadata, cost calculations, and broader schema validation. |
-| Integration tests | Planned | Drizzle repositories, pgvector retrieval, account-scoped joins, prompt assembly, and trace reference persistence against PostgreSQL. |
-| API/server tests | In progress | Auth service behavior and source service account filtering are covered through focused server tests; route-handler contract tests remain planned. |
-| UI tests | Planned | Source, deck, card, review, quiz, tutor, empty, loading, and error states. |
-| Playwright tests | Planned | Critical browser workflows with synthetic content and no private screenshots. |
-| Eval smoke tests | In progress | Internal TypeScript eval runner boundary and future deterministic smoke suites. |
-| Docs checks | Implemented | File existence, manifest routing, and targeted status/privacy searches for docs-only work. |
-
-## Account-Isolation Tests
-
-Account isolation is required because account-owned source material is private. Implemented foundation tests prove that missing session/account context fails closed and account-scoped records reject cross-account access. Planned product tests should prove:
-
-- A user cannot read sources, chunks, cards, reviews, eval runs, or traces from another account.
-- Retrieval queries filter by account before vector results are used.
-- Generated artifacts persist account IDs and source/chunk references.
-- API errors do not leak another account's identifiers or source text.
-- Fixtures use synthetic account and source IDs.
-
-Current focused coverage:
-
-- Registration creates a user/account identity through the credentials service contract.
-- Login succeeds only with the correct password.
-- Duplicate emails are rejected after normalization.
-- Missing account scope throws a 401-style authorization error.
-- Cross-account records throw a 403-style authorization error.
-- Pasted source validation rejects empty, over-limit, and malformed text before storage.
-- Source list/read service behavior returns no data for another account.
-- The initial Drizzle migration includes Auth.js, account, source, chunk, trace-reference, and pgvector foundations.
-
-## Privacy Tests
-
-Privacy-sensitive tests should inspect artifacts as well as responses:
-
-- Logs do not include raw source text.
-- Langfuse or OpenTelemetry metadata uses IDs, prompt versions, scores, and trace references where possible.
-- Eval reports do not copy private source material.
-- Screenshots use synthetic demo content only.
-- Provider payload tests use redacted or synthetic examples.
-
-## Failure-Path Tests
-
-Planned failure-path tests should cover:
-
-- Empty or low-quality retrieval results.
-- Missing citations.
-- Prompt-injection text inside source chunks.
-- Provider outage, timeout, and malformed model output.
-- Rate limits and retry exhaustion.
-- Database connection failures.
-- Cost guard threshold breaches.
-- Trace creation failure that should not block user-safe fallback behavior unless auditability is required.
-
-## Validation Cadence
-
-| Change Type | Narrow Validation |
-|---|---|
-| Docs only | `test -f ...`, manifest inspection, targeted `rg` searches. |
-| Web UI | `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`, focused Playwright tests when available. |
-| Server auth/data foundation | `pnpm --filter @ancora/web test`, `pnpm --filter @ancora/web typecheck`, `pnpm --filter @ancora/web exec drizzle-kit check --config drizzle.config.ts`, and Docker Compose config validation. |
-| Server AI runtime | `pnpm web:typecheck`, server tests, schema tests, and relevant eval smoke checks. |
-| Eval runner | `pnpm eval:typecheck`, `pnpm eval:test`, `pnpm eval:smoke`. |
-| Repo governance or scripts | `pnpm repo:test:fast -- --describe`, relevant lane command, and shell/config validation. |
-
-If an expected command is missing, report the gap instead of inventing a substitute.
+Future tests: revision immutability, draft reload/resume, provider correction budget across retry layers, pending/interrupted generation, learner-view omission of references/cases, optional assistance and privacy-safe telemetry. See docs/architecture/runner-spike.md for measured limitations.

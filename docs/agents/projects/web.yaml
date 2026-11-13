@@ -1,47 +1,23 @@
 name: web
-status: in-progress
-primary_paths:
-  - apps/web
-related_paths:
-  - packages/ui
-  - packages/shared-types
+status: runner-spike
+primary_paths: [apps/web]
+related_paths: [packages/ui, packages/shared-types, packages/schemas]
 read_first:
   - CONTEXT.md
-  - docs/adr/0001-use-monorepo.md
-  - docs/adr/0003-auth-and-account-are-v1-scope.md
-  - docs/adr/0004-use-openai-as-default-llm-provider.md
-  - docs/adr/0005-use-postgresql-pgvector-for-v1.md
-  - docs/adr/0008-use-nextjs-for-v1-client-ui.md
-  - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
-  - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
+  - docs/adr/0011-focus-on-local-programming-practice.md
   - docs/frontend/nextjs-feature-first-convention.md
   - docs/frontend/nextjs-naming-convention.md
-role: Next.js/Node/TypeScript owner for the v1 client UI, product API, and AI runtime.
+  - docs/architecture/runner-spike.md
+role: Next.js UI/product boundary, future Drizzle persistence and isolated browser execution delivery.
 allowed_work:
-  - Next.js routes and UI
-  - thin app/api route handlers
-  - server-side product API orchestration under apps/web/server
-  - Auth.js integration under apps/web/server/auth
-  - Drizzle schema and account-scoped data access under apps/web/server/db
-  - server-side AI runtime orchestration under apps/web/server
-  - client-side product workflows
-  - typed server contracts for account-aware product workflows
-  - accessibility and responsive behavior
-  - UI state for source, deck, card, review, quiz, and tutor workflows
-  - Next.js feature-first and naming convention docs
+  - Thin App Router routes and programming-practice UI
+  - Bounded runner protocol, dedicated static origin and disposable workers
+  - Future product lifecycle, server clients and persistence within approved slices
 out_of_scope:
-  - direct database, pgvector, OpenAI, Langfuse secret, or provider calls from browser code
-  - separate backend microservices without an ADR
-  - Python runtime services or workers without an ADR
-  - bypassing account-aware server boundaries
-privacy_rules:
-  - Do not place private source material in screenshots, fixtures, docs, analytics, or client logs.
-  - Use source IDs, chunk IDs, deck IDs, card IDs, and trace references where full text is not required.
+  - Authentication, account, source and card feature restoration
+  - Provider/database credentials or privileged bridges in browser execution
+  - Host/server execution of generated Python
+  - Database migration/application before persistence review
 validation:
-  expected_commands:
-    - pnpm web:lint
-    - pnpm web:typecheck
-    - pnpm web:test
-    - pnpm --filter @ancora/web exec drizzle-kit check --config drizzle.config.ts
-    - pnpm repo:test:fast
-  fallback: If commands do not exist, inspect available scripts and report the gap.
+  expected_commands: [pnpm web:lint, pnpm web:typecheck, pnpm web:test, pnpm web:test:browser]
+  fallback: Report missing commands and browser prerequisites honestly.

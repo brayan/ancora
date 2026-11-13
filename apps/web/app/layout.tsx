@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Ancora",
-  description: "Grounded study workspace",
+  description: "Local Python programming practice",
 };
 
 export default function RootLayout({

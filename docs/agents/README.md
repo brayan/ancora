@@ -1,5 +1,7 @@
 # Agent Startup Flow
 
+Current scope is local programming practice under [ADR 0011](../adr/0011-focus-on-local-programming-practice.md). Older account/source/RAG guidance below is historical until replaced by the persistence/generation slices. The current eval CLI is an empty synthetic scaffold, not runner evidence.
+
 Ancora uses compact root guidance plus routing metadata. Agents should start narrow and open only the docs needed for the requested boundary.
 
 ## Required Startup

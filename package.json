@@ -8,7 +8,7 @@
     "pnpm": ">=10"
   },
   "scripts": {
-    "dev": "scripts/dev/run-web.sh",
+    "dev": "node scripts/dev/run-local.mjs",
     "lint": "pnpm repo:test:fast",
     "test": "pnpm repo:test:task",
     "test:impact": "pnpm repo:test:context",
@@ -16,8 +16,6 @@
     "docker:config": "docker compose -f docker/docker-compose.yml config",
     "docker:up": "docker compose -f docker/docker-compose.yml up -d db",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
-    "db:migrate": "scripts/db/migrate.sh",
-    "db:seed": "scripts/db/seed.sh",
     "web:dev": "scripts/dev/run-web.sh",
     "web:lint": "pnpm --filter @ancora/web lint",
     "web:typecheck": "pnpm --filter @ancora/web typecheck",
@@ -32,6 +30,8 @@
     "guards:fast": "pnpm repo:test:fast",
     "guards:task": "pnpm repo:test:task",
     "guards:context": "pnpm repo:test:context",
-    "guards:pr": "pnpm repo:test:pr"
+    "guards:pr": "pnpm repo:test:pr",
+    "runner:dev": "pnpm --filter @ancora/web runner:dev",
+    "web:test:browser": "pnpm --filter @ancora/web test:browser"
   }
 }

@@ -33,8 +33,7 @@ read_first:
   - docs/ops/solo-dev-guardrails.md
   - docs/adr/0001-use-monorepo.md
   - docs/adr/0006-defer-standalone-node-api-kubernetes-terraform.md
-  - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
-  - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
+  - docs/adr/0011-focus-on-local-programming-practice.md
 role: Developer-experience, local command, CI, local Docker, documentation, and governance metadata boundary.
 allowed_work:
   - Make command wrappers
@@ -46,7 +45,7 @@ allowed_work:
   - portfolio evidence docs for product, architecture, testing, evals, operations, and roadmap
 out_of_scope:
   - separate backend microservices without an ADR
-  - Python runtime services or workers without an ADR
+  - Python services outside the bounded ADR 0011 generation scope
   - Kubernetes
   - Terraform
   - real environment secrets

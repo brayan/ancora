@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted
+Superseded for the current local programming-practice product by [ADR 0011](0011-focus-on-local-programming-practice.md). Retained as decision history; PostgreSQL persistence remains selected.
+
 
 ## Context
 

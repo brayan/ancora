@@ -6,30 +6,27 @@ cd "$ROOT_DIR"
 
 for arg in "$@"; do
   if [[ "$arg" == "--describe" ]]; then
-    cat <<'EOF'
+    cat <<'DESCRIPTION'
 Task context guards:
-- Verify root guidance, manifest, project shards, ADRs, and scaffold entry points exist.
-- Search for required architecture language and eval-runner routing.
-- This lane is the current test-impact check for scaffold/governance changes.
-EOF
+- Verify local programming-practice guidance, ADR, plan and runner routing.
+- Check deferred service and historical database boundaries.
+- This governance lane does not execute Python or prove runner isolation.
+DESCRIPTION
     exit 0
   fi
 done
 
-test -f AGENTS.md
-test -f CONTEXT.md
-test -f docs/agents/repo-manifest.yaml
-test -f docs/agents/projects/web.yaml
-test -f docs/agents/projects/eval-runner.yaml
-test -f docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
-test -f docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
-test -f apps/web/package.json
-test -f apps/web/server/ai-runtime/README.md
-test -f tools/eval-runner/package.json
-test -f docker/docker-compose.yml
-test -x scripts/ci/lanes/run-fast-blockers.sh
-test -x scripts/ci/lanes/run-task-guards.sh
-test -x scripts/ci/lanes/run-pr-guards.sh
+for file in AGENTS.md CONTEXT.md docs/agents/repo-manifest.yaml \
+  docs/agents/projects/web.yaml docs/agents/projects/practice-service.yaml \
+  docs/agents/projects/eval-runner.yaml docs/adr/0011-focus-on-local-programming-practice.md \
+  docs/product/programming-practice.md docs/exec-plans/programming-practice.md \
+  docs/architecture/runner-spike.md apps/web/package.json apps/web/runner/worker.mjs \
+  apps/web/runner/protocol.mjs tools/eval-runner/package.json docker/docker-compose.yml; do
+  test -f "$file"
+done
 
-rg -n "Next\\.js|TypeScript|OpenAI|account|pgvector|tools/eval-runner|source material|Python.*deferred" \
-  AGENTS.md CONTEXT.md README.md docs/agents docs/adr docs/engineering docs/testing docs/ops >/dev/null
+rg -q 'concept_generated' CONTEXT.md
+rg -q 'No authentication|No auth|no login' AGENTS.md
+rg -q 'Pydantic AI|Pydantic AI|Pydantic' docs/adr/0011-focus-on-local-programming-practice.md
+rg -q 'PostgreSQL.*Drizzle' docs/adr/0011-focus-on-local-programming-practice.md
+rg -q 'not.*attestation' docs/adr/0011-focus-on-local-programming-practice.md
