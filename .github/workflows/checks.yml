@@ -34,6 +34,10 @@ jobs:
           node-version: '22'
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Install repository guard prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends ripgrep
       - name: Pull disposable PostgreSQL image
         run: docker pull pgvector/pgvector:pg16
       - run: pnpm repo:test:pr

@@ -10,6 +10,8 @@
 
 Node jobs install the `packageManager` version from `package.json` and run `pnpm install --frozen-lockfile`; Python jobs use uv `0.11.18`, Python `3.13` and `uv.lock`. Browser checks also install the frozen Python workspace for the synthetic service. Updating either dependency manifest requires its lockfile update. See [Python conventions](python-conventions.md) for maintained paths and strict typing policy.
 
+Repository guard lanes require ripgrep (`rg`) locally. The repository job installs it explicitly from Ubuntu packages before invoking the lane; it does not rely on the hosted image including this tool.
+
 Both database-using jobs explicitly pull `pgvector/pgvector:pg16` before invoking the local wrapper, which refuses a missing image. The wrapper creates fresh Docker containers with tmpfs storage and random loopback ports/credentials, applies retained additive migrations, then removes the containers. CI does not connect to an existing database or run schema push/diff generation.
 
 Chrome installation uses `pnpm --filter @ancora/web exec playwright install --with-deps chrome`; Playwright selects `channel: 'chrome'`. The browser suite is separate from the PR lane and has no retries. Host pytest does not execute submitted/generated Python. Live generation evaluation is a separately authorized manual activity; it is never a CI gate.
