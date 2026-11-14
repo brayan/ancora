@@ -13,13 +13,23 @@ export function PracticeResults({
   response,
   label,
   source,
+  technique,
 }: {
   response: RunnerResponse | null;
   label: string;
   source: string | undefined;
+  technique?: 'none' | 'list_comprehension' | 'dict_comprehension';
 }) {
   const passed =
     response?.type === 'result' ? response.cases.filter((item) => item.passed).length : 0;
+  const techniqueName =
+    technique === 'dict_comprehension' ? 'Dictionary comprehension' : 'List comprehension';
+  const techniqueMessages = {
+    passed: `${techniqueName} verified`,
+    failed: `${techniqueName} required`,
+    inconclusive: 'Inconclusive — unsupported code pattern',
+    not_required: 'No technique requirement',
+  };
   return (
     <section className="resultsPanel" aria-labelledby="results-heading">
       <div className="panelHeader">
@@ -50,13 +60,7 @@ export function PracticeResults({
             </p>
             <p>
               <strong>Technique</strong>
-              <span>
-                {response.technique === 'passed'
-                  ? 'List comprehension verified'
-                  : response.technique === 'failed'
-                    ? 'List comprehension required'
-                    : 'Inconclusive — unsupported code pattern'}
-              </span>
+              <span>{techniqueMessages[response.technique]}</span>
             </p>
             <p>
               <strong>Timing</strong>

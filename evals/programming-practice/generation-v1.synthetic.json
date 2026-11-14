@@ -1,0 +1,396 @@
+{
+  "schemaVersion": 1,
+  "synthetic": true,
+  "fixtures": [
+    {
+      "input": {
+        "schemaVersion": 1,
+        "request": {
+          "language": "python",
+          "concept": "collections",
+          "difficulty": "beginner",
+          "goal": "Practice pure functions",
+          "targetMinutes": 10,
+          "preferences": ""
+        },
+        "previous": null,
+        "feedback": [],
+        "recentExercises": []
+      },
+      "output": {
+        "schemaVersion": 1,
+        "draft": {
+          "schemaVersion": 1,
+          "title": "Synthetic collections beginner",
+          "concept": "collections",
+          "difficulty": "beginner",
+          "objective": "Return an unchanged value using a fresh container when applicable.",
+          "statement": "Return the input unchanged. Preserve order and duplicates. Do not mutate it.",
+          "functionContract": {
+            "name": "copy_values",
+            "parameter": {
+              "name": "value",
+              "type": "list[int]"
+            },
+            "returns": "list[int]"
+          },
+          "requirements": [
+            "Preserve values, order and duplicates; never mutate the input."
+          ],
+          "constraints": [
+            "Integers have magnitude <=1000000; strings <=2000; containers <=100."
+          ],
+          "technique": "list_comprehension",
+          "publicCases": [
+            {
+              "id": "case_0",
+              "inputJson": "[]",
+              "expectedJson": "[]"
+            },
+            {
+              "id": "case_1",
+              "inputJson": "[1]",
+              "expectedJson": "[1]"
+            }
+          ],
+          "checkCases": [
+            {
+              "id": "case_2",
+              "inputJson": "[-1]",
+              "expectedJson": "[-1]"
+            },
+            {
+              "id": "case_3",
+              "inputJson": "[1, 1]",
+              "expectedJson": "[1, 1]"
+            },
+            {
+              "id": "case_4",
+              "inputJson": "[0, 2]",
+              "expectedJson": "[0, 2]"
+            }
+          ],
+          "referenceSource": "def copy_values(value: list[int]) -> list[int]:\n    return [number for number in value]\n"
+        },
+        "model": {
+          "provider": "openai",
+          "name": "synthetic-offline",
+          "promptVersion": "programming-practice-v1",
+          "schemaVersion": 1
+        }
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "request": {
+          "language": "python",
+          "concept": "comprehensions",
+          "difficulty": "beginner",
+          "goal": "Practice pure functions",
+          "targetMinutes": 10,
+          "preferences": ""
+        },
+        "previous": null,
+        "feedback": [],
+        "recentExercises": []
+      },
+      "output": {
+        "schemaVersion": 1,
+        "draft": {
+          "schemaVersion": 1,
+          "title": "Synthetic comprehensions beginner",
+          "concept": "comprehensions",
+          "difficulty": "beginner",
+          "objective": "Return an unchanged value using a fresh container when applicable.",
+          "statement": "Return the input unchanged. Preserve order and duplicates. Do not mutate it.",
+          "functionContract": {
+            "name": "copy_labels",
+            "parameter": {
+              "name": "value",
+              "type": "list[str]"
+            },
+            "returns": "list[str]"
+          },
+          "requirements": [
+            "Preserve values, order and duplicates; never mutate the input."
+          ],
+          "constraints": [
+            "Integers have magnitude <=1000000; strings <=2000; containers <=100."
+          ],
+          "technique": "list_comprehension",
+          "publicCases": [
+            {
+              "id": "case_0",
+              "inputJson": "[]",
+              "expectedJson": "[]"
+            },
+            {
+              "id": "case_1",
+              "inputJson": "[\"a\"]",
+              "expectedJson": "[\"a\"]"
+            }
+          ],
+          "checkCases": [
+            {
+              "id": "case_2",
+              "inputJson": "[\"a\", \"a\"]",
+              "expectedJson": "[\"a\", \"a\"]"
+            },
+            {
+              "id": "case_3",
+              "inputJson": "[\"\"]",
+              "expectedJson": "[\"\"]"
+            },
+            {
+              "id": "case_4",
+              "inputJson": "[\"b\", \"c\"]",
+              "expectedJson": "[\"b\", \"c\"]"
+            }
+          ],
+          "referenceSource": "def copy_labels(value: list[str]) -> list[str]:\n    return [label for label in value]\n"
+        },
+        "model": {
+          "provider": "openai",
+          "name": "synthetic-offline",
+          "promptVersion": "programming-practice-v1",
+          "schemaVersion": 1
+        }
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "request": {
+          "language": "python",
+          "concept": "dictionaries",
+          "difficulty": "beginner",
+          "goal": "Practice pure functions",
+          "targetMinutes": 10,
+          "preferences": ""
+        },
+        "previous": null,
+        "feedback": [],
+        "recentExercises": []
+      },
+      "output": {
+        "schemaVersion": 1,
+        "draft": {
+          "schemaVersion": 1,
+          "title": "Synthetic dictionaries beginner",
+          "concept": "dictionaries",
+          "difficulty": "beginner",
+          "objective": "Return an unchanged value using a fresh container when applicable.",
+          "statement": "Return the input unchanged. Preserve order and duplicates. Do not mutate it.",
+          "functionContract": {
+            "name": "copy_scores",
+            "parameter": {
+              "name": "value",
+              "type": "dict[str,int]"
+            },
+            "returns": "dict[str,int]"
+          },
+          "requirements": [
+            "Preserve values, order and duplicates; never mutate the input."
+          ],
+          "constraints": [
+            "Integers have magnitude <=1000000; strings <=2000; containers <=100."
+          ],
+          "technique": "dict_comprehension",
+          "publicCases": [
+            {
+              "id": "case_0",
+              "inputJson": "{}",
+              "expectedJson": "{}"
+            },
+            {
+              "id": "case_1",
+              "inputJson": "{\"a\": 1}",
+              "expectedJson": "{\"a\": 1}"
+            }
+          ],
+          "checkCases": [
+            {
+              "id": "case_2",
+              "inputJson": "{\"b\": -1}",
+              "expectedJson": "{\"b\": -1}"
+            },
+            {
+              "id": "case_3",
+              "inputJson": "{\"a\": 0}",
+              "expectedJson": "{\"a\": 0}"
+            },
+            {
+              "id": "case_4",
+              "inputJson": "{\"b\": 2}",
+              "expectedJson": "{\"b\": 2}"
+            }
+          ],
+          "referenceSource": "def copy_scores(value: dict[str,int]) -> dict[str,int]:\n    return {key: score for key, score in value.items()}\n"
+        },
+        "model": {
+          "provider": "openai",
+          "name": "synthetic-offline",
+          "promptVersion": "programming-practice-v1",
+          "schemaVersion": 1
+        }
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "request": {
+          "language": "python",
+          "concept": "strings",
+          "difficulty": "beginner",
+          "goal": "Practice pure functions",
+          "targetMinutes": 10,
+          "preferences": ""
+        },
+        "previous": null,
+        "feedback": [],
+        "recentExercises": []
+      },
+      "output": {
+        "schemaVersion": 1,
+        "draft": {
+          "schemaVersion": 1,
+          "title": "Synthetic strings beginner",
+          "concept": "strings",
+          "difficulty": "beginner",
+          "objective": "Return an unchanged value using a fresh container when applicable.",
+          "statement": "Return the input unchanged. Preserve order and duplicates. Do not mutate it.",
+          "functionContract": {
+            "name": "retain_letters",
+            "parameter": {
+              "name": "value",
+              "type": "str"
+            },
+            "returns": "str"
+          },
+          "requirements": [
+            "Preserve values, order and duplicates; never mutate the input."
+          ],
+          "constraints": [
+            "Integers have magnitude <=1000000; strings <=2000; containers <=100."
+          ],
+          "technique": "none",
+          "publicCases": [
+            {
+              "id": "case_0",
+              "inputJson": "\"\"",
+              "expectedJson": "\"\""
+            },
+            {
+              "id": "case_1",
+              "inputJson": "\"a\"",
+              "expectedJson": "\"a\""
+            }
+          ],
+          "checkCases": [
+            {
+              "id": "case_2",
+              "inputJson": "\"aa\"",
+              "expectedJson": "\"aa\""
+            },
+            {
+              "id": "case_3",
+              "inputJson": "\"z\"",
+              "expectedJson": "\"z\""
+            },
+            {
+              "id": "case_4",
+              "inputJson": "\"b\"",
+              "expectedJson": "\"b\""
+            }
+          ],
+          "referenceSource": "def retain_letters(value: str) -> str:\n    return value\n"
+        },
+        "model": {
+          "provider": "openai",
+          "name": "synthetic-offline",
+          "promptVersion": "programming-practice-v1",
+          "schemaVersion": 1
+        }
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "request": {
+          "language": "python",
+          "concept": "functions",
+          "difficulty": "beginner",
+          "goal": "Practice pure functions",
+          "targetMinutes": 10,
+          "preferences": ""
+        },
+        "previous": null,
+        "feedback": [],
+        "recentExercises": []
+      },
+      "output": {
+        "schemaVersion": 1,
+        "draft": {
+          "schemaVersion": 1,
+          "title": "Synthetic functions beginner",
+          "concept": "functions",
+          "difficulty": "beginner",
+          "objective": "Return an unchanged value using a fresh container when applicable.",
+          "statement": "Return the input unchanged. Preserve order and duplicates. Do not mutate it.",
+          "functionContract": {
+            "name": "keep_integer",
+            "parameter": {
+              "name": "value",
+              "type": "int"
+            },
+            "returns": "int"
+          },
+          "requirements": [
+            "Preserve values, order and duplicates; never mutate the input."
+          ],
+          "constraints": [
+            "Integers have magnitude <=1000000; strings <=2000; containers <=100."
+          ],
+          "technique": "none",
+          "publicCases": [
+            {
+              "id": "case_0",
+              "inputJson": "0",
+              "expectedJson": "0"
+            },
+            {
+              "id": "case_1",
+              "inputJson": "-1",
+              "expectedJson": "-1"
+            }
+          ],
+          "checkCases": [
+            {
+              "id": "case_2",
+              "inputJson": "1",
+              "expectedJson": "1"
+            },
+            {
+              "id": "case_3",
+              "inputJson": "-1000000",
+              "expectedJson": "-1000000"
+            },
+            {
+              "id": "case_4",
+              "inputJson": "1000000",
+              "expectedJson": "1000000"
+            }
+          ],
+          "referenceSource": "def keep_integer(value: int) -> int:\n    return value\n"
+        },
+        "model": {
+          "provider": "openai",
+          "name": "synthetic-offline",
+          "promptVersion": "programming-practice-v1",
+          "schemaVersion": 1
+        }
+      }
+    }
+  ]
+}

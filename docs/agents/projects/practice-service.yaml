@@ -1,10 +1,13 @@
 name: practice-service
-status: planned
+status: implemented
 primary_paths: [apps/practice-service]
 read_first:
   - CONTEXT.md
   - docs/adr/0011-focus-on-local-programming-practice.md
   - docs/product/programming-practice.md
+  - docs/adr/0013-bounded-generation-and-automated-checks.md
+  - docs/engineering/python-conventions.md
+  - docs/architecture/challenge-generation.md
 role: Bounded FastAPI/Pydantic AI challenge generation and explicitly requested coaching.
 allowed_work:
   - Complete typed challenge generation and structural/contract validation
@@ -15,5 +18,5 @@ out_of_scope:
   - Execution of reference or learner Python
   - Live evaluation before model and spending budget selection
 validation:
-  proposed: [Ruff, strict Pyright, pytest, wire-schema drift checks]
-  rule: No Python service or commands exist yet; create them only in the approved generation slice.
+  expected_commands: [pnpm python:lint, pnpm python:format:check, pnpm python:typecheck, pnpm python:test, pnpm contracts:check]
+  rule: Host tests never execute generated or submitted solutions. Live calls require the selected model and remaining explicit budget.

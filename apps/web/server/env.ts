@@ -9,3 +9,10 @@ export function getDatabaseUrl() {
 
   return 'postgresql://ancora:ancora@127.0.0.1:5433/ancora_practice';
 }
+
+export function getPracticeServiceConfig() {
+  return {
+    url: 'http://127.0.0.1:8001',
+    token: process.env.PRACTICE_SERVICE_TOKEN ?? '',
+  };
+}

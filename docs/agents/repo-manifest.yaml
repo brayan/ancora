@@ -1,6 +1,6 @@
-version: 0.4
+version: 0.5
 project: ancora
-status: fixed-practice-persistence
+status: challenge-generation
 description: Local single-user Python programming practice with generated challenges.
 startup:
   root_guidance: AGENTS.md
@@ -13,6 +13,9 @@ canonical_docs:
   programming_practice: docs/product/programming-practice.md
   system_overview: docs/architecture/system-overview.md
   practice_persistence: docs/architecture/practice-persistence.md
+  challenge_generation: docs/architecture/challenge-generation.md
+  python_conventions: docs/engineering/python-conventions.md
+  continuous_integration: docs/engineering/continuous-integration.md
   runner_spike: docs/architecture/runner-spike.md
   architecture_decisions: docs/adr
   documentation_governance: docs/engineering/documentation-governance.md
@@ -28,9 +31,9 @@ canonical_docs:
 accepted_stack:
   web: Next.js App Router, React and TypeScript
   product: apps/web owns product orchestration and durable records
-  generation: Planned FastAPI/Pydantic AI service in apps/practice-service; no DB writes
-  persistence: PostgreSQL and Drizzle; additive 0006 with ledger preflight
-  provider: OpenAI; model and live-eval budget not yet selected
+  generation: Bounded FastAPI/Pydantic AI service in apps/practice-service; no DB writes
+  persistence: PostgreSQL and Drizzle; additive 0006/0007 with ledger preflight
+  provider: OpenAI; owner selected gpt-6-luna and USD 1 total live-evaluation budget
   identity: Local single-user; no login or accounts
   runner: Disposable Pyodide worker on separate loopback static origin
 privacy_boundary: Submitted code and private material must not leak to logs, traces, screenshots, fixtures or eval artifacts.
@@ -43,6 +46,12 @@ command_surface:
     - pnpm db:migrate
     - pnpm contracts:check
     - pnpm contracts:generate
+    - pnpm python:sync
+    - pnpm python:lint
+    - pnpm python:format:check
+    - pnpm python:typecheck
+    - pnpm python:test
+    - pnpm python:check
     - pnpm web:test:db
     - pnpm dev
     - pnpm code:check
@@ -72,8 +81,9 @@ project_shards:
     routes: [tools/eval-runner/**, evals/**]
   - name: scripts-ci
     file: docs/agents/projects/scripts-ci.yaml
-    routes: [scripts/**, docker/**, infra/**, config/**, packages/config/**, docs/**, package.json, Makefile, pnpm-workspace.yaml]
+    routes: [scripts/**, docker/**, infra/**, config/**, packages/config/**, docs/**, package.json, Makefile, pnpm-workspace.yaml, pyproject.toml, uv.lock, .python-version, .github/**]
 adr_index:
   - docs/adr/0011-focus-on-local-programming-practice.md
   - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
+  - docs/adr/0013-bounded-generation-and-automated-checks.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

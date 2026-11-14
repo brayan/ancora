@@ -3,35 +3,54 @@ import { challengeSchema, sessionSchema } from '@ancora/schemas';
 import type { Submission } from '@ancora/shared-types';
 import { FIXED_REVISION } from '@/server/programming-practice/fixture';
 import { PracticeError, type PracticeRepository } from '@/server/programming-practice/repository';
-import { matchesJob, parseRunnerResponse, resultsMatchCases } from '@/runner/protocol.mjs';
+import {
+  casesDigestText,
+  isRunRequest,
+  matchesJob,
+  parseRunnerResponse,
+  resultsMatchCases,
+} from '@/runner/protocol.mjs';
 import type { RunRequest } from '@/runner/protocol.mjs';
 import type { RevisionContent } from '@/server/db/schema';
 
-function runRequest(
+export function buildRunRequest(
   content: RevisionContent,
   source: string,
   mode: 'examples' | 'check',
   jobId: string
 ): RunRequest {
   const cases = mode === 'examples' ? content.publicCases : content.checkCases;
-  return {
+  const request = {
     type: 'run',
-    protocolVersion: 1,
     jobId,
     revisionId: content.revisionId,
     sourceDigest: createHash('sha256').update(source).digest('hex'),
-    casesDigest: createHash('sha256').update(JSON.stringify(cases)).digest('hex'),
+    casesDigest: createHash('sha256')
+      .update(casesDigestText(cases, content.functionContract))
+      .digest('hex'),
     runtimeVersion: content.runtimeVersion,
     source,
     cases,
-    functionName: 'positive_even',
-    technique: 'list_comprehension',
+    ...(content.functionContract
+      ? {
+          protocolVersion: 2,
+          functionContract: content.functionContract,
+          technique: content.technique ?? 'none',
+        }
+      : { protocolVersion: 1, functionName: 'positive_even', technique: 'list_comprehension' }),
   };
+  if (!isRunRequest(request)) {
+    throw new PracticeError('invalid_execution_contract');
+  }
+  return request;
 }
 
 export function createPracticeService(repository: PracticeRepository) {
-  async function session() {
-    const revision = await repository.initialize();
+  async function session(revisionId?: string) {
+    await repository.initialize();
+    const revision = revisionId
+      ? await repository.usableRevision(revisionId)
+      : await repository.active();
     const draft = await repository.draft(revision.id);
     const attempts = await repository.recent(revision.id);
     const latest = attempts[0];
@@ -57,12 +76,13 @@ export function createPracticeService(repository: PracticeRepository) {
             report: latest.report,
           }
         : null,
+      challenges: await repository.readyChallenges(revision.id),
     });
   }
 
   async function submit(input: Submission) {
-    const revision = await repository.revision(input.revisionId);
-    const request = runRequest(revision.content, input.source, input.mode, input.submissionId);
+    const revision = await repository.usableRevision(input.revisionId);
+    const request = buildRunRequest(revision.content, input.source, input.mode, input.submissionId);
     const saved = await repository.submit({
       id: input.submissionId,
       revisionId: input.revisionId,
@@ -78,7 +98,7 @@ export function createPracticeService(repository: PracticeRepository) {
   async function complete(id: string, value: unknown) {
     const attempt = await repository.attempt(id);
     const revision = await repository.revision(attempt.revisionId);
-    const request = runRequest(revision.content, attempt.source, attempt.mode, attempt.id);
+    const request = buildRunRequest(revision.content, attempt.source, attempt.mode, attempt.id);
     const report = parseRunnerResponse(value);
     if (!report || !matchesJob(report, request) || !resultsMatchCases(report, request)) {
       throw new PracticeError('invalid_report');
@@ -87,12 +107,12 @@ export function createPracticeService(repository: PracticeRepository) {
   }
 
   async function reference(revisionId: string) {
-    const revision = await repository.revision(revisionId);
+    const revision = await repository.usableRevision(revisionId);
     return {
       apiVersion: 1,
       attemptId: null,
       report: null,
-      request: runRequest(
+      request: buildRunRequest(
         revision.content,
         revision.content.referenceSource,
         'check',
@@ -121,6 +141,10 @@ export function createPracticeService(repository: PracticeRepository) {
     viewAttempt,
     saveDraft: repository.saveDraft,
     draft: repository.draft,
+    select: async (revisionId: string) => {
+      await repository.select(revisionId);
+      return session();
+    },
   };
 }
 

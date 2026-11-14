@@ -1,7 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { attemptSchema, draftSchema, envelopeSchema, sessionSchema } from '@ancora/schemas';
+import {
+  attemptSchema,
+  draftSchema,
+  envelopeSchema,
+  referenceSchema,
+  sessionSchema,
+} from '@ancora/schemas';
 import type { PracticeDraft, PracticeSession, RunEnvelope } from '@ancora/shared-types';
 import type { RunnerResponse } from '@/runner/protocol.mjs';
 import {
@@ -13,6 +19,7 @@ import {
 type SaveState = 'loading' | 'saved' | 'unsaved' | 'saving' | 'error' | 'conflict';
 type Recovery = { source: string; version: number };
 const recoveryKey = (revisionId: string) => `ancora:draft:v1:${revisionId}`;
+const selectionKey = 'ancora:practice-revision:v1';
 
 async function jsonRequest(url: string, method = 'GET', value?: unknown) {
   const response = await fetch(url, {
@@ -64,7 +71,21 @@ export function usePracticeSession() {
   }, []);
 
   const refresh = useCallback(async () => {
-    const { response, data } = await jsonRequest('/api/practice/session');
+    let revisionId = current.current.revisionId;
+    if (!revisionId) {
+      try {
+        const saved = referenceSchema.shape.revisionId.safeParse(
+          sessionStorage.getItem(selectionKey)
+        );
+        if (saved.success) {
+          revisionId = saved.data;
+        }
+      } catch {
+        // The database selection still supports opening when browser storage is unavailable.
+      }
+    }
+    const query = revisionId ? `?revisionId=${encodeURIComponent(revisionId)}` : '';
+    const { response, data } = await jsonRequest(`/api/practice/session${query}`);
     if (!response.ok) {
       throw new Error('practice_unavailable');
     }
@@ -77,6 +98,11 @@ export function usePracticeSession() {
         return;
       }
       const draft = saved.draft;
+      try {
+        sessionStorage.setItem(selectionKey, draft.revisionId);
+      } catch {
+        setRecoveryAvailable(false);
+      }
       let recovery: Recovery | null = null;
       try {
         const raw = sessionStorage.getItem(recoveryKey(draft.revisionId));
@@ -331,6 +357,21 @@ export function usePracticeSession() {
     return envelopeSchema.parse(data);
   };
 
+  const select = async (revisionId: string) => {
+    if (!(await save())) {
+      return false;
+    }
+    const { response, data } = await jsonRequest('/api/practice/session', 'POST', {
+      apiVersion: 1,
+      revisionId,
+    });
+    if (!response.ok) {
+      throw new Error('challenge_not_available');
+    }
+    applySession(sessionSchema.parse(data));
+    return true;
+  };
+
   return {
     session,
     source,
@@ -352,5 +393,6 @@ export function usePracticeSession() {
     refresh,
     reference,
     viewAttempt,
+    select,
   };
 }

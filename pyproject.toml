@@ -1,0 +1,54 @@
+[project]
+name = "ancora-python"
+version = "0.1.0"
+requires-python = ">=3.13,<3.15"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "httpx==0.28.1",
+    "pyright==1.1.414",
+    "pytest==9.2.0",
+    "pytest-asyncio==1.5.0",
+    "ruff==0.17.5",
+]
+
+[tool.uv]
+package = false
+required-version = "==0.11.18"
+
+[tool.uv.workspace]
+members = ["apps/practice-service"]
+
+[tool.pyright]
+include = [
+    "apps/practice-service/src",
+    "apps/practice-service/tests",
+    "apps/web/runner/harness.py",
+    "apps/web/tests/python",
+]
+extraPaths = ["apps/practice-service/src", "apps/web/runner"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.13"
+typeCheckingMode = "strict"
+enableTypeIgnoreComments = false
+reportPrivateUsage = "error"
+reportImplicitStringConcatenation = "error"
+reportMatchNotExhaustive = "error"
+reportUnnecessaryTypeIgnoreComment = "error"
+useLibraryCodeForTypes = true
+
+[tool.ruff]
+target-version = "py313"
+include = ["apps/practice-service/**/*.py", "apps/web/runner/harness.py", "apps/web/tests/python/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["ANN", "B", "I", "UP", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["apps/practice-service/tests", "apps/web/tests/python"]
+pythonpath = ["apps/practice-service/src", "apps/web/runner"]
+addopts = "--strict-config --strict-markers"
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
