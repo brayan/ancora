@@ -185,6 +185,38 @@ test('should retain independent unsaved recoveries when another tab saves in the
   }
 });
 
+test('should resume the latest database draft when another tab saves after local acknowledgment', async ({
+  browser,
+  request,
+}) => {
+  const context = await browser.newContext();
+  const a = await context.newPage();
+  const b = await context.newPage();
+  try {
+    await open(a);
+    await open(b);
+    const firstSource = '# Synthetic newer draft after opening\n' + REFERENCE_CODE;
+    await save(b, firstSource);
+
+    await a.reload();
+    await expect(a.getByLabel('Python solution')).toHaveValue(firstSource);
+    await expect(a.getByRole('button', { name: 'Keep my edits', exact: true })).toHaveCount(0);
+    await save(a, '# Synthetic acknowledged local edits\n' + REFERENCE_CODE);
+    await b.reload();
+    const latestSource = '# Synthetic newer draft after acknowledgment\n' + REFERENCE_CODE;
+    await save(b, latestSource);
+    const acknowledged = (await (await request.get('/api/practice/session')).json()).draft;
+
+    await a.reload();
+    await expect(a.getByLabel('Python solution')).toHaveValue(latestSource);
+    await expect(a.locator('#draft-status')).toHaveText('Draft saved to your local database.');
+    await expect(a.getByRole('button', { name: 'Keep my edits', exact: true })).toHaveCount(0);
+    expect((await (await request.get('/api/practice/session')).json()).draft).toEqual(acknowledged);
+  } finally {
+    await context.close();
+  }
+});
+
 test('should retain a completed result for retry when the result endpoint is unavailable across reload', async ({
   page,
   request,

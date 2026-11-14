@@ -44,13 +44,17 @@ export function usePracticeSession() {
   const recover = useCallback(() => {
     const value = current.current;
     try {
-      sessionStorage.setItem(
-        recoveryKey(value.revisionId),
-        JSON.stringify({
-          source: value.source,
-          version: value.version,
-        })
-      );
+      if (value.source === value.savedSource) {
+        sessionStorage.removeItem(recoveryKey(value.revisionId));
+      } else {
+        sessionStorage.setItem(
+          recoveryKey(value.revisionId),
+          JSON.stringify({
+            source: value.source,
+            version: value.version,
+          })
+        );
+      }
       return true;
     } catch {
       setRecoveryAvailable(false);
