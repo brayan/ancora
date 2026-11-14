@@ -1,0 +1,492 @@
+{
+  "apiVersion": 1,
+  "contracts": {
+    "session": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "challenge": {
+          "type": "object",
+          "properties": {
+            "revisionId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "objective": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "statement": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
+            },
+            "signature": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            "requirements": {
+              "minItems": 1,
+              "maxItems": 20,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            },
+            "publicCases": {
+              "minItems": 1,
+              "maxItems": 12,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+                  },
+                  "input": {
+                    "maxItems": 1000,
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": -1000000,
+                      "maximum": 1000000
+                    }
+                  },
+                  "expected": {
+                    "maxItems": 1000,
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": -1000000,
+                      "maximum": 1000000
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "input",
+                  "expected"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "starterCode": {
+              "type": "string",
+              "maxLength": 12000
+            }
+          },
+          "required": [
+            "revisionId",
+            "title",
+            "objective",
+            "statement",
+            "signature",
+            "requirements",
+            "publicCases",
+            "starterCode"
+          ],
+          "additionalProperties": false
+        },
+        "draft": {
+          "type": "object",
+          "properties": {
+            "revisionId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+            },
+            "source": {
+              "type": "string",
+              "maxLength": 12000
+            },
+            "version": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "revisionId",
+            "source",
+            "version"
+          ],
+          "additionalProperties": false
+        },
+        "attempts": {
+          "maxItems": 20,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "revisionId": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+              },
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "examples",
+                  "check"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              },
+              "completed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "revisionId",
+              "mode",
+              "createdAt",
+              "completed"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "latestAttempt": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "revisionId": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+                },
+                "source": {
+                  "type": "string",
+                  "maxLength": 12000
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": [
+                    "examples",
+                    "check"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                },
+                "report": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "revisionId",
+                "source",
+                "mode",
+                "createdAt",
+                "report"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "challenge",
+        "draft",
+        "attempts",
+        "latestAttempt"
+      ],
+      "additionalProperties": false
+    },
+    "draft": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "revisionId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+        },
+        "source": {
+          "type": "string",
+          "maxLength": 12000
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "apiVersion": {
+          "type": "number",
+          "const": 1
+        }
+      },
+      "required": [
+        "revisionId",
+        "source",
+        "version",
+        "apiVersion"
+      ],
+      "additionalProperties": false
+    },
+    "submission": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "revisionId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+        },
+        "submissionId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12000,
+          "pattern": "\\S"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "examples",
+            "check"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "revisionId",
+        "submissionId",
+        "source",
+        "mode"
+      ],
+      "additionalProperties": false
+    },
+    "completion": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "report": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "apiVersion",
+        "report"
+      ],
+      "additionalProperties": false
+    },
+    "envelope": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "attemptId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "request": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "run"
+            },
+            "protocolVersion": {
+              "type": "number",
+              "const": 1
+            },
+            "jobId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+            },
+            "revisionId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+            },
+            "sourceDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "casesDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "runtimeVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            },
+            "source": {
+              "type": "string",
+              "maxLength": 12000
+            },
+            "cases": {
+              "minItems": 1,
+              "maxItems": 12,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+                  },
+                  "input": {
+                    "maxItems": 1000,
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": -1000000,
+                      "maximum": 1000000
+                    }
+                  },
+                  "expected": {
+                    "maxItems": 1000,
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": -1000000,
+                      "maximum": 1000000
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "input",
+                  "expected"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "functionName": {
+              "type": "string",
+              "const": "positive_even"
+            },
+            "technique": {
+              "type": "string",
+              "const": "list_comprehension"
+            }
+          },
+          "required": [
+            "type",
+            "protocolVersion",
+            "jobId",
+            "revisionId",
+            "sourceDigest",
+            "casesDigest",
+            "runtimeVersion",
+            "source",
+            "cases",
+            "functionName",
+            "technique"
+          ],
+          "additionalProperties": false
+        },
+        "report": {
+          "anyOf": [
+            {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "attemptId",
+        "request",
+        "report"
+      ],
+      "additionalProperties": false
+    },
+    "reference": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "revisionId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9@_.:-]{1,100}$"
+        }
+      },
+      "required": [
+        "apiVersion",
+        "revisionId"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

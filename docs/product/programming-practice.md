@@ -4,7 +4,7 @@
 
 Choose a concept/difficulty, receive a generated Python challenge, implement one pure function, run examples, check behavior/technique and optionally request help. This replaces the earlier account/source/flashcard product direction (ADR 0011).
 
-The first implementation is a synthetic runner spike. It exposes one fixed exercise and a plain code textarea to prove execution boundaries. It has no live generation, persistence, history or coaching. No login is required. Difficulty and duration are targets, not measurements.
+The current implementation exposes one fixed synthetic exercise, a plain code editor, PostgreSQL-backed drafts, exact submitted attempts, immutable revisions and reload/resume. Recent attempts can be inspected without replacing the draft. It has no live generation or coaching. No login is required. Difficulty and duration are targets, not measurements.
 
 ## Execution contract
 
@@ -24,4 +24,4 @@ Generate a full draft, validate structure/cross-field agreement, persist a candi
 
 ## Interaction requirements for later slices
 
-Concept/difficulty, generate, statement/contract/examples, editor, run examples, check, Stop, separate behavior/technique results, optional hints/coaching, explicit reveal and history. Preserve drafts across errors/reload and before changing exercise. AI completion defaults off. CodeMirror remains a proposal for the persistence slice. No marketing page, leaderboards, collaboration or arbitrary package installation.
+Concept/difficulty, generate, statement/contract/examples, editor, run examples, check, Stop, separate behavior/technique results, optional hints/coaching, explicit reveal and history. Preserve drafts across errors/reload and before changing exercise. AI completion defaults off. The existing textarea is retained for this persistence slice; CodeMirror remains a future editor enhancement. No marketing page, leaderboards, collaboration or arbitrary package installation.

@@ -1,9 +1,11 @@
 # Ancora Web
 
-Next.js App Router/React/TypeScript programming workspace. `app/` is thin delivery, `features/programming-practice/` owns UI and job orchestration, `runner/` owns the static execution broker/worker/protocol, and `server/db/` is reserved for later PostgreSQL/Drizzle models.
+Next.js App Router/React/TypeScript programming workspace. Thin `app/api/practice` routes delegate to `server/programming-practice`; feature-owned UI coordinates drafts and isolated runs. PostgreSQL/Drizzle owns durable records. The static runner has a separate origin and no database capability.
 
-From the root, `pnpm dev` starts 127.0.0.1:3000 and the separate 127.0.0.1:3001 runner origin. No credentials/database are needed. Fixed synthetic exercises only; drafts/attempts are not persisted yet. A textarea is deliberate for the spike; editor-package selection belongs to the fixed-exercise slice.
+Follow the [root startup](../../README.md). The practice database uses port 5433 and a separate named volume. `pnpm db:migrate` requires an explicit DATABASE_URL and verifies known migration history before applying additive 0006. Historical SQL/snapshots remain unchanged; automatic schema-diff generation stays unavailable because legacy models are retired.
 
-Commands: `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`, `pnpm web:test:browser` (installed Google Chrome). Historical migrations/snapshots are unchanged; database generation/application is paused pending schema transition review. No auth/source/card runtime remains.
+Drafts save optimistically, with browser recovery for pending writes and explicit conflict choices. Attempts preserve the submitted snapshot and accept one bound report. Reload restores the draft and latest saved attempt; recent attempts can be inspected without replacing the editor. References are fetched only by an explicit action and reference runs do not become learner attempts.
 
-See ../../docs/adr/0011-focus-on-local-programming-practice.md and ../../docs/architecture/runner-spike.md.
+Commands: `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`, `pnpm web:test:db`, `pnpm web:test:browser`, `pnpm contracts:check`. The database/browser wrappers use disposable synthetic databases. No Python service or live provider calls are introduced.
+
+See [persistence](../../docs/architecture/practice-persistence.md), [ADR 0012](../../docs/adr/0012-persist-fixed-practice-with-additive-migrations.md) and [runner limits](../../docs/architecture/runner-spike.md).

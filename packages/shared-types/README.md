@@ -1,11 +1,5 @@
 # Shared Types
 
-## Start Here
+Practice contracts are type-only re-exports inferred from `@ancora/schemas`. Keep the runtime schemas canonical; do not duplicate their fields here. Backend orchestration and persistence stay in the owning application.
 
-Shared TypeScript contracts live here when they are needed across package or app boundaries. Do not hide backend business logic in this package.
-
-Useful command:
-
-```bash
-pnpm --filter @ancora/shared-types typecheck
-```
+Run `pnpm --filter @ancora/shared-types typecheck`. JSON Schema export/check commands are documented in [schemas](../schemas/README.md).

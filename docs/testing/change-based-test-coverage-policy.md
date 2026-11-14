@@ -6,7 +6,7 @@ Run the narrowest meaningful checks for the changed boundary. Read scripts befor
 - Web: naming preflight, `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`.
 - Runner/UI: `pnpm web:test:browser` in actual Google Chrome, relevant desktop/mobile states, console/network checks and synthetic screenshots. Cover cancellation, failure recovery and capability negative paths.
 - Future Python generation: typed fakes, structural/cross-field schemas, bounded provider attempts and synthetic evals. Tooling is not implemented yet.
-- Persistence: review existing database/migration history before introducing a schema transition, then test repositories and lifecycle against disposable synthetic data.
+- Persistence: review migration history, run `pnpm contracts:check` and `pnpm web:test:db` against disposable real PostgreSQL; cover immutable records, optimistic conflicts and report replay. Browser reload/recovery checks are additional. Never point tests at an existing database.
 - Code conventions/tooling: synthetic positive/negative `pnpm quality:test` fixtures and `pnpm code:check`; inspect contextual paragraphs separately.
 - Scripts/CI: shell syntax/config checks and the owning lane. The context lane does not execute the runner; the empty eval scaffold does not establish model correctness.
 

@@ -36,6 +36,13 @@
       "when": 1781011696931,
       "tag": "0004_enforce-trace-source-chunk-lineage",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794628542001,
+      "tag": "0006_programming-practice",
+      "breakpoints": true
     }
   ]
 }

@@ -10,7 +10,7 @@ for arg in "$@"; do
 Task guards:
 - Run fast blockers.
 - Run convention policy fixtures.
-- Run the web unit tests.
+- Run the web unit tests and disposable PostgreSQL integration tests.
 - Run the TypeScript eval-runner test.
 - Run deterministic eval smoke.
 EOF
@@ -21,5 +21,6 @@ done
 scripts/ci/lanes/run-fast-blockers.sh
 pnpm quality:test
 pnpm web:test
+pnpm web:test:db
 pnpm eval:test
 pnpm eval:smoke >/dev/null

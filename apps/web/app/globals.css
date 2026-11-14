@@ -363,3 +363,50 @@ summary {
     transition: none;
   }
 }
+
+.draftStatus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block: 0.75rem 1.25rem;
+}
+.draftStatus p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.draftStatus .button {
+  flex-shrink: 0;
+}
+.draftConflict,
+.pendingResult {
+  padding-block: 1rem;
+  border-block: 1px solid var(--line);
+  margin-block: 1rem;
+}
+.attemptHistory {
+  margin-block: 2rem;
+}
+.attemptHistory ul {
+  list-style: none;
+  padding: 0;
+}
+.attemptHistory li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+.submittedSource {
+  margin-top: 1rem;
+}
+@media (max-width: 600px) {
+  .draftStatus,
+  .attemptHistory li {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

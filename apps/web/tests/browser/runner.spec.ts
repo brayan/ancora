@@ -1,6 +1,6 @@
 import { createServer, get as getHttp } from 'node:http';
 import { expect, test, type Page } from '@playwright/test';
-import { CHECK_CASES, REFERENCE_CODE } from '../../features/programming-practice/constants';
+import { CHECK_CASES, REFERENCE_CODE } from '../../server/programming-practice/fixture';
 import type { RunnerResponse } from '../../runner/protocol.mjs';
 
 async function ready(page: Page) {
@@ -107,6 +107,8 @@ test('should run the local practice UI without login when opened on desktop and 
     true
   );
   await page.getByLabel('Python solution').focus();
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('button', { name: 'Save draft', exact: true })).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Run examples', exact: true })).toBeFocused();
   await page.screenshot({

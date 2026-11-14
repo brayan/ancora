@@ -1,11 +1,7 @@
 # Schemas Package
 
-## Start Here
+`src/practice.ts` owns versioned runtime schemas for the fixed-practice API. Zod validates both requests and browser responses; TypeScript contracts are inferred from these schemas and re-exported by `@ancora/shared-types`.
 
-Schema artifacts shared across app, service, prompt, and eval boundaries live here. Keep them explicit and versionable.
+`practice-v1.schema.json` is generated. Run `pnpm contracts:generate` after changing the canonical schemas; `pnpm contracts:check` rejects drift. Do not edit the generated file by hand. Runner reports also pass the bounded runner-protocol validator; JSON Schema alone does not validate execution evidence.
 
-Useful command:
-
-```bash
-pnpm --filter @ancora/schemas typecheck
-```
+`pnpm --filter @ancora/schemas typecheck` checks this package. Python consumers remain future work; no Python service owns a separate product schema or database migration.
