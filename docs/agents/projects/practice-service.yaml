@@ -6,10 +6,13 @@ read_first:
   - docs/adr/0011-focus-on-local-programming-practice.md
   - docs/product/programming-practice.md
   - docs/adr/0013-bounded-generation-and-automated-checks.md
+  - docs/adr/0014-layer-generation-around-a-framework-free-core.md
   - docs/engineering/python-conventions.md
   - docs/architecture/challenge-generation.md
 role: Bounded FastAPI/Pydantic AI challenge generation and explicitly requested coaching.
 allowed_work:
+  - Framework-free domain/application services and application-owned provider interfaces
+  - API capability routers and independent API/infrastructure Pydantic mappings
   - Complete typed challenge generation and structural/contract validation
   - Bounded correction under the Next.js-owned durable allowance
   - Versioned wire-schema export and provider adapters

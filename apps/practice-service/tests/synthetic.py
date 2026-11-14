@@ -1,8 +1,16 @@
 """Authored synthetic drafts; never imported by the production provider."""
 
 import json
+from dataclasses import replace
 
-from practice_service.contracts import ChallengeDraft, GeneratorInput, PythonType
+from practice_service.api.mappers.generation import draft_to_domain
+from practice_service.api.schemas.generation import ChallengeDraft, GeneratorInput
+from practice_service.application.models import (
+    GenerationCommand,
+    GenerationResult,
+    ModelProvenance,
+)
+from practice_service.domain.challenges.models import PythonType
 
 
 def draft_for(generation_input: GeneratorInput) -> ChallengeDraft:
@@ -96,24 +104,29 @@ def generation_input(concept: str = "collections") -> GeneratorInput:
     )
 
 
-class SyntheticGenerator:
+class SyntheticChallengeProvider:
     available: bool = True
     model: str = "synthetic-offline"
 
     def __init__(self) -> None:
         self.calls = 0
 
-    async def generate(self, generation_input: GeneratorInput) -> ChallengeDraft:
+    async def generate(self, command: GenerationCommand) -> GenerationResult:
         self.calls += 1
-        draft = draft_for(generation_input)
+        draft = draft_for(generation_input(command.request.concept))
         if (
-            generation_input.request.preferences == "synthetic-invalid-reference"
-            and generation_input.request.concept == "strings"
-            and generation_input.previous is None
+            command.request.preferences == "synthetic-invalid-reference"
+            and command.request.concept == "strings"
+            and command.previous is None
         ):
             draft = draft.model_copy(
                 update={
                     "reference_source": 'def retain_letters(value: str) -> str:\n    return ""\n',
                 }
             )
-        return draft
+        return GenerationResult(
+            draft=replace(
+                draft_to_domain(draft), difficulty=command.request.difficulty
+            ),
+            model=ModelProvenance("openai", self.model, "programming-practice-v1"),
+        )

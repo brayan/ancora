@@ -5,7 +5,7 @@ import uvicorn
 
 def main() -> None:
     uvicorn.run(
-        "practice_service.http:create_app",
+        "practice_service.bootstrap:create_app",
         factory=True,
         host="127.0.0.1",
         port=8001,

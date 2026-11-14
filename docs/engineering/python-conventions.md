@@ -8,6 +8,14 @@ The root uv workspace supports Python `>=3.13,<3.15`; `.python-version`, CI, Ruf
 
 FastAPI delivers a bounded generation API, Pydantic validates untrusted HTTP/model output, and Pydantic AI stays behind a typed provider adapter. Keep HTTP thin, deterministic validation independently testable, and create packages only when they own real behavior. Python never owns product database writes. Provider configuration is explicit; SDK/framework retries cannot expand the durable generation allowance.
 
+## Package structure and dependency direction
+
+Follow [ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md). The service package has root `api/`, `application/`, `domain/` and `infrastructure/` boundaries. Split API routers by capability and Pydantic schemas by boundary/domain; do not restore a global `contracts.py`. `bootstrap.py` wires concrete adapters and their lifecycle; `main.py` starts the process. FastAPI `Depends` stays in the API.
+
+Domain models and application commands/results are plain dataclasses. Neither layer imports Pydantic, FastAPI, vendor SDKs or transport DTOs. Application services coordinate operations with meaningful orchestration; application-owned `interfaces/` use typed `Protocol` dependencies and plain core models. Name provider interfaces separately from the services that consume them. Deterministic domain rules can remain functions. Avoid forwarding-only use-case classes and repositories for non-persistence operations.
+
+API and infrastructure Pydantic models validate untrusted data, then map explicitly to/from core values. Wire versions and JSON case encoding stay at those boundaries. The HTTP and LLM schemas each have parity tests against the canonical versioned artifact. Pytest also guards import direction and imports the core without site packages; add new core modules under that coverage.
+
 ## Maintained code and strict checks
 
 Root Ruff and Pyright configuration covers service source/tests, `apps/web/runner/harness.py` and AST-only host tests under `apps/web/tests/python`. Ruff retains its defaults and adds `ANN`, `B`, `I`, `UP` and `SIM`. Pyright checks all these paths in strict mode, including typed fixtures and fakes. No maintained path is excluded or globally weakened for a dynamic dependency.

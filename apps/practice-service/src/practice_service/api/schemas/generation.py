@@ -5,6 +5,13 @@ from typing import Annotated, Literal
 from pydantic import AfterValidator, BaseModel, BeforeValidator, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
+from practice_service.domain.challenges.models import (
+    Concept,
+    Difficulty,
+    PythonType,
+    Technique,
+)
+
 
 def _strict_version(value: object) -> object:
     if type(value) not in (int, float):
@@ -23,13 +30,6 @@ def _wire_text_limit(maximum: int) -> AfterValidator:
 
 
 Version = Annotated[Literal[1], BeforeValidator(_strict_version)]
-PythonType = Literal[
-    "int", "str", "list[int]", "list[str]", "dict[str,int]", "dict[str,str]"
-]
-Concept = Literal[
-    "collections", "comprehensions", "dictionaries", "strings", "functions"
-]
-Difficulty = Literal["beginner", "intermediate"]
 PythonName = Annotated[str, Field(pattern=r"^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$")]
 Requirement = Annotated[str, Field(min_length=1, max_length=500), _wire_text_limit(500)]
 
@@ -84,7 +84,7 @@ class ChallengeDraft(WireModel):
     function_contract: FunctionContract
     requirements: Annotated[list[Requirement], Field(min_length=1, max_length=12)]
     constraints: Annotated[list[Requirement], Field(min_length=1, max_length=10)]
-    technique: Literal["none", "list_comprehension", "dict_comprehension"]
+    technique: Technique
     public_cases: Annotated[list[GeneratedCase], Field(min_length=2, max_length=4)]
     check_cases: Annotated[list[GeneratedCase], Field(min_length=3, max_length=8)]
     reference_source: Annotated[

@@ -86,4 +86,5 @@ adr_index:
   - docs/adr/0011-focus-on-local-programming-practice.md
   - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
   - docs/adr/0013-bounded-generation-and-automated-checks.md
+  - docs/adr/0014-layer-generation-around-a-framework-free-core.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

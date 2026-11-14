@@ -3,9 +3,9 @@
 import os
 
 import uvicorn
-from practice_service.http import create_app
+from practice_service.bootstrap import create_app
 from practice_service.settings import Settings
-from synthetic import SyntheticGenerator
+from synthetic import SyntheticChallengeProvider
 
 
 def main() -> None:
@@ -22,7 +22,7 @@ def main() -> None:
             "Synthetic service requires a server token of at least 32 characters"
         )
     uvicorn.run(
-        create_app(settings, SyntheticGenerator()),
+        create_app(settings, SyntheticChallengeProvider()),
         host="127.0.0.1",
         port=8001,
         access_log=False,

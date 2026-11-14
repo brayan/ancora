@@ -1,75 +1,17 @@
-"""Deterministic checks only. Reference source is parsed, never executed."""
+"""Deterministic challenge rules. Reference source is parsed, never executed."""
 
 import ast
 import json
 import keyword
-from typing import cast
 
-from practice_service.contracts import ChallengeDraft, GenerationRequest, PythonType
-
-CaseValue = int | str | list[int] | list[str] | dict[str, int] | dict[str, str]
-
-
-class DraftInvalid(Exception):
-    def __init__(self, issue: str = "structure_invalid") -> None:
-        self.issue = issue
-        super().__init__(issue)
-
-
-def _reject_constant(_value: str) -> object:
-    raise DraftInvalid("case_json_invalid")
-
-
-def _unique_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
-    result: dict[str, object] = {}
-    for key, value in pairs:
-        if key in result:
-            raise DraftInvalid("case_json_invalid")
-        result[key] = value
-    return result
-
-
-def _string_units(value: str) -> int:
-    return len(value.encode("utf-16-le", errors="surrogatepass")) // 2
-
-
-def _scalar_matches(value: object, kind: str) -> bool:
-    if kind == "int":
-        return type(value) is int and abs(value) <= 1_000_000
-    return type(value) is str and _string_units(value) <= 2000
-
-
-def parse_case_value(source: str, kind: PythonType) -> CaseValue:
-    try:
-        value: object = json.loads(
-            source, parse_constant=_reject_constant, object_pairs_hook=_unique_object
-        )
-    except (ValueError, RecursionError) as error:
-        raise DraftInvalid("case_json_invalid") from error
-
-    if kind in ("int", "str"):
-        valid = _scalar_matches(value, kind)
-    elif kind.startswith("list"):
-        values = cast(list[object], value) if type(value) is list else None
-        valid = (
-            values is not None
-            and len(values) <= 100
-            and all(_scalar_matches(element, kind[5:-1]) for element in values)
-        )
-    else:
-        mapping = cast(dict[str, object], value) if type(value) is dict else None
-        valid = (
-            mapping is not None
-            and len(mapping) <= 100
-            and all(
-                _string_units(key) <= 100 and _scalar_matches(element, kind[9:-1])
-                for key, element in mapping.items()
-            )
-        )
-
-    if not valid:
-        raise DraftInvalid("case_type_invalid")
-    return cast(CaseValue, value)
+from practice_service.domain.challenges.errors import DraftInvalid
+from practice_service.domain.challenges.models import (
+    CaseValue,
+    ChallengeDraft,
+    GenerationRequest,
+    PythonType,
+)
+from practice_service.domain.challenges.values import validate_case_value
 
 
 def _annotation_matches(annotation: ast.expr | None, kind: PythonType) -> bool:
@@ -142,21 +84,11 @@ def validate_draft(draft: ChallengeDraft, request: GenerationRequest) -> None:
     cases = draft.public_cases + draft.check_cases
     if len(cases) > 12 or len({case.id for case in cases}) != len(cases):
         raise DraftInvalid("case_ids_invalid")
-    payload = json.dumps(
-        {
-            "source": draft.reference_source,
-            "cases": [case.model_dump(by_alias=True) for case in cases],
-        },
-        ensure_ascii=True,
-    ).encode("utf-8")
-    if len(payload) > 50_000:
-        raise DraftInvalid("runner_payload_too_large")
-
     input_values: list[CaseValue] = []
     expectations: dict[str, str] = {}
     for case in cases:
-        value = parse_case_value(case.input_json, contract.parameter.type)
-        expected = parse_case_value(case.expected_json, contract.returns)
+        value = validate_case_value(case.input, contract.parameter.type)
+        expected = validate_case_value(case.expected, contract.returns)
         canonical = json.dumps(value, sort_keys=True)
         serialized_expected = json.dumps(expected, sort_keys=True)
         if canonical in expectations and expectations[canonical] != serialized_expected:

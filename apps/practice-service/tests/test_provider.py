@@ -3,9 +3,15 @@ from typing import cast
 
 import httpx2
 import pytest
-from practice_service.generation import ProviderInterrupted
-from practice_service.provider import OpenAIChallengeGenerator
-from practice_service.validation import DraftInvalid
+from practice_service.api.mappers.generation import (
+    command_from_request,
+    draft_to_domain,
+)
+from practice_service.application.errors import ProviderInterrupted
+from practice_service.domain.challenges.errors import DraftInvalid
+from practice_service.infrastructure.llm.openai_challenge_provider import (
+    OpenAIChallengeProvider,
+)
 from synthetic import draft_for, generation_input
 
 
@@ -53,15 +59,17 @@ async def test_should_dispatch_one_structured_request_when_output_is_valid() -> 
             200, json=provider_response(draft.model_dump_json(by_alias=True))
         )
 
-    generator = OpenAIChallengeGenerator(
+    generator = OpenAIChallengeProvider(
         "gpt-4.1", "synthetic-key", transport=httpx2.MockTransport(respond)
     )
     try:
-        outcome = await generator.generate(request)
+        outcome = await generator.generate(command_from_request(request))
     finally:
         await generator.close()
 
-    assert outcome == draft
+    assert outcome.draft == draft_to_domain(draft)
+    assert outcome.model.name == "gpt-4.1"
+    assert outcome.model.prompt_version == "programming-practice-v1"
     assert len(requests) == 1
     body = cast(dict[str, object], json.loads(requests[0].content))
     assert body["store"] is False
@@ -110,7 +118,7 @@ async def test_should_never_retry_when_provider_rejects_or_interrupts(
             ),
         )
 
-    generator = OpenAIChallengeGenerator(
+    generator = OpenAIChallengeProvider(
         "gpt-4.1", "synthetic-key", transport=httpx2.MockTransport(respond)
     )
     expected: type[Exception] = (
@@ -120,7 +128,7 @@ async def test_should_never_retry_when_provider_rejects_or_interrupts(
     )
     try:
         with pytest.raises(expected):
-            await generator.generate(generation_input())
+            await generator.generate(command_from_request(generation_input()))
     finally:
         await generator.close()
     assert dispatches == 1

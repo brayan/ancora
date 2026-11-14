@@ -14,19 +14,28 @@ from pydantic_ai.models.openai import OpenAIResponsesModel, OpenAIResponsesModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.usage import UsageLimits
 
-from practice_service.contracts import ChallengeDraft, GeneratorInput
-from practice_service.generation import ProviderInterrupted
-from practice_service.validation import DraftInvalid
+from practice_service.application.errors import ProviderInterrupted
+from practice_service.application.models import (
+    GenerationCommand,
+    GenerationResult,
+    ModelProvenance,
+)
+from practice_service.domain.challenges.errors import DraftInvalid
+from practice_service.infrastructure.llm.mappers import (
+    draft_to_domain,
+    request_from_command,
+)
+from practice_service.infrastructure.llm.schemas import ChallengeDraft
 
 PROMPT_VERSION = "programming-practice-v1"
 PROMPT_PATH = (
-    Path(__file__).resolve().parents[4]
+    Path(__file__).resolve().parents[6]
     / "prompts/programming-practice"
     / f"{PROMPT_VERSION}.md"
 )
 
 
-class OpenAIChallengeGenerator:
+class OpenAIChallengeProvider:
     available: bool = True
 
     def __init__(
@@ -66,14 +75,21 @@ class OpenAIChallengeGenerator:
 
         self._agent.instrument = False
 
-    async def generate(self, generation_input: GeneratorInput) -> ChallengeDraft:
+    async def generate(self, command: GenerationCommand) -> GenerationResult:
         try:
             async with asyncio.timeout(65.0):
                 outcome = await self._agent.run(
-                    generation_input.model_dump_json(by_alias=True),
+                    request_from_command(command).model_dump_json(by_alias=True),
                     usage_limits=UsageLimits(request_limit=1, tool_calls_limit=0),
                 )
-            return outcome.output
+            return GenerationResult(
+                draft=draft_to_domain(outcome.output),
+                model=ModelProvenance(
+                    provider="openai",
+                    name=self.model,
+                    prompt_version="programming-practice-v1",
+                ),
+            )
         except UnexpectedModelBehavior as error:
             # Includes refusal, incomplete output and exhausted schema validation.
             raise DraftInvalid("provider_output_invalid") from error

@@ -1,11 +1,22 @@
 import pytest
 from fastapi.testclient import TestClient
-from practice_service.contracts import ChallengeDraft, GeneratorInput, GeneratorOutput
-from practice_service.generation import ProviderInterrupted
-from practice_service.http import create_app
+from practice_service.api.mappers.generation import (
+    command_from_request,
+    draft_to_domain,
+)
+from practice_service.api.schemas.generation import (
+    ChallengeDraft,
+    GeneratorInput,
+    GeneratorOutput,
+)
+from practice_service.application.errors import ProviderInterrupted
+from practice_service.application.models import GenerationCommand, GenerationResult
+from practice_service.bootstrap import create_app
+from practice_service.domain.challenges.errors import DraftInvalid
+from practice_service.domain.challenges.rules import validate_draft
+from practice_service.domain.challenges.values import parse_case_value
 from practice_service.settings import Settings
-from practice_service.validation import DraftInvalid, parse_case_value, validate_draft
-from synthetic import SyntheticGenerator, draft_for, generation_input
+from synthetic import SyntheticChallengeProvider, draft_for, generation_input
 
 TOKEN = "synthetic-server-token-32-characters"
 SETTINGS = Settings(service_token=TOKEN)
@@ -18,7 +29,7 @@ HEADERS = {"Authorization": f"Bearer {TOKEN}"}
 def test_should_return_varied_typed_drafts_when_generator_is_injected(
     concept: str,
 ) -> None:
-    generator = SyntheticGenerator()
+    generator = SyntheticChallengeProvider()
     request = generation_input(concept)
     with TestClient(create_app(SETTINGS, generator)) as client:
         response = client.post(
@@ -32,7 +43,7 @@ def test_should_return_varied_typed_drafts_when_generator_is_injected(
 
 
 def test_should_spend_one_dispatch_when_explicit_correction_is_supplied() -> None:
-    generator = SyntheticGenerator()
+    generator = SyntheticChallengeProvider()
     request = generation_input()
     corrected = request.model_copy(
         update={"previous": draft_for(request), "feedback": ["reference_failed"]}
@@ -51,7 +62,7 @@ def test_should_spend_one_dispatch_when_explicit_correction_is_supplied() -> Non
 def test_should_reject_untrusted_requests_before_dispatch(
     headers: dict[str, str], status: int
 ) -> None:
-    generator = SyntheticGenerator()
+    generator = SyntheticChallengeProvider()
     with TestClient(create_app(SETTINGS, generator)) as client:
         response = client.post(
             "/v1/generate", headers=headers, json={"private": "not-echoed"}
@@ -62,7 +73,7 @@ def test_should_reject_untrusted_requests_before_dispatch(
 
 
 def test_should_hide_sensitive_input_when_schema_is_invalid() -> None:
-    generator = SyntheticGenerator()
+    generator = SyntheticChallengeProvider()
     with TestClient(create_app(SETTINGS, generator)) as client:
         response = client.post(
             "/v1/generate", headers=HEADERS, json={"private": "not-echoed"}
@@ -85,8 +96,8 @@ def test_should_report_unavailable_without_selected_provider_configuration() -> 
 
 
 def test_should_consume_uncertain_dispatch_without_retry_when_provider_fails() -> None:
-    class InterruptedGenerator(SyntheticGenerator):
-        async def generate(self, generation_input: GeneratorInput) -> ChallengeDraft:
+    class InterruptedGenerator(SyntheticChallengeProvider):
+        async def generate(self, command: GenerationCommand) -> GenerationResult:
             self.calls += 1
             raise ProviderInterrupted("private provider output")
 
@@ -118,7 +129,7 @@ def test_should_reject_unsafe_case_values_when_type_or_json_is_invalid(
 ) -> None:
     from typing import cast
 
-    from practice_service.contracts import PythonType
+    from practice_service.domain.challenges.models import PythonType
 
     with pytest.raises(DraftInvalid):
         parse_case_value(source, cast(PythonType, kind))
@@ -152,7 +163,7 @@ def test_should_reject_reference_contradictions_without_execution(
     request = generation_input()
     draft = draft_for(request).model_copy(update={"reference_source": source})
     with pytest.raises(DraftInvalid, match=issue):
-        validate_draft(draft, request.request)
+        validate_draft(draft_to_domain(draft), command_from_request(request).request)
 
 
 def test_should_reject_conflicting_examples_when_same_input_has_different_results() -> (
@@ -167,7 +178,7 @@ def test_should_reject_conflicting_examples_when_same_input_has_different_result
         update={"check_cases": [contradictory, *draft.check_cases[1:]]}
     )
     with pytest.raises(DraftInvalid, match="case_contradiction"):
-        validate_draft(draft, request.request)
+        validate_draft(draft_to_domain(draft), command_from_request(request).request)
 
 
 @pytest.mark.parametrize("value", [True, "1"])
@@ -183,7 +194,7 @@ def test_should_reject_noninteger_version_when_literal_matches_numerically(
 
 
 def test_should_block_oversized_payload_before_provider_dispatch() -> None:
-    generator = SyntheticGenerator()
+    generator = SyntheticChallengeProvider()
     with TestClient(create_app(SETTINGS, generator)) as client:
         response = client.post("/v1/generate", headers=HEADERS, content="x" * 200001)
     assert response.status_code == 422
@@ -214,7 +225,7 @@ def test_should_reject_case_bounds_when_collection_or_string_exceeds_limit(
 ) -> None:
     from typing import cast
 
-    from practice_service.contracts import PythonType
+    from practice_service.domain.challenges.models import PythonType
 
     with pytest.raises(DraftInvalid, match="case_type_invalid"):
         parse_case_value(source, cast(PythonType, kind))
@@ -228,7 +239,7 @@ def test_should_reject_missing_empty_boundary_when_examples_only_have_values() -
     )
     draft = draft.model_copy(update={"public_cases": [first, draft.public_cases[1]]})
     with pytest.raises(DraftInvalid, match="boundary_case_missing"):
-        validate_draft(draft, request.request)
+        validate_draft(draft_to_domain(draft), command_from_request(request).request)
 
 
 def test_should_reject_duplicate_ids_when_public_and_check_cases_overlap() -> None:
@@ -237,7 +248,7 @@ def test_should_reject_duplicate_ids_when_public_and_check_cases_overlap() -> No
     first = draft.check_cases[0].model_copy(update={"id": draft.public_cases[0].id})
     draft = draft.model_copy(update={"check_cases": [first, *draft.check_cases[1:]]})
     with pytest.raises(DraftInvalid, match="case_ids_invalid"):
-        validate_draft(draft, request.request)
+        validate_draft(draft_to_domain(draft), command_from_request(request).request)
 
 
 def test_should_use_javascript_string_units_when_case_contains_astral_unicode() -> None:
@@ -320,4 +331,4 @@ def test_should_reject_oversized_runner_payload_when_individual_cases_fit_bounds
         update={"public_cases": cases[:2], "check_cases": cases[2:]}
     )
     with pytest.raises(DraftInvalid, match="runner_payload_too_large"):
-        validate_draft(draft, request.request)
+        validate_draft(draft_to_domain(draft), command_from_request(request).request)

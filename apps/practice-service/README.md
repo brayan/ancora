@@ -2,6 +2,8 @@
 
 FastAPI owns one bounded challenge-generation dispatch. Next.js owns durable lifecycle, initial plus one explicit correction allowance and all database writes. Reference and learner Python execute only in the isolated browser runner; this service only parses reference AST and JSON cases.
 
+The package separates `api/` routers/schemas/mappers, `application/services/` orchestration and `application/interfaces/` provider dependencies, framework-free `domain/challenges/` models/rules, and `infrastructure/llm/` adapters/schemas/mappers. `bootstrap.create_app` wires resources; `main` starts the service. Neither domain nor application imports Pydantic. See [ADR 0014](../../docs/adr/0014-layer-generation-around-a-framework-free-core.md) for structure and dependency rules.
+
 From repository root, install the pinned uv version then `uv sync --frozen --all-packages`. Start with `uv run --frozen --all-packages python -m practice_service.main`; it binds `127.0.0.1:8001`, with no CORS, OpenAPI or access logging. It requires Python >=3.13,<3.15. The versioned prompt is read from this repository checkout.
 
 Server environment:
@@ -24,4 +26,4 @@ uv run --frozen --all-packages pytest apps/practice-service/tests
 
 For disposable browser integration only, run `uv run --frozen --all-packages python apps/practice-service/tests/serve_synthetic.py` with both `ANCORA_SYNTHETIC_DATABASE=1` and `ANCORA_SYNTHETIC_PROVIDER=1` and a valid service token. This explicit test module injects a typed synthetic generator; it is outside the production package. No provider credentials are needed. Do not use its authored exercises as production content. No database dependencies or code-execution helpers exist here.
 
-API behavior was checked against the installed locked Pydantic AI/OpenAI packages and the official [Pydantic AI output documentation](https://ai.pydantic.dev/output/) and [OpenAI structured output guide](https://developers.openai.com/api/docs/guides/structured-outputs). No paid calls or live quality evaluation ran.
+API behavior is checked offline against the installed locked Pydantic AI/OpenAI packages. The initial manual pilot and owner acceptance are recorded separately in [the generation plan](../../docs/exec-plans/challenge-generation.md); CI and this structural refactor make no paid calls.
