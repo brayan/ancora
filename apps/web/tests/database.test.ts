@@ -1,22 +1,22 @@
-import assert from "node:assert/strict";
-import { readdir, readFile } from "node:fs/promises";
-import { test } from "node:test";
+import assert from 'node:assert/strict';
+import { readdir, readFile } from 'node:fs/promises';
+import { test } from 'node:test';
 
 async function readMigrationSql() {
-  const migrationDirectory = new URL("../drizzle/", import.meta.url);
+  const migrationDirectory = new URL('../drizzle/', import.meta.url);
   const migrationFiles = await readdir(migrationDirectory);
-  const sqlFiles = migrationFiles.filter((file) => file.endsWith(".sql")).sort();
+  const sqlFiles = migrationFiles.filter((file) => file.endsWith('.sql')).sort();
   const migrations = await Promise.all(
-    sqlFiles.map((file) => readFile(new URL(file, migrationDirectory), "utf8")),
+    sqlFiles.map((file) => readFile(new URL(file, migrationDirectory), 'utf8'))
   );
 
-  return migrations.join("\n");
+  return migrations.join('\n');
 }
 
-test("should include auth account and source foundations in the initial migration", async () => {
+test('should preserve historical table definitions when the legacy runtime is retired', async () => {
   const migration = await readFile(
-    new URL("../drizzle/0000_account-auth-foundation.sql", import.meta.url),
-    "utf8",
+    new URL('../drizzle/0000_account-auth-foundation.sql', import.meta.url),
+    'utf8'
   );
 
   assert.match(migration, /CREATE EXTENSION IF NOT EXISTS vector/);
@@ -29,7 +29,7 @@ test("should include auth account and source foundations in the initial migratio
   assert.match(migration, /CREATE TABLE "llm_trace_refs"/);
 });
 
-test("should enforce deterministic account ownership in migrations", async () => {
+test('should preserve historical ownership constraints when existing databases are retained', async () => {
   const migrationSql = await readMigrationSql();
 
   assert.match(migrationSql, /"active_account_id" text/);
@@ -38,29 +38,29 @@ test("should enforce deterministic account ownership in migrations", async () =>
   assert.match(migrationSql, /"sources_account_id_id_unique"/);
   assert.match(
     migrationSql,
-    /"sources_account_created_by_membership_fk" FOREIGN KEY \("account_id","created_by_user_id"\) REFERENCES "public"."account_memberships"\("account_id","user_id"\)/,
+    /"sources_account_created_by_membership_fk" FOREIGN KEY \("account_id","created_by_user_id"\) REFERENCES "public"."account_memberships"\("account_id","user_id"\)/
   );
   assert.match(migrationSql, /"source_chunks_account_source_fk"/);
   assert.match(migrationSql, /FOREIGN KEY \("account_id","source_id"\)/);
   assert.match(
     migrationSql,
-    /"llm_trace_refs_account_source_fk" FOREIGN KEY \("account_id","source_id"\) REFERENCES "public"."sources"\("account_id","id"\)/,
+    /"llm_trace_refs_account_source_fk" FOREIGN KEY \("account_id","source_id"\) REFERENCES "public"."sources"\("account_id","id"\)/
   );
   assert.match(
     migrationSql,
-    /"llm_trace_refs_account_source_chunk_fk" FOREIGN KEY \("account_id","source_chunk_id"\) REFERENCES "public"."source_chunks"\("account_id","id"\)/,
+    /"llm_trace_refs_account_source_chunk_fk" FOREIGN KEY \("account_id","source_chunk_id"\) REFERENCES "public"."source_chunks"\("account_id","id"\)/
   );
   assert.match(migrationSql, /"source_chunks_account_source_id_id_unique"/);
   assert.match(
     migrationSql,
-    /"llm_trace_refs_account_source_chunk_source_fk" FOREIGN KEY \("account_id","source_id","source_chunk_id"\) REFERENCES "public"."source_chunks"\("account_id","source_id","id"\)/,
+    /"llm_trace_refs_account_source_chunk_source_fk" FOREIGN KEY \("account_id","source_id","source_chunk_id"\) REFERENCES "public"."source_chunks"\("account_id","source_id","id"\)/
   );
 
   const traceLineageIndexPosition = migrationSql.indexOf(
-    'CREATE UNIQUE INDEX "source_chunks_account_source_id_id_unique"',
+    'CREATE UNIQUE INDEX "source_chunks_account_source_id_id_unique"'
   );
   const traceLineageForeignKeyPosition = migrationSql.indexOf(
-    'ALTER TABLE "llm_trace_refs" ADD CONSTRAINT "llm_trace_refs_account_source_chunk_source_fk"',
+    'ALTER TABLE "llm_trace_refs" ADD CONSTRAINT "llm_trace_refs_account_source_chunk_source_fk"'
   );
 
   assert.ok(traceLineageIndexPosition >= 0);

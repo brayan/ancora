@@ -1,50 +1,13 @@
 # Change-Based Test Coverage Policy
 
-Ancora should validate the boundary that changed without turning every small edit into a full repo run.
+Run the narrowest meaningful checks for the changed boundary. Read scripts before use and report missing prerequisites; do not invent passing commands.
 
-## General Rule
+- Docs/governance: file/link checks, manifest/shard inspection and `pnpm repo:test:context`.
+- Web: naming preflight, `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`.
+- Runner/UI: `pnpm web:test:browser` in actual Google Chrome, relevant desktop/mobile states, console/network checks and synthetic screenshots. Cover cancellation, failure recovery and capability negative paths.
+- Future Python generation: typed fakes, structural/cross-field schemas, bounded provider attempts and synthetic evals. Tooling is not implemented yet.
+- Persistence: review existing database/migration history before introducing a schema transition, then test repositories and lifecycle against disposable synthetic data.
+- Code conventions/tooling: synthetic positive/negative `pnpm quality:test` fixtures and `pnpm code:check`; inspect contextual paragraphs separately.
+- Scripts/CI: shell syntax/config checks and the owning lane. The context lane does not execute the runner; the empty eval scaffold does not establish model correctness.
 
-Run the narrowest meaningful validation available for the changed area. If expected commands do not exist yet, inspect available scripts and report the missing command surface.
-
-## Docs-Only Changes
-
-Use file-existence checks, manifest/shard inspection, and targeted search.
-
-Expected checks for governance changes:
-
-```bash
-test -f AGENTS.md
-test -f docs/agents/repo-manifest.yaml
-find docs/agents/projects -type f | sort
-find docs/adr -type f | sort
-rg -n "Next\\.js|TypeScript|OpenAI|auth|account|pgvector|source material|defer" AGENTS.md CONTEXT.md docs
-```
-
-## Web Changes
-
-Prefer web-specific lint, type, and test commands once `apps/web` exists. The web boundary should validate routing, accessibility-sensitive UI, typed API usage, and account-aware flows.
-
-## AI Runtime Changes
-
-Prefer `pnpm web:typecheck`, server-boundary tests, schema validation, API contract checks, and narrow eval smoke checks when prompts, retrieval, generation, or grading behavior changes.
-
-## Worker Changes
-
-Validate job behavior, retry/error paths, account scoping, and logging privacy inside the TypeScript server boundary. Do not introduce Redis, queue infrastructure, or a separate worker runtime without an ADR.
-
-## Eval Changes
-
-Run `make eval-smoke` when available. Eval fixtures must be synthetic or explicitly approved sample material, and reports must not leak private source material.
-
-## Scripts, CI, and Infra Changes
-
-Validate shell scripts and workflow syntax with the narrowest available command. Docker validation should stay local to accepted v1 services. Kubernetes and Terraform checks are out of scope until approved by ADR.
-
-## Handoff
-
-Every handoff should report:
-
-- changed files
-- validation commands run
-- missing expected commands
-- known residual risk
+Before broad checks, self-review the task-owned diff and run existing lightweight convention checks. `pnpm repo:test:pr` includes the local context/task lanes; browser checks are additional for runner changes. Report changed files, commands/results, validation gaps and residual risks. Do not log/capture private learner code.

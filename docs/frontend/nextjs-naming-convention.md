@@ -9,16 +9,16 @@ Use filename shape to show the file's role.
 React component files use `PascalCase` and should match the exported component name:
 
 ```txt
-HomeShell.tsx
-SourceList.tsx
-DeckReviewPanel.tsx
+PracticeScreen.tsx
+ChallengePanel.tsx
+AttemptResults.tsx
 ```
 
 React hook files use `camelCase`, start with `use`, and should match the exported hook name:
 
 ```txt
-useSourceFilters.ts
-useReviewSession.ts
+usePracticeRunner.ts
+usePracticeSession.ts
 ```
 
 Feature contract files stay lowercase and use these canonical names when present:
@@ -55,7 +55,7 @@ not-found.tsx
 - Use dynamic folders as `[param]`.
 - Use catch-all folders as `[...param]`.
 - Use optional catch-all folders as `[[...param]]`.
-- Dynamic segment tokens should be `camelCase`, such as `[sourceId]`, `[deckId]`, and `[cardId]`.
+- Dynamic segment tokens should be `camelCase`, such as `[challengeId]` and `[attemptId]`.
 
 ## Imports
 
@@ -69,7 +69,7 @@ not-found.tsx
 New and edited TS/JS web tests should use behavior-focused names with `should` and `when` semantics:
 
 ```ts
-test("should list scaffold lanes when home constants are loaded", () => {
+test('should show results when the runner completes', () => {
   // ...
 });
 ```
@@ -78,7 +78,9 @@ Prefer one scenario per test. Use blank-line grouping for optional setup, exerci
 
 ## Local Enforcement
 
-The current filename guard is:
+The filename CLI is shared through `@ancora/config` and checks exported component/hook names as well as filenames. See [code quality conventions](../engineering/code-quality-conventions.md) for provenance, braces, paragraph grouping and the complete check lane.
+
+Run the filename guard:
 
 ```bash
 pnpm --filter @ancora/web lint:naming

@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@ancora/config", "@ancora/shared-types", "@ancora/ui"],
+  devIndicators: false,
+  transpilePackages: ['@ancora/config', '@ancora/shared-types', '@ancora/ui'],
 };
 
 export default nextConfig;

@@ -1,133 +1,73 @@
-version: 0.3
+version: 0.4
 project: ancora
-status: typescript-first-scaffold
-description: AI-native learning platform with grounded flashcards, adaptive quizzes, RAG tutoring, evals, and observability.
-
+status: programming-practice-runner-spike
+description: Local single-user Python programming practice with generated challenges.
 startup:
   root_guidance: AGENTS.md
   domain_context: CONTEXT.md
   manifest: docs/agents/repo-manifest.yaml
   project_shards_dir: docs/agents/projects
-  rule: Read the root guidance, domain context, this manifest, relevant ADRs, and only the shard for the touched boundary.
-
+  rule: Read current guidance, ADR 0011 and only the shard for the touched boundary.
 canonical_docs:
   business_problem: docs/product/business-problem.md
+  programming_practice: docs/product/programming-practice.md
   system_overview: docs/architecture/system-overview.md
-  architecture_diagrams: docs/architecture/diagrams.md
+  runner_spike: docs/architecture/runner-spike.md
   architecture_decisions: docs/adr
-  engineering_tradeoffs: docs/engineering/tradeoffs.md
   documentation_governance: docs/engineering/documentation-governance.md
   git_conventions: docs/engineering/git-conventions.md
+  code_quality: docs/engineering/code-quality-conventions.md
   monorepo_conventions: docs/engineering/monorepo-conventions.md
   nextjs_feature_first_convention: docs/frontend/nextjs-feature-first-convention.md
   nextjs_naming_convention: docs/frontend/nextjs-naming-convention.md
   test_impact_policy: docs/testing/change-based-test-coverage-policy.md
   testing_strategy: docs/testing/testing-strategy.md
   eval_strategy: docs/evals/eval-strategy.md
-  failure_cases: docs/ops/failure-cases.md
-  monitoring: docs/ops/monitoring.md
-  deployment: docs/ops/deployment.md
-  cost_model: docs/ops/cost-model.md
-  solo_dev_guardrails: docs/ops/solo-dev-guardrails.md
-  next_improvements: docs/roadmap/next-improvements.md
-  execution_plans: docs/exec-plans/README.md
-  implementation_plan: docs/implementation/ancora-project-plan-v0.2.md
-
-accepted_v1_stack:
-  web: Next.js in apps/web
-  product_and_ai_runtime: Next.js/Node/TypeScript in apps/web/server owns the v1 product API and AI runtime
-  ai_sdk: Vercel AI SDK with OpenAI SDK
-  persistence: Drizzle with PostgreSQL and pgvector
-  llm_provider: OpenAI is the default v1 LLM and embedding provider
-  auth: Auth.js with account ownership is required v1 product scope
-  observability: Langfuse JS/TS for LLM traces and eval metadata
-  workflows: LangChain.js and LangGraph.js for bounded AI workflows
-  local_platform: Docker Compose
-
-deferred_until_adr:
-  - separate NestJS or Express microservices
-  - Python runtime services and workers
-  - Kubernetes
-  - Terraform
-  - Redis
-  - PyTorch
-  - uploaded file ingestion
-
-privacy_boundary: Account-owned source material is private and must not leak into logs, traces, fixtures, docs, screenshots, commits, or eval datasets.
-
+  implementation_plan: docs/exec-plans/programming-practice.md
+accepted_stack:
+  web: Next.js App Router, React and TypeScript
+  product: apps/web owns product orchestration and durable records
+  generation: Planned FastAPI/Pydantic AI service in apps/practice-service; no DB writes
+  persistence: PostgreSQL and Drizzle; migration transition deferred to persistence slice
+  provider: OpenAI; model and live-eval budget not yet selected
+  identity: Local single-user; no login or accounts
+  runner: Disposable Pyodide worker on separate loopback static origin
+privacy_boundary: Submitted code and private material must not leak to logs, traces, screenshots, fixtures or eval artifacts.
+deferred:
+  - public hosting and multi-user access
+  - auth, sources, decks/cards, RAG and embeddings
+  - uploaded files, queues, Redis, Kubernetes and Terraform
 command_surface:
-  expected:
-    - make dev
-    - make test
-    - make lint
-    - make eval-smoke
-    - make db-migrate
-    - make db-seed
-    - make docker-up
-    - make docker-down
+  available:
+    - pnpm dev
+    - pnpm code:check
+    - pnpm format:check
+    - pnpm format:write
+    - pnpm quality:test
     - pnpm web:lint
     - pnpm web:typecheck
     - pnpm web:test
+    - pnpm web:test:browser
     - pnpm eval:smoke
-    - pnpm docker:config
-    - pnpm docker:up
-    - pnpm docker:down
     - pnpm repo:test:fast
-    - pnpm repo:test:task
     - pnpm repo:test:context
+    - pnpm repo:test:task
     - pnpm repo:test:pr
-  rule: Until commands exist, inspect available scripts and report missing commands rather than inventing behavior.
-
+  paused: Database migration/generation/seed commands pending persistence review
+  rule: Inspect scripts; never report planned commands as available or run.
 project_shards:
   - name: web
     file: docs/agents/projects/web.yaml
-    routes:
-      - apps/web/**
-      - packages/ui/**
-      - packages/shared-types/**
-      - packages/schemas/**
-      - prompts/**
-      - docs/frontend/**
-
+    routes: [apps/web/**, packages/ui/**, packages/shared-types/**, packages/schemas/**, prompts/**, docs/frontend/**]
+  - name: practice-service
+    file: docs/agents/projects/practice-service.yaml
+    routes: [apps/practice-service/**]
   - name: eval-runner
     file: docs/agents/projects/eval-runner.yaml
-    routes:
-      - tools/eval-runner/**
-      - evals/**
-
+    routes: [tools/eval-runner/**, evals/**]
   - name: scripts-ci
     file: docs/agents/projects/scripts-ci.yaml
-    routes:
-      - scripts/**
-      - .github/workflows/**
-      - infra/**
-      - docker/**
-      - config/**
-      - packages/config/**
-      - Makefile
-      - package.json
-      - pnpm-workspace.yaml
-      - tsconfig.base.json
-      - .gitignore
-      - "*.env.example"
-      - docs/agents/**
-      - docs/product/**
-      - docs/architecture/**
-      - docs/engineering/**
-      - docs/testing/**
-      - docs/evals/**
-      - docs/ops/**
-      - docs/roadmap/**
-      - docs/exec-plans/**
-
+    routes: [scripts/**, docker/**, infra/**, config/**, packages/config/**, docs/**, package.json, Makefile, pnpm-workspace.yaml]
 adr_index:
-  - docs/adr/0001-use-monorepo.md
-  - docs/adr/0002-fastapi-owns-v1-product-and-ai-api.md
-  - docs/adr/0003-auth-and-account-are-v1-scope.md
-  - docs/adr/0004-use-openai-as-default-llm-provider.md
-  - docs/adr/0005-use-postgresql-pgvector-for-v1.md
-  - docs/adr/0006-defer-standalone-node-api-kubernetes-terraform.md
-  - docs/adr/0007-place-eval-runner-under-services.md
-  - docs/adr/0008-use-nextjs-for-v1-client-ui.md
-  - docs/adr/0009-nextjs-typescript-owns-v1-product-and-ai-runtime.md
-  - docs/adr/0010-defer-python-runtime-to-later-research-and-tooling.md
+  - docs/adr/0011-focus-on-local-programming-practice.md
+historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

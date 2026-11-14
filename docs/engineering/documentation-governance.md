@@ -22,7 +22,7 @@ Long-form product, architecture, engineering, frontend, testing, eval, operation
 - Update the repo manifest when routes, boundaries, commands, or canonical docs change.
 - Update a project shard when ownership, allowed work, out-of-scope work, privacy rules, or validation changes for that boundary.
 - Add or update an ADR before implementing a decision that changes accepted v1 architecture.
-- Add or update `docs/engineering/git-conventions.md` when commit message or pull request title conventions change.
+- Add or update `docs/engineering/git-conventions.md` when branch naming, commit message or pull request conventions change.
 - Add or update `docs/frontend` when Next.js structure, naming, import-boundary, or UI code conventions change.
 - Keep implementation plans under `docs/implementation/` or `docs/exec-plans/`.
 

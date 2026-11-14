@@ -1,9 +1,2 @@
-export const healthResponseSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["status", "service"],
-  properties: {
-    status: { const: "ok" },
-    service: { const: "web-runtime" },
-  },
-} as const;
+// Canonical wire schemas are introduced with the persistence/generation slice.
+export {};

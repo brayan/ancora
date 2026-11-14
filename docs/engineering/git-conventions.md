@@ -1,6 +1,21 @@
 # Git Conventions
 
-Ancora uses Conventional Commits for commit subjects and pull request titles. The goal is reviewable history, searchable change intent, and predictable release notes later.
+Ancora follows the [shared Sailtech Git and PR convention](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/pull-request-and-commit-convention.md), the same canonical source used by the Sailtech monorepo. These rules apply repository-wide: web, the future Python service, shared packages, tooling and documentation.
+
+## Branch Names
+
+Follow the shared [branch naming rules](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/pull-request-and-commit-convention.md#branch-names): new work branches use `<type>/<slug>`, with a lowercase, hyphenated slug derived from the change objective. Use the Conventional Commits type for that objective; do not add tool-specific prefixes such as `codex/`.
+
+Ancora examples:
+
+```txt
+feat/practice-generation
+fix/runner-timeout-recovery
+docs/python-service-structure
+chore/code-quality-conventions
+```
+
+Preserve existing PR head branches during follow-up work. This convention does not authorize renaming/deleting published branches, rewriting history or replacing PRs.
 
 ## Required Format
 
@@ -22,12 +37,14 @@ The `type` and optional `scope` stay lowercase. The description starts with an u
 
 ## Types
 
+The shared standard owns the complete allowed type set. Common examples:
+
 - `feat`: A new feature.
 - `fix`: A bug fix.
 - `docs`: Documentation-only changes.
 - `refactor`: Code changes that neither fix a bug nor add a feature.
 - `test`: Adding or updating tests.
-- `chore`: Changes to build process, dependencies, generated metadata, or tools.
+- `chore`: Repository maintenance that does not fit a more specific type; use `build` for build systems, packaging and dependencies.
 
 ## Scope
 

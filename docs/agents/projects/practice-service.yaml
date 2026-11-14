@@ -1,0 +1,19 @@
+name: practice-service
+status: planned
+primary_paths: [apps/practice-service]
+read_first:
+  - CONTEXT.md
+  - docs/adr/0011-focus-on-local-programming-practice.md
+  - docs/product/programming-practice.md
+role: Bounded FastAPI/Pydantic AI challenge generation and explicitly requested coaching.
+allowed_work:
+  - Complete typed challenge generation and structural/contract validation
+  - Bounded correction under the Next.js-owned durable allowance
+  - Versioned wire-schema export and provider adapters
+out_of_scope:
+  - Product database writes, independent migrations and account ownership
+  - Execution of reference or learner Python
+  - Live evaluation before model and spending budget selection
+validation:
+  proposed: [Ruff, strict Pyright, pytest, wire-schema drift checks]
+  rule: No Python service or commands exist yet; create them only in the approved generation slice.

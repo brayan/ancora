@@ -4,27 +4,27 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --hostname 127.0.0.1 --port 3000",
     "build": "next build",
-    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
-    "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
-    "db:studio": "drizzle-kit studio --config drizzle.config.ts",
-    "lint": "pnpm --silent run lint:naming && eslint .",
-    "lint:naming": "node scripts/check-filename-case.mjs",
+    "lint": "pnpm --silent run lint:naming && pnpm --silent run lint:imports && pnpm --silent run lint:architecture && eslint . --max-warnings=0",
+    "lint:naming": "ancora-check-next-filenames",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "runner:dev": "node scripts/run-runner.mjs",
+    "test:browser": "playwright test",
+    "lint:imports": "node scripts/check-import-boundaries.mjs",
+    "lint:architecture": "node scripts/check-architecture-policy.mjs && node scripts/check-typescript-size-guardrails.mjs"
   },
   "dependencies": {
     "@ancora/config": "workspace:*",
     "@ancora/shared-types": "workspace:*",
     "@ancora/ui": "workspace:*",
-    "@auth/drizzle-adapter": "^1.11.2",
     "drizzle-orm": "^0.45.2",
     "next": "16.2.6",
-    "next-auth": "5.0.0-beta.31",
     "pg": "^8.21.0",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "pyodide": "314.0.7"
   },
   "devDependencies": {
     "@types/node": "24.0.0",
@@ -35,6 +35,7 @@
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
     "tsx": "^4.22.3",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "@playwright/test": "1.65.0"
   }
 }

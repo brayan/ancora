@@ -1,13 +1,13 @@
-import assert from "node:assert/strict";
-import { test } from "node:test";
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
 
-import { runSmoke } from "../dist/smoke.js";
+import { runSmoke } from '../dist/smoke.js';
 
-test("smoke result is deterministic and synthetic", () => {
+test('should return deterministic synthetic metadata when the smoke scaffold runs', () => {
   assert.deepEqual(runSmoke(), {
     checks: [],
-    dataset: "synthetic-empty",
-    status: "ok",
-    suite: "smoke",
+    dataset: 'synthetic-empty',
+    status: 'ok',
+    suite: 'smoke',
   });
 });

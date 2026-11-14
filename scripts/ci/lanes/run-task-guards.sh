@@ -9,7 +9,8 @@ for arg in "$@"; do
     cat <<'EOF'
 Task guards:
 - Run fast blockers.
-- Run the web scaffold test.
+- Run convention policy fixtures.
+- Run the web unit tests.
 - Run the TypeScript eval-runner test.
 - Run deterministic eval smoke.
 EOF
@@ -18,6 +19,7 @@ EOF
 done
 
 scripts/ci/lanes/run-fast-blockers.sh
+pnpm quality:test
 pnpm web:test
 pnpm eval:test
 pnpm eval:smoke >/dev/null

@@ -1,61 +1,24 @@
 # Ancora Context
 
-This document defines canonical domain language for Ancora. Terms should describe product concepts, not framework or storage details.
+Ancora provides short programming challenges for a learner practising locally. Python is the initial language; collections, comprehensions, filtering/transformation, strings and functions cover basic through intermediate practice. See ADR 0011 and docs/product/programming-practice.md.
 
-## Canonical Terms
+## Canonical terms
 
-**Account**
+- **Challenge:** stable identity of a programming exercise.
+- **Challenge Revision:** immutable statement, structured function contract, requirements, examples, reference solution, cases and provenance for one version.
+- **Generation:** the requested concept/difficulty, provider-dispatch allowance and lifecycle producing candidate revisions.
+- **Practice Draft:** mutable editor content tied to a challenge revision, preserved separately from a submitted attempt.
+- **Attempt:** exact submitted code snapshot and behavioral, technique and execution results tied to a revision/runtime.
+- **Assistance:** an explicitly requested hint, coaching response or solution reveal, tied to the selected revision/attempt.
+- **Execution Job:** bounded runner request identified by job ID, revision, source/case digests and runtime version.
+- **Prompt Version / Trace Reference / Eval Run:** versioned instructions, privacy-safe observability reference and evaluation evidence.
 
-The ownership, access-control, billing, and privacy boundary for one or more users. Source material, source chunks, decks, cards, reviews, eval runs, and trace references belong to an account.
+## Principles
 
-**User**
-
-A person who signs in to Ancora and studies within an account. A user creates, reviews, edits, or evaluates study material according to their account permissions.
-
-**Source**
-
-A user-provided learning artifact such as pasted notes, markdown, transcripts, articles, or later uploaded files. A source is the account-owned original material from which study artifacts are derived.
-
-**Source Chunk**
-
-A bounded portion of a source used for retrieval, citation, generation, and traceability. A source chunk should carry enough metadata to identify its origin without exposing private text unnecessarily.
-
-**Prompt Version**
-
-A versioned prompt artifact used by an AI workflow. Prompt versions connect generated outputs to instructions, schemas, model settings, evals, and later improvements.
-
-**Trace Reference**
-
-A stable reference from Ancora product data to an observability record. Trace references allow debugging without copying private source material throughout the product database.
-
-**Eval Run**
-
-An execution of an evaluation suite against prompts, retrieval, grading, generation, or workflows. Eval runs capture inputs, configuration, scores, failures, and report references.
-
-**Deck**
-
-A user-organized collection of cards for a subject, goal, course, or study workflow. A deck is the main container a learner reviews.
-
-**Card**
-
-The stable identity of a study item. A card represents the learning target across edits, regenerations, reviews, and quality checks.
-
-**Card Version**
-
-A specific version of a card's prompt, answer, citations, metadata, and generated or edited content. Card versions preserve history and allow quality comparisons.
-
-**Review**
-
-A user's study interaction with a card, including the response, rating, result, timing, and scheduling impact. Reviews are the basis for learning progress.
-
-**LLM Trace**
-
-An observability record for an LLM workflow, including metadata such as prompt version, model, latency, token counts, cost, source and chunk identifiers, scores, and related product IDs.
-
-## Product Principles
-
-- Generated study material must be grounded in sources and traceable to source chunks.
-- Product flows should be deterministic first and AI-assisted where generation, grading, explanation, or adaptation adds value.
-- Auth and account boundaries are part of v1 because private source material needs clear ownership from the start.
-- Pasted text is the first source path. Uploaded file ingestion is deferred until the core vertical slice works and an ADR changes the scope.
-- OpenAI is the default v1 LLM and embedding provider, and product behavior must be explicit when account-owned content is sent to an external provider.
+- The LLM primarily generates complete new challenges, rather than rewording a fixed exercise bank.
+- `concept_generated` content comes from a concept and difficulty. It has no fabricated source/citation lineage. Source-grounded material is deferred.
+- Deterministic contracts and execution checks precede optional coaching. Internal reference/case agreement is not independent proof of semantic correctness.
+- Use local single-user operation without login or accounts. A dummy identity is unnecessary.
+- Challenges, drafts and attempts are distinct from the retired Cards and Reviews.
+- Keep submitted code private. Sending it to an external provider requires an explicit assistance action with clear product behavior.
+- Browser execution is untrusted self-study evidence and cannot authorize privileged or paid actions.

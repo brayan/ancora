@@ -7,12 +7,17 @@
     ".": {
       "types": "./src/index.ts",
       "import": "./src/index.ts"
-    }
+    },
+    "./eslint": "./eslint/conventions.mjs"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs"
   },
   "devDependencies": {
     "typescript": "6.0.3"
+  },
+  "bin": {
+    "ancora-check-next-filenames": "./bin/check-next-filenames.mjs"
   }
 }
