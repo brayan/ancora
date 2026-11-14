@@ -96,6 +96,95 @@ test('should preserve both drafts for an explicit choice when two tabs save the 
   }
 });
 
+test('should preserve an unresolved recovery conflict when repeated reloads precede an explicit choice', async ({
+  page,
+  request,
+}) => {
+  await open(page);
+  page.on('dialog', (dialog) => dialog.accept());
+  const original = (await (await request.get('/api/practice/session')).json()).draft;
+  await page.route('**/api/practice/draft', (route) => route.abort());
+  const recoveredSource = '# Synthetic unresolved recovery\n' + REFERENCE_CODE;
+  await page.getByLabel('Python solution').fill(recoveredSource);
+  await expect(page.getByRole('button', { name: 'Retry save', exact: true })).toBeVisible();
+
+  const databaseSource = '# Synthetic concurrent database draft\n' + REFERENCE_CODE;
+  const saved = await request.put('/api/practice/draft', {
+    headers: { Origin: 'http://127.0.0.1:3000' },
+    data: { apiVersion: 1, ...original, source: databaseSource },
+  });
+  expect(saved.ok()).toBe(true);
+  await page.unroute('**/api/practice/draft');
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Keep my edits', exact: true })).toBeVisible();
+
+  const editedSource = '# Synthetic edits during unresolved conflict\n' + REFERENCE_CODE;
+  await page.getByLabel('Python solution').fill(editedSource);
+  for (let reload = 0; reload < 2; ++reload) {
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Keep my edits', exact: true })).toBeVisible();
+    await expect(page.getByLabel('Python solution')).toHaveValue(editedSource);
+    await expect(page.getByRole('button', { name: 'Check solution', exact: true })).toBeDisabled();
+    expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(
+      databaseSource
+    );
+  }
+
+  await page
+    .locator('.editorPanel')
+    .screenshot({ path: 'test-results/practice-conflict-desktop.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('button', { name: 'Use database draft', exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page
+    .locator('.editorPanel')
+    .screenshot({ path: 'test-results/practice-conflict-mobile.png' });
+
+  await page.getByRole('button', { name: 'Keep my edits', exact: true }).click();
+  await expect(page.locator('#draft-status')).toHaveText('Draft saved to your local database.');
+  expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(
+    editedSource
+  );
+});
+
+test('should retain independent unsaved recoveries when another tab saves in the same browser', async ({
+  browser,
+  request,
+}) => {
+  const context = await browser.newContext();
+  const a = await context.newPage();
+  const b = await context.newPage();
+  a.on('dialog', (dialog) => dialog.accept());
+  try {
+    await open(a);
+    await a.route('**/api/practice/draft', (route) => route.abort());
+    const localSource = '# Synthetic first tab unsaved recovery\n' + REFERENCE_CODE;
+    await a.getByLabel('Python solution').fill(localSource);
+    await expect(a.getByRole('button', { name: 'Retry save', exact: true })).toBeVisible();
+
+    await open(b);
+    const databaseSource = '# Synthetic second tab acknowledged draft\n' + REFERENCE_CODE;
+    await save(b, databaseSource);
+    await a.unroute('**/api/practice/draft');
+    await a.reload();
+
+    await expect(a.getByLabel('Python solution')).toHaveValue(localSource);
+    await expect(a.getByRole('button', { name: 'Keep my edits', exact: true })).toBeVisible();
+    await b.reload();
+    await expect(b.getByLabel('Python solution')).toHaveValue(databaseSource);
+    expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(
+      databaseSource
+    );
+
+    await a.getByRole('button', { name: 'Use database draft', exact: true }).click();
+    await a.reload();
+    await expect(a.getByLabel('Python solution')).toHaveValue(databaseSource);
+    await expect(a.getByRole('button', { name: 'Keep my edits', exact: true })).toHaveCount(0);
+  } finally {
+    await context.close();
+  }
+});
+
 test('should retain a completed result for retry when the result endpoint is unavailable across reload', async ({
   page,
   request,

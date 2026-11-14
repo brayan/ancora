@@ -44,7 +44,7 @@ export function usePracticeSession() {
   const recover = useCallback(() => {
     const value = current.current;
     try {
-      localStorage.setItem(
+      sessionStorage.setItem(
         recoveryKey(value.revisionId),
         JSON.stringify({
           source: value.source,
@@ -74,7 +74,7 @@ export function usePracticeSession() {
       const draft = saved.draft;
       let recovery: Recovery | null = null;
       try {
-        const raw = localStorage.getItem(recoveryKey(draft.revisionId));
+        const raw = sessionStorage.getItem(recoveryKey(draft.revisionId));
         const parsed = raw
           ? draftSchema.omit({ revisionId: true }).safeParse(JSON.parse(raw))
           : null;
@@ -84,17 +84,19 @@ export function usePracticeSession() {
       }
 
       const localSource = recovery?.source ?? draft.source;
+      const hasConflict =
+        recovery !== null && recovery.source !== draft.source && recovery.version !== draft.version;
       current.current = {
         revisionId: draft.revisionId,
         source: localSource,
         savedSource: draft.source,
-        version: draft.version,
+        version: recovery && hasConflict ? recovery.version : draft.version,
       };
+
       setSession(saved);
       setSource(localSource);
       setPendingReport(readPendingReport(draft.revisionId));
-      blocked.current =
-        !!recovery && recovery.source !== draft.source && recovery.version !== draft.version;
+      blocked.current = hasConflict;
       setConflict(blocked.current ? draft : null);
       setSaveState(
         blocked.current ? 'conflict' : localSource === draft.source ? 'saved' : 'unsaved'
