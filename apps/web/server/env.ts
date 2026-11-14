@@ -7,5 +7,5 @@ export function getDatabaseUrl() {
     throw new Error('DATABASE_URL is required in production.');
   }
 
-  return 'postgresql://ancora:ancora@localhost:5432/ancora';
+  return 'postgresql://ancora:ancora@127.0.0.1:5433/ancora_practice';
 }

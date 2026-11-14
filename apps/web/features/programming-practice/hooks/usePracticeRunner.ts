@@ -4,24 +4,23 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 import {
   BOOT_TIMEOUT_MS,
   PROTOCOL_VERSION,
-  RUNTIME_VERSION,
   RUN_TIMEOUT_MS,
-  digestText,
+  isRunRequest,
   jobBinding,
   isLoadedResponse,
   matchesJob,
   parseRunnerResponse,
   resultsMatchCases,
   type RunRequest,
+  type RunnerResponse,
 } from '@/runner/protocol.mjs';
-import { CHALLENGE_REVISION, RUNNER_ORIGIN } from '@/features/programming-practice/constants';
+import { RUNNER_ORIGIN } from '@/features/programming-practice/constants';
 import type { RunnerState } from '@/features/programming-practice/types';
-import type { RunnerCase } from '@/runner/protocol.mjs';
 
 type CurrentRun = {
-  id: string;
-  request: RunRequest | null;
-  watchdog: ReturnType<typeof setTimeout> | null;
+  request: RunRequest;
+  watchdog: ReturnType<typeof setTimeout>;
+  resolve: (response: RunnerResponse | null) => void;
 };
 
 export function usePracticeRunner(frameRef: RefObject<HTMLIFrameElement | null>) {
@@ -34,9 +33,24 @@ export function usePracticeRunner(frameRef: RefObject<HTMLIFrameElement | null>)
     label: 'Connecting to the local runner…',
   });
 
+  const finish = (response: RunnerResponse) => {
+    const active = activeRun.current;
+    if (!active) {
+      return;
+    }
+    clearTimeout(active.watchdog);
+    activeRun.current = null;
+    setState({
+      status: 'finished',
+      response,
+      label: response.type === 'result' ? 'Run complete.' : 'Run ended. Your draft is preserved.',
+    });
+    active.resolve(response);
+  };
+
   useEffect(() => {
     const frame = frameRef.current;
-    const connectionTimer = setTimeout(() => {
+    const timer = setTimeout(() => {
       if (!connected.current) {
         setState({
           status: 'unavailable',
@@ -55,7 +69,6 @@ export function usePracticeRunner(frameRef: RefObject<HTMLIFrameElement | null>)
       ) {
         return;
       }
-
       const message = event.data as Record<string, unknown>;
       if (
         message.type === 'connected' &&
@@ -64,7 +77,7 @@ export function usePracticeRunner(frameRef: RefObject<HTMLIFrameElement | null>)
         !activeRun.current
       ) {
         connected.current = true;
-        clearTimeout(connectionTimer);
+        clearTimeout(timer);
         setState({
           status: 'ready',
           response: null,
@@ -73,61 +86,42 @@ export function usePracticeRunner(frameRef: RefObject<HTMLIFrameElement | null>)
         return;
       }
 
-      const run = activeRun.current;
-      if (!run?.request) {
+      const active = activeRun.current;
+      if (!active) {
         return;
       }
-
-      if (isLoadedResponse(message) && matchesJob(message, run.request)) {
-        setState({
-          status: 'running',
-          response: null,
-          label: 'Running your function…',
-        });
+      if (isLoadedResponse(message) && matchesJob(message, active.request)) {
+        setState({ status: 'running', response: null, label: 'Running your function…' });
         return;
       }
-
       const response = parseRunnerResponse(message);
       if (
-        !response ||
-        !matchesJob(response, run.request) ||
-        !resultsMatchCases(response, run.request)
+        response &&
+        matchesJob(response, active.request) &&
+        resultsMatchCases(response, active.request)
       ) {
-        return;
+        finish(response);
       }
-
-      if (run.watchdog) {
-        clearTimeout(run.watchdog);
-      }
-      activeRun.current = null;
-      setState({
-        status: 'finished',
-        response,
-        label:
-          response.type === 'result'
-            ? 'Run complete.'
-            : 'Run ended. Your code is still in the editor.',
-      });
     };
 
     window.addEventListener('message', receive);
-    // The iframe can finish loading before React installs this listener.
     frame?.contentWindow?.postMessage(
       { type: 'connect', protocolVersion: PROTOCOL_VERSION },
       RUNNER_ORIGIN
     );
-
     return () => {
-      clearTimeout(connectionTimer);
+      clearTimeout(timer);
       window.removeEventListener('message', receive);
-      const run = activeRun.current;
-      if (run?.watchdog) {
-        clearTimeout(run.watchdog);
+      const active = activeRun.current;
+      if (active) {
+        clearTimeout(active.watchdog);
+        frame?.contentWindow?.postMessage(
+          { type: 'stop', jobId: active.request.jobId },
+          RUNNER_ORIGIN
+        );
+        activeRun.current = null;
+        active.resolve(null);
       }
-      if (run) {
-        frame?.contentWindow?.postMessage({ type: 'stop', jobId: run.id }, RUNNER_ORIGIN);
-      }
-      activeRun.current = null;
     };
   }, [frameVersion, frameRef]);
 
@@ -139,85 +133,37 @@ export function usePracticeRunner(frameRef: RefObject<HTMLIFrameElement | null>)
 
   const reconnect = () => {
     connected.current = false;
-    setState({
-      status: 'connecting',
-      response: null,
-      label: 'Connecting to the local runner…',
-    });
+    setState({ status: 'connecting', response: null, label: 'Connecting to the local runner…' });
     setFrameVersion((version) => version + 1);
   };
 
   const stop = () => {
-    const run = activeRun.current;
-    if (!run) {
+    const active = activeRun.current;
+    if (!active) {
       return;
     }
-
-    if (run.watchdog) {
-      clearTimeout(run.watchdog);
-    }
-    frameRef.current?.contentWindow?.postMessage({ type: 'stop', jobId: run.id }, RUNNER_ORIGIN);
-    activeRun.current = null;
-
-    setState({
-      status: 'finished',
-      response: run.request
-        ? {
-            ...jobBinding(run.request),
-            type: 'failure',
-            code: 'stopped',
-            output: '',
-          }
-        : null,
-      label: 'Stopped. You can run again.',
-    });
+    frameRef.current?.contentWindow?.postMessage(
+      { type: 'stop', jobId: active.request.jobId },
+      RUNNER_ORIGIN
+    );
+    finish({ ...jobBinding(active.request), type: 'failure', code: 'stopped', output: '' });
   };
 
-  const run = async (source: string, cases: RunnerCase[]) => {
-    if (!connected.current || activeRun.current) {
-      return;
+  const run = (request: RunRequest): Promise<RunnerResponse | null> => {
+    if (!connected.current || activeRun.current || !isRunRequest(request)) {
+      return Promise.resolve(null);
     }
-
-    const id = crypto.randomUUID();
-    const pending: CurrentRun = { id, request: null, watchdog: null };
-    activeRun.current = pending;
-    setState({
-      status: 'preparing',
-      response: null,
-      label: 'Preparing this run…',
-    });
-
-    try {
-      const [sourceDigest, casesDigest] = await Promise.all([
-        digestText(source),
-        digestText(JSON.stringify(cases)),
-      ]);
-      if (activeRun.current !== pending) {
-        return;
-      }
-
-      const request: RunRequest = {
-        type: 'run',
-        protocolVersion: PROTOCOL_VERSION,
-        jobId: id,
-        revisionId: CHALLENGE_REVISION,
-        sourceDigest,
-        casesDigest,
-        runtimeVersion: RUNTIME_VERSION,
-        source,
-        cases,
-        functionName: 'positive_even',
-        technique: 'list_comprehension',
-      };
-
-      pending.request = request;
-      pending.watchdog = setTimeout(
+    return new Promise((resolve) => {
+      const watchdog = setTimeout(
         () => {
-          if (activeRun.current !== pending) {
+          if (activeRun.current?.request !== request) {
             return;
           }
-          frameRef.current?.contentWindow?.postMessage({ type: 'stop', jobId: id }, RUNNER_ORIGIN);
-          activeRun.current = null;
+          frameRef.current?.contentWindow?.postMessage(
+            { type: 'stop', jobId: request.jobId },
+            RUNNER_ORIGIN
+          );
+          finish({ ...jobBinding(request), type: 'failure', code: 'bootstrap_error', output: '' });
           connected.current = false;
           setState({
             status: 'unavailable',
@@ -227,20 +173,10 @@ export function usePracticeRunner(frameRef: RefObject<HTMLIFrameElement | null>)
         },
         BOOT_TIMEOUT_MS + RUN_TIMEOUT_MS + 2_000
       );
-      setState({
-        status: 'loading',
-        response: null,
-        label: 'Starting a fresh Python runtime…',
-      });
+      activeRun.current = { request, watchdog, resolve };
+      setState({ status: 'loading', response: null, label: 'Starting a fresh Python runtime…' });
       frameRef.current?.contentWindow?.postMessage(request, RUNNER_ORIGIN);
-    } catch {
-      activeRun.current = null;
-      setState({
-        status: 'unavailable',
-        response: null,
-        label: 'Could not prepare the run. Reconnect and try again.',
-      });
-    }
+    });
   };
 
   return {

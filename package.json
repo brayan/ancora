@@ -13,9 +13,9 @@
     "test": "pnpm repo:test:task",
     "test:impact": "pnpm repo:test:context",
     "eval:smoke": "pnpm --filter @ancora/eval-runner smoke",
-    "docker:config": "docker compose -f docker/docker-compose.yml config",
-    "docker:up": "docker compose -f docker/docker-compose.yml up -d db",
-    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "docker:config": "docker compose -f docker/docker-compose.practice.yml config",
+    "docker:up": "docker compose -f docker/docker-compose.practice.yml up -d db",
+    "docker:down": "docker compose -f docker/docker-compose.practice.yml down",
     "web:dev": "scripts/dev/run-web.sh",
     "web:lint": "pnpm --filter @ancora/web lint",
     "web:typecheck": "pnpm --filter @ancora/web typecheck",
@@ -37,7 +37,11 @@
     "lint:shared": "eslint packages scripts tools eslint.config.mjs --max-warnings=0",
     "format:check": "prettier --check \"{apps/web,packages,scripts,tools}/**/*.{ts,tsx,js,jsx,mjs,mts,cts,cjs,css}\" eslint.config.mjs",
     "format:write": "prettier --write \"{apps/web,packages,scripts,tools}/**/*.{ts,tsx,js,jsx,mjs,mts,cts,cjs,css}\" eslint.config.mjs",
-    "quality:test": "pnpm --filter @ancora/config test && node --test scripts/quality/tests/*.test.mjs"
+    "quality:test": "pnpm --filter @ancora/config test && node --test scripts/quality/tests/*.test.mjs",
+    "db:migrate": "pnpm --filter @ancora/web db:migrate",
+    "contracts:generate": "pnpm --filter @ancora/web contracts:generate",
+    "contracts:check": "pnpm --filter @ancora/web contracts:check",
+    "web:test:db": "pnpm --filter @ancora/web test:db"
   },
   "devDependencies": {
     "eslint": "9.39.4",

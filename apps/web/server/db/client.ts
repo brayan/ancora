@@ -15,6 +15,13 @@ const pool =
     connectionString: getDatabaseUrl(),
   });
 
+if (pool.listenerCount('error') === 0) {
+  pool.on('error', () => {
+    // Idle connection failures must not terminate the app or log private query context.
+    console.error('practice_database_connection_unavailable');
+  });
+}
+
 if (process.env.NODE_ENV !== 'production') {
   globalForDatabase.ancoraDatabasePool = pool;
 }

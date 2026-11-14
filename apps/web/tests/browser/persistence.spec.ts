@@ -1,0 +1,269 @@
+import { expect, test, type Page } from '@playwright/test';
+import { REFERENCE_CODE } from '../../server/programming-practice/fixture';
+
+async function open(page: Page) {
+  await page.goto('/practice');
+  await expect(page.getByRole('button', { name: 'Check solution', exact: true })).toBeEnabled();
+}
+
+async function save(page: Page, source: string) {
+  await page.getByLabel('Python solution').fill(source);
+  await page.getByRole('button', { name: 'Save draft', exact: true }).click();
+  await expect(page.locator('#draft-status')).toHaveText('Draft saved to your local database.');
+}
+
+test('should resume exact database drafts and immutable submissions when reopening without browser storage', async ({
+  page,
+  browser,
+  request,
+}) => {
+  await open(page);
+  const source = '# Synthetic persisted draft\n\n' + REFERENCE_CODE + '\n';
+  await save(page, source);
+  await page.getByRole('button', { name: 'Check solution', exact: true }).click();
+  await expect(page.getByText('6/6 cases passed', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Check solution', exact: true })).toBeEnabled();
+  const submitted = (await (await request.get('/api/practice/session')).json()).latestAttempt;
+  expect(submitted.source).toBe(source);
+  expect(submitted.report.type).toBe('result');
+
+  await save(page, '# A newer synthetic draft\n' + REFERENCE_CODE);
+  const context = await browser.newContext();
+  const reopened = await context.newPage();
+  try {
+    await open(reopened);
+    await expect(reopened.getByLabel('Python solution')).toHaveValue(
+      '# A newer synthetic draft\n' + REFERENCE_CODE
+    );
+    await expect(reopened.getByText('6/6 cases passed', { exact: true })).toBeVisible();
+    await reopened.getByText('Submitted code snapshot', { exact: true }).click();
+    await expect(reopened.locator('.submittedSource pre')).toHaveText(source);
+    await reopened.screenshot({ path: 'test-results/practice-resume.png', fullPage: true });
+  } finally {
+    await context.close();
+  }
+});
+
+test('should recover unsaved edits when a failed draft save is followed by reload', async ({
+  page,
+  request,
+}) => {
+  await open(page);
+  page.on('dialog', (dialog) => dialog.accept());
+  await page.route('**/api/practice/draft', (route) => route.abort());
+  const source = '# Synthetic offline recovery\n' + REFERENCE_CODE;
+  await page.getByLabel('Python solution').fill(source);
+  await expect(page.getByRole('button', { name: 'Retry save', exact: true })).toBeVisible();
+  await expect(page.getByLabel('Python solution')).toHaveValue(source);
+
+  await page.unroute('**/api/practice/draft');
+  await page.reload();
+  await expect(page.getByLabel('Python solution')).toHaveValue(source);
+  await expect(page.locator('#draft-status')).toHaveText('Draft saved to your local database.');
+  expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(source);
+});
+
+test('should preserve both drafts for an explicit choice when two tabs save the same version', async ({
+  browser,
+  request,
+}) => {
+  const first = await browser.newContext();
+  const second = await browser.newContext();
+  const a = await first.newPage();
+  const b = await second.newPage();
+  b.on('dialog', (dialog) => dialog.accept());
+  try {
+    await open(a);
+    await open(b);
+    await save(a, '# Synthetic first tab\n' + REFERENCE_CODE);
+    const secondSource = '# Synthetic second tab\n' + REFERENCE_CODE;
+    await b.getByLabel('Python solution').fill(secondSource);
+    await expect(b.getByRole('button', { name: 'Keep my edits', exact: true })).toBeVisible();
+    await expect(b.getByLabel('Python solution')).toHaveValue(secondSource);
+    await expect(b.getByRole('button', { name: 'Check solution', exact: true })).toBeDisabled();
+
+    await b.getByRole('button', { name: 'Keep my edits', exact: true }).click();
+    await expect(b.locator('#draft-status')).toHaveText('Draft saved to your local database.');
+    expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(
+      secondSource
+    );
+    await expect(a.getByLabel('Python solution')).toHaveValue(
+      '# Synthetic first tab\n' + REFERENCE_CODE
+    );
+  } finally {
+    await first.close();
+    await second.close();
+  }
+});
+
+test('should retain a completed result for retry when the result endpoint is unavailable across reload', async ({
+  page,
+  request,
+}) => {
+  await open(page);
+  await save(page, '# Synthetic result recovery\n' + REFERENCE_CODE);
+  await page.route('**/api/practice/attempts/*/result', (route) => route.abort());
+  await page.getByRole('button', { name: 'Check solution', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Retry saving result', exact: true })
+  ).toBeVisible();
+  const pending = (await (await request.get('/api/practice/session')).json()).latestAttempt;
+  expect(pending.report).toBeNull();
+
+  await page.unroute('**/api/practice/attempts/*/result');
+  await page.reload();
+  await expect(
+    page.getByRole('button', { name: 'Retry saving result', exact: true })
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Retry saving result', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Retry saving result', exact: true })).toHaveCount(
+    0
+  );
+  await page.reload();
+  await expect(page.getByText('6/6 cases passed', { exact: true })).toBeVisible();
+  const saved = (await (await request.get('/api/practice/session')).json()).latestAttempt;
+  expect(saved.id).toBe(pending.id);
+  expect(saved.report.type).toBe('result');
+});
+
+test('should keep an unfinished snapshot when reloading an active run then allow another attempt', async ({
+  page,
+  request,
+}) => {
+  await open(page);
+  await save(page, 'def positive_even(values):\n    while True:\n        pass\n');
+  await page.getByRole('button', { name: 'Check solution', exact: true }).click();
+  await expect(page.getByText('Running your function…', { exact: true })).toBeVisible();
+  const pending = (await (await request.get('/api/practice/session')).json()).latestAttempt;
+  await page.reload();
+  await expect(page.getByLabel('Python solution')).toHaveValue(pending.source);
+  await expect(
+    page.getByText('Your last submission has no saved result. Run again to create another attempt.')
+  ).toBeVisible();
+
+  await save(page, REFERENCE_CODE);
+  await page.getByRole('button', { name: 'Check solution', exact: true }).click();
+  await expect(page.getByText('6/6 cases passed', { exact: true })).toBeVisible();
+  const previous = await (await request.get(`/api/practice/attempts/${pending.id}`)).json();
+  expect(previous.source).toBe(pending.source);
+  expect(previous.report).toBeNull();
+});
+
+test('should recover both pending results when two tabs lose completion saves then close', async ({
+  browser,
+  request,
+}) => {
+  const context = await browser.newContext();
+  const a = await context.newPage();
+  const b = await context.newPage();
+  try {
+    await open(a);
+    await save(a, REFERENCE_CODE);
+    await open(b);
+    for (const page of [a, b]) {
+      await page.route('**/api/practice/attempts/*/result', (route) => route.abort());
+    }
+    await a.getByRole('button', { name: 'Check solution', exact: true }).click();
+    await expect(a.getByRole('button', { name: 'Retry saving result', exact: true })).toBeEnabled();
+    const firstId = (await (await request.get('/api/practice/session')).json()).latestAttempt.id;
+    await b.getByRole('button', { name: 'Check solution', exact: true }).click();
+    await expect(b.getByRole('button', { name: 'Retry saving result', exact: true })).toBeEnabled();
+    const secondId = (await (await request.get('/api/practice/session')).json()).latestAttempt.id;
+    expect(firstId).not.toBe(secondId);
+    await a.close();
+    await b.close();
+
+    const reopened = await context.newPage();
+    await reopened.goto('/practice');
+    const retry = reopened.getByRole('button', { name: 'Retry saving result', exact: true });
+    const completedCount = async () => {
+      const attempts = await Promise.all(
+        [firstId, secondId].map(async (id) =>
+          (await request.get(`/api/practice/attempts/${id}`)).json()
+        )
+      );
+      return attempts.filter((attempt) => attempt.report !== null).length;
+    };
+    await expect(retry).toBeEnabled();
+    await retry.click();
+    await expect.poll(completedCount).toBe(1);
+    await expect(retry).toBeEnabled();
+    await retry.click();
+    await expect.poll(completedCount).toBe(2);
+    await expect(retry).toHaveCount(0);
+  } finally {
+    await context.close();
+  }
+});
+
+test('should warn before leaving when browser recovery storage is unavailable but database saves work', async ({
+  page,
+  request,
+}) => {
+  await page.addInitScript(() => {
+    Storage.prototype.setItem = () => {
+      throw new DOMException('Synthetic unavailable storage', 'QuotaExceededError');
+    };
+  });
+  await open(page);
+  const source = '# Synthetic storage warning\n' + REFERENCE_CODE;
+  await save(page, source);
+  await expect(
+    page.getByText(
+      'Browser recovery storage is unavailable. Keep this tab open until the draft and result are saved.'
+    )
+  ).toBeVisible();
+  expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(source);
+});
+
+test('should reject foreign origins and unsupported contracts when accessing local product persistence', async ({
+  request,
+}) => {
+  const response = await request.get('/api/practice/session');
+  expect(response.headers()['cache-control']).toBe('no-store');
+  const session = await response.json();
+  expect(session.challenge.referenceSource).toBeUndefined();
+  expect(session.challenge.checkCases).toBeUndefined();
+  const draft = { apiVersion: 1, ...session.draft };
+
+  for (const origin of ['http://127.0.0.1:3001', 'https://untrusted.invalid']) {
+    expect(
+      (
+        await request.put('/api/practice/draft', { headers: { Origin: origin }, data: draft })
+      ).status()
+    ).toBe(403);
+    expect(
+      (await request.get('/api/practice/session', { headers: { Origin: origin } })).status()
+    ).toBe(403);
+  }
+  const headers = { Origin: 'http://127.0.0.1:3000' };
+  expect(
+    (
+      await request.put('/api/practice/draft', { headers, data: { ...draft, apiVersion: 2 } })
+    ).status()
+  ).toBe(400);
+  expect(
+    (
+      await request.put('/api/practice/draft', {
+        headers,
+        data: { ...draft, accountId: 'untrusted' },
+      })
+    ).status()
+  ).toBe(400);
+  expect(
+    (
+      await request.put('/api/practice/draft', {
+        headers,
+        data: { ...draft, source: 'x'.repeat(12_001) },
+      })
+    ).status()
+  ).toBe(400);
+  expect(
+    (
+      await request.put('/api/practice/draft', {
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        data: 'x'.repeat(100_001),
+      })
+    ).status()
+  ).toBe(413);
+});

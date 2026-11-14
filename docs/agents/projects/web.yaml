@@ -1,5 +1,5 @@
 name: web
-status: runner-spike
+status: fixed-practice-persistence
 primary_paths: [apps/web]
 related_paths: [packages/ui, packages/shared-types, packages/schemas]
 read_first:
@@ -9,6 +9,8 @@ read_first:
   - docs/frontend/nextjs-feature-first-convention.md
   - docs/frontend/nextjs-naming-convention.md
   - docs/architecture/runner-spike.md
+  - docs/architecture/practice-persistence.md
+  - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
 role: Next.js UI/product boundary, future Drizzle persistence and isolated browser execution delivery.
 allowed_work:
   - Thin App Router routes and programming-practice UI
@@ -18,7 +20,7 @@ out_of_scope:
   - Authentication, account, source and card feature restoration
   - Provider/database credentials or privileged bridges in browser execution
   - Host/server execution of generated Python
-  - Database migration/application before persistence review
+  - Destructive legacy schema transition or schema push without further review
 validation:
-  expected_commands: [pnpm code:check, pnpm quality:test, pnpm web:lint, pnpm web:typecheck, pnpm web:test, pnpm web:test:browser]
+  expected_commands: [pnpm contracts:check, pnpm web:test:db, pnpm code:check, pnpm quality:test, pnpm web:lint, pnpm web:typecheck, pnpm web:test, pnpm web:test:browser]
   fallback: Report missing commands and browser prerequisites honestly.

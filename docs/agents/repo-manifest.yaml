@@ -1,6 +1,6 @@
 version: 0.4
 project: ancora
-status: programming-practice-runner-spike
+status: fixed-practice-persistence
 description: Local single-user Python programming practice with generated challenges.
 startup:
   root_guidance: AGENTS.md
@@ -12,6 +12,7 @@ canonical_docs:
   business_problem: docs/product/business-problem.md
   programming_practice: docs/product/programming-practice.md
   system_overview: docs/architecture/system-overview.md
+  practice_persistence: docs/architecture/practice-persistence.md
   runner_spike: docs/architecture/runner-spike.md
   architecture_decisions: docs/adr
   documentation_governance: docs/engineering/documentation-governance.md
@@ -28,7 +29,7 @@ accepted_stack:
   web: Next.js App Router, React and TypeScript
   product: apps/web owns product orchestration and durable records
   generation: Planned FastAPI/Pydantic AI service in apps/practice-service; no DB writes
-  persistence: PostgreSQL and Drizzle; migration transition deferred to persistence slice
+  persistence: PostgreSQL and Drizzle; additive 0006 with ledger preflight
   provider: OpenAI; model and live-eval budget not yet selected
   identity: Local single-user; no login or accounts
   runner: Disposable Pyodide worker on separate loopback static origin
@@ -39,6 +40,10 @@ deferred:
   - uploaded files, queues, Redis, Kubernetes and Terraform
 command_surface:
   available:
+    - pnpm db:migrate
+    - pnpm contracts:check
+    - pnpm contracts:generate
+    - pnpm web:test:db
     - pnpm dev
     - pnpm code:check
     - pnpm format:check
@@ -53,7 +58,7 @@ command_surface:
     - pnpm repo:test:context
     - pnpm repo:test:task
     - pnpm repo:test:pr
-  paused: Database migration/generation/seed commands pending persistence review
+  paused: Schema diff generation and account seeding; custom migrations require ledger review
   rule: Inspect scripts; never report planned commands as available or run.
 project_shards:
   - name: web
@@ -70,4 +75,5 @@ project_shards:
     routes: [scripts/**, docker/**, infra/**, config/**, packages/config/**, docs/**, package.json, Makefile, pnpm-workspace.yaml]
 adr_index:
   - docs/adr/0011-focus-on-local-programming-practice.md
+  - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

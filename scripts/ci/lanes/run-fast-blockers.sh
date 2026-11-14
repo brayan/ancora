@@ -19,6 +19,7 @@ EOF
 done
 
 pnpm code:check
+pnpm contracts:check
 pnpm packages:typecheck
 pnpm web:typecheck
 pnpm eval:typecheck

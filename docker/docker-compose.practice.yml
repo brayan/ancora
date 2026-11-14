@@ -1,0 +1,22 @@
+name: ancora-practice
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: ancora-practice-postgres
+    environment:
+      POSTGRES_DB: ancora_practice
+      POSTGRES_USER: ancora
+      POSTGRES_PASSWORD: ancora
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - ancora-practice-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ancora -d ancora_practice"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+volumes:
+  ancora-practice-data:

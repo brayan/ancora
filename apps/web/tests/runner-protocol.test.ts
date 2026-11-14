@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { CHECK_CASES } from '../features/programming-practice/constants';
+import { CHECK_CASES } from '../server/programming-practice/fixture';
 import {
   digestText,
   isRunRequest,

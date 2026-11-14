@@ -26,6 +26,7 @@ related_paths:
 read_first:
   - docs/engineering/git-conventions.md
   - docs/engineering/code-quality-conventions.md
+  - docs/architecture/practice-persistence.md
   - CONTEXT.md
   - docs/engineering/documentation-governance.md
   - docs/architecture/system-overview.md
@@ -57,6 +58,8 @@ privacy_rules:
   - Commit `.env.example` only; never commit real `.env` files.
 validation:
   expected_commands:
+    - pnpm contracts:check
+    - pnpm web:test:db
     - pnpm code:check
     - pnpm quality:test
     - pnpm repo:test:fast

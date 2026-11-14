@@ -11,9 +11,13 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "runner:dev": "node scripts/run-runner.mjs",
-    "test:browser": "playwright test",
+    "test:browser": "tsx scripts/with-test-database.ts browser",
     "lint:imports": "node scripts/check-import-boundaries.mjs",
-    "lint:architecture": "node scripts/check-architecture-policy.mjs && node scripts/check-typescript-size-guardrails.mjs"
+    "lint:architecture": "node scripts/check-architecture-policy.mjs && node scripts/check-typescript-size-guardrails.mjs",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "contracts:generate": "tsx scripts/export-contracts.ts",
+    "contracts:check": "tsx scripts/export-contracts.ts --check",
+    "test:db": "tsx scripts/with-test-database.ts db"
   },
   "dependencies": {
     "@ancora/config": "workspace:*",
@@ -24,7 +28,8 @@
     "pg": "^8.21.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "pyodide": "314.0.7"
+    "pyodide": "314.0.7",
+    "@ancora/schemas": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.0.0",
