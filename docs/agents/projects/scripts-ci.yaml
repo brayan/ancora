@@ -24,6 +24,7 @@ related_paths:
   - config
   - packages/config
 read_first:
+  - docs/engineering/code-quality-conventions.md
   - CONTEXT.md
   - docs/engineering/documentation-governance.md
   - docs/architecture/system-overview.md
@@ -55,6 +56,8 @@ privacy_rules:
   - Commit `.env.example` only; never commit real `.env` files.
 validation:
   expected_commands:
+    - pnpm code:check
+    - pnpm quality:test
     - pnpm repo:test:fast
     - pnpm repo:test:task
     - pnpm repo:test:context

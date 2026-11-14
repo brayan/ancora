@@ -3,6 +3,7 @@ status: runner-spike
 primary_paths: [apps/web]
 related_paths: [packages/ui, packages/shared-types, packages/schemas]
 read_first:
+  - docs/engineering/code-quality-conventions.md
   - CONTEXT.md
   - docs/adr/0011-focus-on-local-programming-practice.md
   - docs/frontend/nextjs-feature-first-convention.md
@@ -19,5 +20,5 @@ out_of_scope:
   - Host/server execution of generated Python
   - Database migration/application before persistence review
 validation:
-  expected_commands: [pnpm web:lint, pnpm web:typecheck, pnpm web:test, pnpm web:test:browser]
+  expected_commands: [pnpm code:check, pnpm quality:test, pnpm web:lint, pnpm web:typecheck, pnpm web:test, pnpm web:test:browser]
   fallback: Report missing commands and browser prerequisites honestly.

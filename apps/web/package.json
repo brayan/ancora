@@ -6,12 +6,14 @@
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1 --port 3000",
     "build": "next build",
-    "lint": "pnpm --silent run lint:naming && eslint .",
-    "lint:naming": "node scripts/check-filename-case.mjs",
+    "lint": "pnpm --silent run lint:naming && pnpm --silent run lint:imports && pnpm --silent run lint:architecture && eslint . --max-warnings=0",
+    "lint:naming": "ancora-check-next-filenames",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "runner:dev": "node scripts/run-runner.mjs",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "lint:imports": "node scripts/check-import-boundaries.mjs",
+    "lint:architecture": "node scripts/check-architecture-policy.mjs && node scripts/check-typescript-size-guardrails.mjs"
   },
   "dependencies": {
     "@ancora/config": "workspace:*",

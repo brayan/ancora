@@ -3,9 +3,9 @@ export function getDatabaseUrl() {
     return process.env.DATABASE_URL;
   }
 
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("DATABASE_URL is required in production.");
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('DATABASE_URL is required in production.');
   }
 
-  return "postgresql://ancora:ancora@localhost:5432/ancora";
+  return 'postgresql://ancora:ancora@localhost:5432/ancora';
 }

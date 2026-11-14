@@ -1,45 +1,36 @@
-"use client";
+'use client';
 
-import { useRef, useState } from "react";
-import { StatusBadge } from "@ancora/ui";
-import { MAX_SOURCE_LENGTH } from "@/runner/protocol.mjs";
+import { useRef, useState } from 'react';
+import { StatusBadge } from '@ancora/ui';
+import { MAX_SOURCE_LENGTH } from '@/runner/protocol.mjs';
 import {
   CHECK_CASES,
   PUBLIC_CASES,
   REFERENCE_CODE,
   RUNNER_ORIGIN,
   STARTER_CODE,
-} from "@/features/programming-practice/constants";
-import { usePracticeRunner } from "@/features/programming-practice/hooks/usePracticeRunner";
+} from '@/features/programming-practice/constants';
+import { usePracticeRunner } from '@/features/programming-practice/hooks/usePracticeRunner';
 
 const failureMessages = {
-  bootstrap_error:
-    "Python could not start. Check the local runner and try again.",
-  execution_error: "The execution context failed. Try a fresh run.",
-  timeout:
-    "Time limit reached (2 seconds). Check for an infinite loop and run again.",
-  stopped:
-    "Execution stopped. The next run starts with a fresh Python runtime.",
-  output_limit:
-    "Output limit reached (8,000 characters). Reduce printing and run again.",
-  invalid_message: "The runner returned an invalid report. Start a fresh run.",
+  bootstrap_error: 'Python could not start. Check the local runner and try again.',
+  execution_error: 'The execution context failed. Try a fresh run.',
+  timeout: 'Time limit reached (2 seconds). Check for an infinite loop and run again.',
+  stopped: 'Execution stopped. The next run starts with a fresh Python runtime.',
+  output_limit: 'Output limit reached (8,000 characters). Reduce printing and run again.',
+  invalid_message: 'The runner returned an invalid report. Start a fresh run.',
 };
 
 export function PracticeScreen() {
   const [source, setSource] = useState(STARTER_CODE);
-  const [resultSource, setResultSource] = useState("Your solution");
+  const [resultSource, setResultSource] = useState('Your solution');
   const frameRef = useRef<HTMLIFrameElement>(null);
   const runner = usePracticeRunner(frameRef);
   const response = runner.state.response;
-  const available = !["connecting", "unavailable"].includes(
-    runner.state.status,
-  );
-  const validSource =
-    source.trim().length > 0 && source.length <= MAX_SOURCE_LENGTH;
+  const available = !['connecting', 'unavailable'].includes(runner.state.status);
+  const validSource = source.trim().length > 0 && source.length <= MAX_SOURCE_LENGTH;
   const passed =
-    response?.type === "result"
-      ? response.cases.filter((item) => item.passed).length
-      : 0;
+    response?.type === 'result' ? response.cases.filter((item) => item.passed).length : 0;
 
   return (
     <main className="practicePage">
@@ -59,8 +50,8 @@ export function PracticeScreen() {
         <section className="challengePanel" aria-labelledby="challenge-heading">
           <h2 id="challenge-heading">The challenge</h2>
           <p>
-            Write a function that returns a new list containing only the
-            positive, even integers from <code>values</code>.
+            Write a function that returns a new list containing only the positive, even integers
+            from <code>values</code>.
           </p>
           <pre className="signature">
             <code>positive_even(values: list[int]) → list[int]</code>
@@ -69,10 +60,7 @@ export function PracticeScreen() {
             <li>Construct the result with a list comprehension.</li>
             <li>Keep the original order and duplicates.</li>
             <li>Leave the input list unchanged.</li>
-            <li>
-              Zero is not positive. Inputs are valid integers, excluding
-              booleans.
-            </li>
+            <li>Zero is not positive. Inputs are valid integers, excluding booleans.</li>
           </ul>
           <h3>Examples</h3>
           <div className="examples">
@@ -86,8 +74,8 @@ export function PracticeScreen() {
             ))}
           </div>
           <p className="scopeNote">
-            Synthetic exercise for the runner spike. Challenge generation, saved
-            drafts and history come next.
+            Synthetic exercise for the runner spike. Challenge generation, saved drafts and history
+            come next.
           </p>
         </section>
         <section className="editorPanel" aria-labelledby="solution-heading">
@@ -111,8 +99,8 @@ export function PracticeScreen() {
             aria-describedby="editor-note"
           />
           <p id="editor-note" className="editorNote">
-            Code stays in this browser. This spike does not save drafts; copy
-            your work before leaving.
+            Code stays in this browser. This spike does not save drafts; copy your work before
+            leaving.
           </p>
           <div className="runActions">
             <button
@@ -120,7 +108,7 @@ export function PracticeScreen() {
               className="button primary"
               disabled={!available || runner.busy || !validSource}
               onClick={() => {
-                setResultSource("Your solution");
+                setResultSource('Your solution');
                 void runner.run(source, PUBLIC_CASES);
               }}
             >
@@ -131,7 +119,7 @@ export function PracticeScreen() {
               className="button secondary"
               disabled={!available || runner.busy || !validSource}
               onClick={() => {
-                setResultSource("Your solution");
+                setResultSource('Your solution');
                 void runner.run(source, CHECK_CASES);
               }}
             >
@@ -149,12 +137,8 @@ export function PracticeScreen() {
           <p className="runnerStatus" role="status" aria-live="polite">
             {runner.state.label}
           </p>
-          {runner.state.status === "unavailable" && (
-            <button
-              type="button"
-              className="button secondary"
-              onClick={runner.reconnect}
-            >
+          {runner.state.status === 'unavailable' && (
+            <button type="button" className="button secondary" onClick={runner.reconnect}>
               Reconnect runner
             </button>
           )}
@@ -162,22 +146,18 @@ export function PracticeScreen() {
       </div>
       <section className="resultsPanel" aria-labelledby="results-heading">
         <div className="panelHeader">
-          <h2 id="results-heading">
-            Results{response ? ` · ${resultSource}` : ""}
-          </h2>
+          <h2 id="results-heading">Results{response ? ` · ${resultSource}` : ''}</h2>
           <span>Behavior and technique are checked separately</span>
         </div>
         {!response && (
-          <p className="emptyResults">
-            Run the examples to see what your function returns.
-          </p>
+          <p className="emptyResults">Run the examples to see what your function returns.</p>
         )}
-        {response?.type === "failure" && (
+        {response?.type === 'failure' && (
           <p className="executionError" role="alert">
             {failureMessages[response.code]}
           </p>
         )}
-        {response?.type === "result" && (
+        {response?.type === 'result' && (
           <>
             {response.error && (
               <p className="executionError" role="alert">
@@ -189,23 +169,23 @@ export function PracticeScreen() {
                 <strong>Behavior</strong>
                 <span>
                   {passed}/{response.cases.length} cases passed
-                  {response.error ? " before error" : ""}
+                  {response.error ? ' before error' : ''}
                 </span>
               </p>
               <p>
                 <strong>Technique</strong>
                 <span>
-                  {response.technique === "passed"
-                    ? "List comprehension verified"
-                    : response.technique === "failed"
-                      ? "List comprehension required"
-                      : "Inconclusive — unsupported code pattern"}
+                  {response.technique === 'passed'
+                    ? 'List comprehension verified'
+                    : response.technique === 'failed'
+                      ? 'List comprehension required'
+                      : 'Inconclusive — unsupported code pattern'}
                 </span>
               </p>
               <p>
                 <strong>Timing</strong>
                 <span>
-                  Python startup {Math.round(response.loadMs)} ms · execution{" "}
+                  Python startup {Math.round(response.loadMs)} ms · execution{' '}
                   {Math.round(response.executionMs)} ms
                 </span>
               </p>
@@ -213,12 +193,10 @@ export function PracticeScreen() {
             <ul className="caseResults">
               {response.cases.map((item) => (
                 <li key={item.id}>
-                  <strong>{item.passed ? "Passed" : "Failed"}</strong>
+                  <strong>{item.passed ? 'Passed' : 'Failed'}</strong>
                   <span>{item.id}</span>
                   <code>
-                    {item.actual === null
-                      ? "Unsupported result"
-                      : JSON.stringify(item.actual)}
+                    {item.actual === null ? 'Unsupported result' : JSON.stringify(item.actual)}
                   </code>
                   {item.mutated && <span>Input was modified</span>}
                 </li>
@@ -236,8 +214,8 @@ export function PracticeScreen() {
       <details className="spikeTools">
         <summary>Runner spike tools and limits</summary>
         <p>
-          Each run uses a disposable worker on a separate origin. Results are
-          local self-study evidence. The browser has no hard memory quota.
+          Each run uses a disposable worker on a separate origin. Results are local self-study
+          evidence. The browser has no hard memory quota.
         </p>
         <div className="runActions">
           <button
@@ -253,7 +231,7 @@ export function PracticeScreen() {
             className="button secondary"
             disabled={runner.busy || !available}
             onClick={() => {
-              setResultSource("Reference solution");
+              setResultSource('Reference solution');
               void runner.run(REFERENCE_CODE, CHECK_CASES);
             }}
           >

@@ -18,7 +18,8 @@ pnpm dev
 Open http://127.0.0.1:3000/practice. The runner is http://127.0.0.1:3001. Use the exact loopback hostname; origins are intentionally distinct and restricted. `pnpm web:dev` and `pnpm runner:dev` can start each separately. No .env file, provider key or Docker database is needed for the spike.
 
 ```sh
-pnpm web:lint
+pnpm code:check
+pnpm quality:test
 pnpm web:typecheck
 pnpm web:test
 pnpm web:test:browser
@@ -33,6 +34,7 @@ PostgreSQL/Drizzle remain selected for later persistence. Historical SQL/snapsho
 - [Product specification](docs/product/programming-practice.md)
 - [Execution plan](docs/exec-plans/programming-practice.md)
 - [Runner spike and limitations](docs/architecture/runner-spike.md)
+- [Code quality and structure rules](docs/engineering/code-quality-conventions.md)
 - [Testing strategy](docs/testing/testing-strategy.md)
 
 The runner has no privileged bridge, provider credentials or product actions. Its results are untrusted self-study evidence; reference/test agreement is only internal consistency. Hard browser-process memory quotas and hostile-code attestation are unavailable. See the spike report before extending execution.

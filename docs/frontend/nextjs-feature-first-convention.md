@@ -1,6 +1,6 @@
 # Next.js Feature-First Convention
 
-Current product scope is programming practice under ADR 0011; older feature names below illustrate structure only.
+Current product scope is programming practice under ADR 0011.
 
 Ancora Next.js work follows a feature-first App Router structure adapted from Sailtech's Console Web conventions. The goal is to keep framework contracts visible, product behavior owned by feature modules, and server-only infrastructure out of client-safe utilities.
 
@@ -31,11 +31,11 @@ apps/web/
 ```
 
 - `app/`: App Router contracts only. Pages and layouts may compose feature components but should not own product workflows.
-- `features/`: Ancora product capabilities such as sources, decks, reviews, tutor, quiz, dashboard, and onboarding.
+- `features/`: Product capabilities such as programming practice.
 - `components/ui/`: Generic UI primitives and controls. They must be product-agnostic.
 - `components/layout/`: Generic shell and layout components. They must avoid feature-specific product behavior.
-- `server/`: Server-only infrastructure: service clients, environment reads, request helpers, telemetry setup, auth/session helpers, and server caches.
-- `lib/`: Generic client-safe utilities only. Do not put service clients, environment reads, telemetry bootstrap, auth/session reads, or other server infrastructure here.
+- `server/`: Server-only infrastructure: service clients, environment reads, request helpers, telemetry setup and server caches.
+- `lib/`: Generic client-safe utilities only. Do not put service clients, environment reads, telemetry bootstrap or other server infrastructure here.
 - `tests/`: Cross-route, integration, or harness tests that do not belong beside one feature file.
 - `public/`: Static assets served by Next.js.
 - `scripts/`: App-local checks and automation.
@@ -82,7 +82,7 @@ Do not create empty convention folders. Add `hooks/`, `mappers.ts`, `schemas.ts`
 
 - `app/**` may import from `features/**`, `components/layout/**`, `components/ui/**`, `server/**`, and `lib/**`.
 - `features/**` must not import from `app/**`.
-- Client components must not import `data.ts`, `actions.ts`, `server/**`, environment modules, auth/session helpers, or service clients.
+- Client components must not import `data.ts`, `actions.ts`, `server/**`, environment modules or service clients.
 - `components/ui/**` must not import from `app/**`, `features/**`, `server/**`, or product state.
 - `components/layout/**` must stay generic and must not import feature product behavior.
 - `server/**` must not import from `app/**` or feature UI. Keep server infrastructure generic.
@@ -92,10 +92,10 @@ Do not create empty convention folders. Add `hooks/`, `mappers.ts`, `schemas.ts`
 
 ## Server Boundary Rules
 
-- Shared service clients, environment access, request parsing, response helpers, telemetry setup, server caches, and auth/session helpers belong in top-level `server/**`.
+- Shared service clients, environment access, request parsing, response helpers, telemetry setup and server caches belong in top-level `server/**`.
 - Browser-safe display helpers may live in `lib/**`, but only when they do not import server infrastructure.
 - `app/api/**/route.ts` files should parse framework input, call feature or server functions, and shape the response. Do not hide product workflows in route handlers.
-- The web app owns product APIs and durable orchestration; the bounded FastAPI/Pydantic AI service owns programming generation under ADR 0011. Browser code must not access PostgreSQL, pgvector, OpenAI, Langfuse secrets, or private provider credentials directly.
+- The web app owns product APIs and durable orchestration; the bounded FastAPI/Pydantic AI service owns programming generation under ADR 0011. Browser code must not access PostgreSQL or private provider credentials directly.
 
 ## UI Product Stance
 
@@ -115,4 +115,4 @@ Ancora is a learning product, not a marketing site. App screens should be quiet,
 - Move one feature at a time when migrating.
 - Keep `app/` thin as behavior grows.
 - Do not add a top-level `src/` layer to `apps/web`.
-- Enforce naming with `pnpm --filter @ancora/web lint:naming` and broader checks with `pnpm lint`.
+- `pnpm web:lint` enforces naming, import direction, architecture and size budgets. `pnpm code:check` also checks shared scripts and formatting. See [code quality conventions](../engineering/code-quality-conventions.md).

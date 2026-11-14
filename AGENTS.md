@@ -10,7 +10,7 @@ Use the [engineering-playbook](https://github.com/brayan/engineering-playbook) a
 2. Read CONTEXT.md, docs/agents/repo-manifest.yaml, ADR 0011 and only the matching project shard.
 3. Keep App Router delivery thin; use the existing feature-first/naming conventions and no new web src/ layer.
 4. Build small slices. Do not scaffold empty services or architecture layers. Docs-only tasks must not add executable code, dependencies or migrations.
-5. Apply task-owned self-review before narrow checks; report actual results and missing commands.
+5. Follow docs/engineering/code-quality-conventions.md: braces for every TS/JS control-flow body, contextual blank-line grouping, and the shared naming/structure rules. Apply task-owned self-review before narrow checks; formatting does not replace paragraph review.
 
 ## Architecture
 
@@ -32,6 +32,6 @@ Obtain confirmation for architecture/storage/provider/privacy/deployment changes
 
 ## Commands and handoff
 
-Inspect package scripts before use. Current checks: `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`, `pnpm web:test:browser`, `pnpm packages:typecheck`, `pnpm eval:typecheck`, `pnpm eval:test`, `pnpm eval:smoke`, `pnpm docker:config`, and the `pnpm repo:test:{fast,context,task,pr}` lanes. `pnpm dev` runs the web and static runner origins locally. Browser checks require Google Chrome; Python-service checks are not available yet. Database migration/seed commands are paused until the persistence slice.
+Inspect package scripts before use. Current checks: `pnpm code:check`, `pnpm format:check`, `pnpm quality:test`, `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`, `pnpm web:test:browser`, `pnpm packages:typecheck`, `pnpm eval:typecheck`, `pnpm eval:test`, `pnpm eval:smoke`, `pnpm docker:config`, and the `pnpm repo:test:{fast,context,task,pr}` lanes. `pnpm dev` runs the web and static runner origins locally. Browser checks require Google Chrome; Python-service checks are not available yet. Database migration/seed commands are paused until the persistence slice.
 
 Before handoff report changed scope, validation/browser evidence, missing commands and residual limitations. Keep docs concise and canonical long-form decisions under docs/.

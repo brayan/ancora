@@ -15,6 +15,7 @@ canonical_docs:
   runner_spike: docs/architecture/runner-spike.md
   architecture_decisions: docs/adr
   documentation_governance: docs/engineering/documentation-governance.md
+  code_quality: docs/engineering/code-quality-conventions.md
   monorepo_conventions: docs/engineering/monorepo-conventions.md
   nextjs_feature_first_convention: docs/frontend/nextjs-feature-first-convention.md
   nextjs_naming_convention: docs/frontend/nextjs-naming-convention.md
@@ -38,6 +39,10 @@ deferred:
 command_surface:
   available:
     - pnpm dev
+    - pnpm code:check
+    - pnpm format:check
+    - pnpm format:write
+    - pnpm quality:test
     - pnpm web:lint
     - pnpm web:typecheck
     - pnpm web:test

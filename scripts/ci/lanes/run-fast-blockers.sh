@@ -8,8 +8,9 @@ for arg in "$@"; do
   if [[ "$arg" == "--describe" ]]; then
     cat <<'EOF'
 Fast blockers:
+- Check shared formatting, conventions, file roles, imports and architecture.
 - Typecheck shared TypeScript packages.
-- Lint and typecheck the Next.js web scaffold.
+- Typecheck the Next.js web app.
 - Typecheck the TypeScript eval-runner scaffold.
 - Validate Docker Compose syntax for PostgreSQL + pgvector.
 EOF
@@ -17,8 +18,8 @@ EOF
   fi
 done
 
+pnpm code:check
 pnpm packages:typecheck
-pnpm web:lint
 pnpm web:typecheck
 pnpm eval:typecheck
 pnpm docker:config >/dev/null

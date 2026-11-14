@@ -32,6 +32,15 @@
     "guards:context": "pnpm repo:test:context",
     "guards:pr": "pnpm repo:test:pr",
     "runner:dev": "pnpm --filter @ancora/web runner:dev",
-    "web:test:browser": "pnpm --filter @ancora/web test:browser"
+    "web:test:browser": "pnpm --filter @ancora/web test:browser",
+    "code:check": "pnpm web:lint && pnpm lint:shared && pnpm format:check",
+    "lint:shared": "eslint packages scripts tools eslint.config.mjs --max-warnings=0",
+    "format:check": "prettier --check \"{apps/web,packages,scripts,tools}/**/*.{ts,tsx,js,jsx,mjs,mts,cts,cjs,css}\" eslint.config.mjs",
+    "format:write": "prettier --write \"{apps/web,packages,scripts,tools}/**/*.{ts,tsx,js,jsx,mjs,mts,cts,cjs,css}\" eslint.config.mjs",
+    "quality:test": "pnpm --filter @ancora/config test && node --test scripts/quality/tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "eslint": "9.39.4",
+    "prettier": "3.6.2"
   }
 }
