@@ -1,10 +1,12 @@
-import { and, desc, eq, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, isNull, or, sql } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
+import { parseGeneratedCases } from '@ancora/schemas';
 import * as schema from '@/server/db/schema';
 import { FIXED_REVISION } from '@/server/programming-practice/fixture';
 import type { RunnerResponse } from '@/runner/protocol.mjs';
+import { restoreReport, sameReport, storeReport } from './reports';
 
 export class PracticeError extends Error {
   constructor(
@@ -28,6 +30,11 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
     const [row] = await database.select().from(revisions).where(eq(revisions.id, revisionId));
     if (!row) {
       throw new PracticeError('revision_not_found', 404);
+    }
+    if (row.content.generationDraft) {
+      // JSONB normalizes object keys; retained JSON strings preserve dictionary case order.
+      const cases = parseGeneratedCases(row.content.generationDraft);
+      return { ...row, content: { ...row.content, ...cases } };
     }
     return row;
   }
@@ -97,7 +104,7 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
     if (!row) {
       throw new PracticeError('attempt_not_found', 404);
     }
-    return row;
+    return { ...row, report: restoreReport(row.report) };
   }
 
   async function submit(value: NewAttempt) {
@@ -121,24 +128,86 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
   async function complete(id: string, report: RunnerResponse) {
     const [saved] = await database
       .update(attempts)
-      .set({ report, completedAt: new Date() })
+      .set({ report: storeReport(report), completedAt: new Date() })
       .where(and(eq(attempts.id, id), isNull(attempts.report)))
       .returning();
-    if (!saved && !isDeepStrictEqual((await attempt(id)).report, report)) {
+    if (!saved && !sameReport((await attempt(id)).report, report)) {
       throw new PracticeError('completion_conflict', 409);
     }
   }
 
   async function recent(revisionId: string) {
-    return database
+    const rows = await database
       .select()
       .from(attempts)
       .where(eq(attempts.revisionId, revisionId))
       .orderBy(desc(attempts.createdAt), desc(attempts.id))
       .limit(20);
+    return rows.map((row) => ({ ...row, report: restoreReport(row.report) }));
   }
 
-  return { initialize, revision, draft, saveDraft, attempt, submit, complete, recent };
+  async function usableRevision(revisionId: string) {
+    const row = await revision(revisionId);
+    const [candidate] = await database
+      .select()
+      .from(schema.practiceCandidates)
+      .where(eq(schema.practiceCandidates.revisionId, revisionId));
+    if (candidate && !candidate.approved) {
+      throw new PracticeError('candidate_not_ready', 409);
+    }
+    return row;
+  }
+
+  async function active() {
+    const [selection] = await database
+      .select()
+      .from(schema.practiceSessionSelection)
+      .where(eq(schema.practiceSessionSelection.id, 1));
+    return usableRevision(selection?.revisionId ?? FIXED_REVISION.revisionId);
+  }
+
+  async function select(revisionId: string) {
+    await usableRevision(revisionId);
+    await database
+      .insert(schema.practiceSessionSelection)
+      .values({ id: 1, revisionId })
+      .onConflictDoUpdate({ target: schema.practiceSessionSelection.id, set: { revisionId } });
+  }
+
+  async function readyChallenges(currentRevisionId = FIXED_REVISION.revisionId) {
+    return database
+      .select({ revisionId: revisions.id, title: sql<string>`${revisions.content}->>'title'` })
+      .from(revisions)
+      .leftJoin(schema.practiceCandidates, eq(schema.practiceCandidates.revisionId, revisions.id))
+      .where(
+        or(
+          eq(revisions.id, FIXED_REVISION.revisionId),
+          eq(schema.practiceCandidates.approved, true)
+        )
+      )
+      .orderBy(
+        desc(sql<boolean>`${revisions.id} = ${FIXED_REVISION.revisionId}`),
+        desc(sql<boolean>`${revisions.id} = ${currentRevisionId}`),
+        desc(revisions.createdAt),
+        desc(revisions.id)
+      )
+      .limit(20);
+  }
+
+  return {
+    initialize,
+    revision,
+    usableRevision,
+    active,
+    select,
+    readyChallenges,
+    draft,
+    saveDraft,
+    attempt,
+    submit,
+    complete,
+    recent,
+  };
 }
 
 export type PracticeRepository = ReturnType<typeof createPracticeRepository>;

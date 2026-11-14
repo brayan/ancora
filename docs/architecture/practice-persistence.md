@@ -2,6 +2,8 @@
 
 The owner authorized this slice on 2026-11-14. Next.js and Drizzle own all product writes; no Python service or execution on the host is introduced.
 
+The subsequent [generation extension](challenge-generation.md) appends migration 0007 and preserves these records and migration files. Its Python service has no database writer or solution execution.
+
 ## Migration review
 
 Committed SQL and snapshots end at 0004. The original checkout contains an uncommitted 0005 decks/cards migration; retain it there and reserve its number. Its PostgreSQL container is stopped, so the applied database state is unverified. Do not infer state from checkout files or start/reset its volume.

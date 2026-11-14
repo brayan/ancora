@@ -11,6 +11,8 @@ Use the [engineering-playbook](https://github.com/brayan/engineering-playbook) a
 3. Keep App Router delivery thin; use the existing feature-first/naming conventions and no new web src/ layer.
 4. Build small slices. Do not scaffold empty services or architecture layers. Docs-only tasks must not add executable code, dependencies or migrations.
 5. Follow docs/engineering/code-quality-conventions.md: braces for every TS/JS control-flow body, contextual blank-line grouping, and the shared naming/structure rules. Apply task-owned self-review before narrow checks; formatting does not replace paragraph review.
+6. Python follows docs/engineering/python-conventions.md: typed source/tests, strict Pyright, Ruff and pytest from the locked uv workspace. Definitions with 2+ parameters use one per line and a trailing comma; `python:lint` enforces the shared playbook rule. Apply the same contextual paragraph and test naming rules.
+7. ADR 0014 owns Python layering: plain domain/application models, application services and application-owned provider interfaces; Pydantic only in API/infrastructure boundaries with explicit mappings. Split API routers by capability.
 
 ## Git conventions
 
@@ -19,7 +21,7 @@ Follow docs/engineering/git-conventions.md for branch names, commit subjects and
 ## Architecture
 
 - Next.js App Router, React and TypeScript own UI/product orchestration.
-- FastAPI/Pydantic AI own programming generation and optional coaching; the service is planned after the runner spike.
+- FastAPI/Pydantic AI own bounded programming generation; optional coaching remains deferred. ADR 0013 owns generation/CI details.
 - PostgreSQL/Drizzle remain the single durable-store/migration owner. No Python database writer.
 - No authentication, accounts, Sources, decks/cards or RAG in the current product.
 - Generated/submitted Python runs only in the isolated browser runner, never in server/host Python.
@@ -36,6 +38,8 @@ Obtain confirmation for architecture/storage/provider/privacy/deployment changes
 
 ## Commands and handoff
 
-Inspect package scripts before use. Current checks: `pnpm contracts:check`, `pnpm web:test:db`, `pnpm code:check`, `pnpm format:check`, `pnpm quality:test`, `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`, `pnpm web:test:browser`, `pnpm packages:typecheck`, `pnpm eval:typecheck`, `pnpm eval:test`, `pnpm eval:smoke`, `pnpm docker:config`, and the `pnpm repo:test:{fast,context,task,pr}` lanes. `pnpm dev` runs the web and static runner origins locally. Browser checks require Google Chrome; Python-service checks are not available yet. Use `pnpm db:migrate` with an explicit DATABASE_URL after ledger review. Never use schema push/diff generation against the retained legacy models. `pnpm docker:up` starts the separate practice database on 5433; legacy volumes remain untouched.
+Inspect package scripts before use. Current checks: `pnpm contracts:check`, `pnpm web:test:db`, `pnpm code:check`, `pnpm format:check`, `pnpm quality:test`, `pnpm web:lint`, `pnpm web:typecheck`, `pnpm web:test`, `pnpm web:test:browser`, `pnpm packages:typecheck`, `pnpm eval:typecheck`, `pnpm eval:test`, `pnpm eval:smoke`, `pnpm docker:config`, and the `pnpm repo:test:{fast,context,task,pr}` lanes. `pnpm dev` runs the web and static runner origins locally. Browser checks require Google Chrome; Python checks use the locked uv workspace. Use `pnpm db:migrate` with an explicit DATABASE_URL after ledger review. Never use schema push/diff generation against the retained legacy models. `pnpm docker:up` starts the separate practice database on 5433; legacy volumes remain untouched.
+
+Python checks: `pnpm python:sync`, `pnpm python:lint`, `pnpm python:format:check`, `pnpm python:typecheck`, `pnpm python:test`, `pnpm python:check`. GitHub Actions uses the same local checks; no provider calls or credentials in CI. Local startup requires uv 0.11.18 and Python 3.13; `pnpm dev` also starts the bounded service on 8001. Model/key/enable configuration belongs only to the Python environment, with a shared server token for Next.js.
 
 Before handoff report changed scope, validation/browser evidence, missing commands and residual limitations. Keep docs concise and canonical long-form decisions under docs/.

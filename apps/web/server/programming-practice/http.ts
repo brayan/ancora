@@ -14,7 +14,7 @@ const APP_ORIGIN = 'http://127.0.0.1:3000';
 const MAX_BODY_BYTES = 100_000;
 const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
 
-async function body(request: Request) {
+export async function readPracticeBody(request: Request) {
   if (request.headers.get('content-type')?.split(';')[0].trim() !== 'application/json') {
     throw new PracticeError('json_required', 415);
   }
@@ -55,7 +55,7 @@ async function body(request: Request) {
   }
 }
 
-async function respond(request: Request, action: () => Promise<unknown>) {
+export async function respondPractice(request: Request, action: () => Promise<unknown>) {
   try {
     if (request.headers.get('host') !== '127.0.0.1:3000') {
       throw new PracticeError('local_host_required', 403);
@@ -80,12 +80,23 @@ async function respond(request: Request, action: () => Promise<unknown>) {
 }
 
 export function getSession(request: Request) {
-  return respond(request, () => service.session());
+  return respondPractice(request, () => {
+    const value = new URL(request.url).searchParams.get('revisionId');
+    const revisionId = value === null ? undefined : referenceSchema.shape.revisionId.parse(value);
+    return service.session(revisionId);
+  });
+}
+
+export function postSession(request: Request) {
+  return respondPractice(request, async () => {
+    const input = referenceSchema.parse(await readPracticeBody(request));
+    return service.select(input.revisionId);
+  });
 }
 
 export function putDraft(request: Request) {
-  return respond(request, async () => {
-    const input = saveDraftSchema.parse(await body(request));
+  return respondPractice(request, async () => {
+    const input = saveDraftSchema.parse(await readPracticeBody(request));
     try {
       return await service.saveDraft(input.revisionId, input.source, input.version);
     } catch (error) {
@@ -101,27 +112,29 @@ export function putDraft(request: Request) {
 }
 
 export function postAttempt(request: Request) {
-  return respond(request, async () =>
-    service.submit(submitAttemptSchema.parse(await body(request)))
+  return respondPractice(request, async () =>
+    service.submit(submitAttemptSchema.parse(await readPracticeBody(request)))
   );
 }
 
 export function postReport(request: Request, context: { params: Promise<{ attemptId: string }> }) {
-  return respond(request, async () => {
+  return respondPractice(request, async () => {
     const { attemptId } = await context.params;
-    const input = completeAttemptSchema.parse(await body(request));
+    const input = completeAttemptSchema.parse(await readPracticeBody(request));
     await service.complete(attemptId, input.report);
     return { apiVersion: 1, saved: true };
   });
 }
 
 export function getAttempt(request: Request, context: { params: Promise<{ attemptId: string }> }) {
-  return respond(request, async () => service.viewAttempt((await context.params).attemptId));
+  return respondPractice(request, async () =>
+    service.viewAttempt((await context.params).attemptId)
+  );
 }
 
 export function postReference(request: Request) {
-  return respond(request, async () => {
-    const input = referenceSchema.parse(await body(request));
+  return respondPractice(request, async () => {
+    const input = referenceSchema.parse(await readPracticeBody(request));
     return service.reference(input.revisionId);
   });
 }

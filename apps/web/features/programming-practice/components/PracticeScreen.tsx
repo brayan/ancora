@@ -2,10 +2,16 @@
 
 import { useRef, useState } from 'react';
 import { StatusBadge } from '@ancora/ui';
-import { MAX_SOURCE_LENGTH, parseRunnerResponse, type RunnerResponse } from '@/runner/protocol.mjs';
+import {
+  MAX_SOURCE_LENGTH,
+  isRunRequest,
+  parseRunnerResponse,
+  type RunnerResponse,
+} from '@/runner/protocol.mjs';
 import { RUNNER_ORIGIN } from '@/features/programming-practice/constants';
 import { usePracticeRunner } from '@/features/programming-practice/hooks/usePracticeRunner';
 import { usePracticeSession } from '@/features/programming-practice/hooks/usePracticeSession';
+import { GenerationPanel } from '@/features/programming-practice/components/GenerationPanel';
 import { PracticeResults } from '@/features/programming-practice/components/PracticeResults';
 
 type Display = { report: RunnerResponse | null; label: string; source: string };
@@ -15,12 +21,13 @@ export function PracticeScreen() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const runner = usePracticeRunner(frameRef);
   const [preparing, setPreparing] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [display, setDisplay] = useState<Display | null>(null);
   const [error, setError] = useState('');
   const submission = useRef<{ id: string; source: string; mode: 'examples' | 'check' } | null>(
     null
   );
-  const busy = preparing || runner.busy;
+  const busy = preparing || runner.busy || generating || practice.reportSaving;
   const available = !['connecting', 'unavailable'].includes(runner.state.status);
   const validSource =
     practice.source.trim().length > 0 && practice.source.length <= MAX_SOURCE_LENGTH;
@@ -43,6 +50,9 @@ export function PracticeScreen() {
     }
     try {
       const envelope = await practice.prepare(mode, submission.current.id);
+      if (!isRunRequest(envelope.request)) {
+        throw new Error('invalid_run_request');
+      }
       submission.current = null;
       setPreparing(false);
       const report = parseRunnerResponse(envelope.report) ?? (await runner.run(envelope.request));
@@ -65,6 +75,9 @@ export function PracticeScreen() {
     setError('');
     try {
       const envelope = await practice.reference();
+      if (!isRunRequest(envelope.request)) {
+        throw new Error('invalid_run_request');
+      }
       if (load) {
         practice.edit(envelope.request.source);
       } else {
@@ -95,6 +108,21 @@ export function PracticeScreen() {
       );
     } catch {
       setError('The saved attempt could not open. Your draft is preserved; try again.');
+    }
+  };
+
+  const selectChallenge = async (revisionId: string) => {
+    setPreparing(true);
+    try {
+      const selected = await practice.select(revisionId);
+      if (selected) {
+        submission.current = null;
+        setDisplay(null);
+        setError('');
+      }
+      return selected;
+    } finally {
+      setPreparing(false);
     }
   };
 
@@ -132,6 +160,16 @@ export function PracticeScreen() {
             <h1>{practice.session.challenge.title}</h1>
             <p>{practice.session.challenge.objective}</p>
           </div>
+          <GenerationPanel
+            onGenerateSave={practice.save}
+            onSelect={selectChallenge}
+            run={runner.run}
+            onBusyChange={setGenerating}
+            blocked={preparing || runner.busy || practice.reportSaving || !!practice.pendingReport}
+            runnerAvailable={available}
+            currentRevisionId={practice.session.challenge.revisionId}
+            challenges={practice.session.challenges ?? []}
+          />
           <div className="practiceWorkspace">
             <section className="challengePanel" aria-labelledby="challenge-heading">
               <h2 id="challenge-heading">The challenge</h2>
@@ -156,7 +194,8 @@ export function PracticeScreen() {
                 ))}
               </div>
               <p className="scopeNote">
-                Fixed practice exercise · revision 1. Challenge generation and coaching come later.
+                Your draft belongs to this challenge revision. Generating a candidate keeps this
+                challenge open until you choose Open challenge.
               </p>
             </section>
             <section className="editorPanel" aria-labelledby="solution-heading">
@@ -312,6 +351,7 @@ export function PracticeScreen() {
             response={response}
             label={display?.label ?? 'Latest saved attempt'}
             source={display?.source ?? latest?.source}
+            technique={practice.session.challenge.technique}
           />
           {!display && latest && !latest.report && (
             <p className="scopeNote">

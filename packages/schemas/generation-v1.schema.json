@@ -1,0 +1,794 @@
+{
+  "schemaVersion": 1,
+  "contracts": {
+    "request": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "const": "python"
+        },
+        "concept": {
+          "type": "string",
+          "enum": [
+            "collections",
+            "comprehensions",
+            "dictionaries",
+            "strings",
+            "functions"
+          ]
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": [
+            "beginner",
+            "intermediate"
+          ]
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "targetMinutes": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 30
+        },
+        "preferences": {
+          "type": "string",
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "language",
+        "concept",
+        "difficulty",
+        "goal",
+        "targetMinutes",
+        "preferences"
+      ],
+      "additionalProperties": false
+    },
+    "draft": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "concept": {
+          "type": "string",
+          "enum": [
+            "collections",
+            "comprehensions",
+            "dictionaries",
+            "strings",
+            "functions"
+          ]
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": [
+            "beginner",
+            "intermediate"
+          ]
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "functionContract": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "pattern": "^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$"
+            },
+            "parameter": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "int",
+                    "str",
+                    "list[int]",
+                    "list[str]",
+                    "dict[str,int]",
+                    "dict[str,str]"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "type"
+              ],
+              "additionalProperties": false
+            },
+            "returns": {
+              "type": "string",
+              "enum": [
+                "int",
+                "str",
+                "list[int]",
+                "list[str]",
+                "dict[str,int]",
+                "dict[str,str]"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "parameter",
+            "returns"
+          ],
+          "additionalProperties": false
+        },
+        "requirements": {
+          "minItems": 1,
+          "maxItems": 12,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "constraints": {
+          "minItems": 1,
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "technique": {
+          "type": "string",
+          "enum": [
+            "none",
+            "list_comprehension",
+            "dict_comprehension"
+          ]
+        },
+        "publicCases": {
+          "minItems": 2,
+          "maxItems": 4,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,40}$"
+              },
+              "inputJson": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 6000
+              },
+              "expectedJson": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 6000
+              }
+            },
+            "required": [
+              "id",
+              "inputJson",
+              "expectedJson"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "checkCases": {
+          "minItems": 3,
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,40}$"
+              },
+              "inputJson": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 6000
+              },
+              "expectedJson": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 6000
+              }
+            },
+            "required": [
+              "id",
+              "inputJson",
+              "expectedJson"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "referenceSource": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12000
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "title",
+        "concept",
+        "difficulty",
+        "objective",
+        "statement",
+        "functionContract",
+        "requirements",
+        "constraints",
+        "technique",
+        "publicCases",
+        "checkCases",
+        "referenceSource"
+      ],
+      "additionalProperties": false
+    },
+    "input": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "request": {
+          "type": "object",
+          "properties": {
+            "language": {
+              "type": "string",
+              "const": "python"
+            },
+            "concept": {
+              "type": "string",
+              "enum": [
+                "collections",
+                "comprehensions",
+                "dictionaries",
+                "strings",
+                "functions"
+              ]
+            },
+            "difficulty": {
+              "type": "string",
+              "enum": [
+                "beginner",
+                "intermediate"
+              ]
+            },
+            "goal": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            },
+            "targetMinutes": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 30
+            },
+            "preferences": {
+              "type": "string",
+              "maxLength": 300
+            }
+          },
+          "required": [
+            "language",
+            "concept",
+            "difficulty",
+            "goal",
+            "targetMinutes",
+            "preferences"
+          ],
+          "additionalProperties": false
+        },
+        "previous": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "schemaVersion": {
+                  "type": "number",
+                  "const": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "concept": {
+                  "type": "string",
+                  "enum": [
+                    "collections",
+                    "comprehensions",
+                    "dictionaries",
+                    "strings",
+                    "functions"
+                  ]
+                },
+                "difficulty": {
+                  "type": "string",
+                  "enum": [
+                    "beginner",
+                    "intermediate"
+                  ]
+                },
+                "objective": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "statement": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4000
+                },
+                "functionContract": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "pattern": "^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$"
+                    },
+                    "parameter": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "pattern": "^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "int",
+                            "str",
+                            "list[int]",
+                            "list[str]",
+                            "dict[str,int]",
+                            "dict[str,str]"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "returns": {
+                      "type": "string",
+                      "enum": [
+                        "int",
+                        "str",
+                        "list[int]",
+                        "list[str]",
+                        "dict[str,int]",
+                        "dict[str,str]"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "parameter",
+                    "returns"
+                  ],
+                  "additionalProperties": false
+                },
+                "requirements": {
+                  "minItems": 1,
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                },
+                "constraints": {
+                  "minItems": 1,
+                  "maxItems": 10,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                },
+                "technique": {
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "list_comprehension",
+                    "dict_comprehension"
+                  ]
+                },
+                "publicCases": {
+                  "minItems": 2,
+                  "maxItems": 4,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,40}$"
+                      },
+                      "inputJson": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 6000
+                      },
+                      "expectedJson": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 6000
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "inputJson",
+                      "expectedJson"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "checkCases": {
+                  "minItems": 3,
+                  "maxItems": 8,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{1,40}$"
+                      },
+                      "inputJson": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 6000
+                      },
+                      "expectedJson": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 6000
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "inputJson",
+                      "expectedJson"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "referenceSource": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 12000
+                }
+              },
+              "required": [
+                "schemaVersion",
+                "title",
+                "concept",
+                "difficulty",
+                "objective",
+                "statement",
+                "functionContract",
+                "requirements",
+                "constraints",
+                "technique",
+                "publicCases",
+                "checkCases",
+                "referenceSource"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "feedback": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "recentExercises": {
+          "maxItems": 5,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "request",
+        "previous",
+        "feedback",
+        "recentExercises"
+      ],
+      "additionalProperties": false
+    },
+    "output": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "draft": {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "type": "number",
+              "const": 1
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "concept": {
+              "type": "string",
+              "enum": [
+                "collections",
+                "comprehensions",
+                "dictionaries",
+                "strings",
+                "functions"
+              ]
+            },
+            "difficulty": {
+              "type": "string",
+              "enum": [
+                "beginner",
+                "intermediate"
+              ]
+            },
+            "objective": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "statement": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
+            },
+            "functionContract": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$"
+                },
+                "parameter": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "pattern": "^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "int",
+                        "str",
+                        "list[int]",
+                        "list[str]",
+                        "dict[str,int]",
+                        "dict[str,str]"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type"
+                  ],
+                  "additionalProperties": false
+                },
+                "returns": {
+                  "type": "string",
+                  "enum": [
+                    "int",
+                    "str",
+                    "list[int]",
+                    "list[str]",
+                    "dict[str,int]",
+                    "dict[str,str]"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "parameter",
+                "returns"
+              ],
+              "additionalProperties": false
+            },
+            "requirements": {
+              "minItems": 1,
+              "maxItems": 12,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            },
+            "constraints": {
+              "minItems": 1,
+              "maxItems": 10,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              }
+            },
+            "technique": {
+              "type": "string",
+              "enum": [
+                "none",
+                "list_comprehension",
+                "dict_comprehension"
+              ]
+            },
+            "publicCases": {
+              "minItems": 2,
+              "maxItems": 4,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{1,40}$"
+                  },
+                  "inputJson": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 6000
+                  },
+                  "expectedJson": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 6000
+                  }
+                },
+                "required": [
+                  "id",
+                  "inputJson",
+                  "expectedJson"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "checkCases": {
+              "minItems": 3,
+              "maxItems": 8,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{1,40}$"
+                  },
+                  "inputJson": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 6000
+                  },
+                  "expectedJson": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 6000
+                  }
+                },
+                "required": [
+                  "id",
+                  "inputJson",
+                  "expectedJson"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "referenceSource": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 12000
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "title",
+            "concept",
+            "difficulty",
+            "objective",
+            "statement",
+            "functionContract",
+            "requirements",
+            "constraints",
+            "technique",
+            "publicCases",
+            "checkCases",
+            "referenceSource"
+          ],
+          "additionalProperties": false
+        },
+        "model": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "const": "openai"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "promptVersion": {
+              "type": "string",
+              "const": "programming-practice-v1"
+            },
+            "schemaVersion": {
+              "type": "number",
+              "const": 1
+            }
+          },
+          "required": [
+            "provider",
+            "name",
+            "promptVersion",
+            "schemaVersion"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "draft",
+        "model"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

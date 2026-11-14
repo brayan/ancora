@@ -1,5 +1,12 @@
 import { loadPyodide } from '/runtime/pyodide.mjs';
-import { MAX_OUTPUT_LENGTH, RUNTIME_VERSION, isRunRequest, jobBinding } from '/protocol.mjs';
+import {
+  MAX_OUTPUT_LENGTH,
+  RUNTIME_VERSION,
+  casesDigestText,
+  digestText,
+  isRunRequest,
+  jobBinding,
+} from '/protocol.mjs';
 
 self.onmessage = async ({ data: request }) => {
   if (!isRunRequest(request)) {
@@ -14,6 +21,15 @@ self.onmessage = async ({ data: request }) => {
   let loaded = false;
 
   try {
+    const [sourceDigest, casesDigest] = await Promise.all([
+      digestText(request.source),
+      digestText(casesDigestText(request.cases, request.functionContract)),
+    ]);
+    if (sourceDigest !== request.sourceDigest || casesDigest !== request.casesDigest) {
+      self.postMessage({ ...binding, type: 'failure', code: 'invalid_message', output: '' });
+      return;
+    }
+
     const [pyodide, harness] = await Promise.all([
       loadPyodide({
         indexURL: '/runtime/',
@@ -47,14 +63,20 @@ self.onmessage = async ({ data: request }) => {
     pyodide.setStderr({ write });
     pyodide.setStdin({ error: true });
 
-    const evaluate = pyodide.runPython(harness);
+    pyodide.runPython(harness);
+    const evaluate = pyodide.globals.get('evaluate');
     loaded = true;
     self.postMessage({ ...binding, type: 'loaded' });
     const executionStarted = performance.now();
     const cases = pyodide.toPy(request.cases);
 
+    const contract = request.protocolVersion === 2 ? pyodide.toPy(request.functionContract) : null;
     try {
-      const report = JSON.parse(evaluate(request.source, cases, request.technique));
+      const report = JSON.parse(
+        contract
+          ? evaluate(request.source, cases, request.technique, contract)
+          : evaluate(request.source, cases, request.technique)
+      );
       if (!outputLimited) {
         self.postMessage({
           ...binding,
@@ -66,6 +88,7 @@ self.onmessage = async ({ data: request }) => {
         });
       }
     } finally {
+      contract?.destroy();
       cases.destroy();
       evaluate.destroy();
     }

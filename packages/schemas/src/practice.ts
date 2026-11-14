@@ -1,15 +1,24 @@
 import { z } from 'zod';
+import { functionContractSchema, generationRequestSchema } from './generation';
 
 export const API_VERSION = 1;
 export const MAX_SOURCE_LENGTH = 12_000;
 const identifier = z.string().regex(/^[a-zA-Z0-9@_.:-]{1,100}$/);
 const source = z.string().max(MAX_SOURCE_LENGTH);
 const integerList = z.array(z.number().int().min(-1_000_000).max(1_000_000)).max(1_000);
+const primitive = z.union([z.number().int().min(-1_000_000).max(1_000_000), z.string().max(2_000)]);
+export const runnerValueSchema = z.union([
+  primitive,
+  integerList,
+  z.array(z.string().max(2_000)).max(100),
+  z.record(z.string().max(100), z.number().int().min(-1_000_000).max(1_000_000)),
+  z.record(z.string().max(100), z.string().max(2_000)),
+]);
 export const modeSchema = z.enum(['examples', 'check']);
 export const caseSchema = z.strictObject({
   id: identifier,
-  input: integerList,
-  expected: integerList,
+  input: runnerValueSchema,
+  expected: runnerValueSchema,
 });
 export const challengeSchema = z.strictObject({
   revisionId: identifier,
@@ -17,9 +26,13 @@ export const challengeSchema = z.strictObject({
   objective: z.string().min(1).max(500),
   statement: z.string().min(1).max(4_000),
   signature: z.string().min(1).max(300),
-  requirements: z.array(z.string().min(1).max(500)).min(1).max(20),
+  requirements: z.array(z.string().min(1).max(500)).min(1).max(24),
   publicCases: z.array(caseSchema).min(1).max(12),
   starterCode: source,
+  functionContract: functionContractSchema.optional(),
+  technique: z.enum(['none', 'list_comprehension', 'dict_comprehension']).optional(),
+  concept: generationRequestSchema.shape.concept.optional(),
+  difficulty: generationRequestSchema.shape.difficulty.optional(),
 });
 export const draftSchema = z.strictObject({
   revisionId: identifier,
@@ -42,7 +55,7 @@ export const referenceSchema = z.strictObject({
   apiVersion: z.literal(API_VERSION),
   revisionId: identifier,
 });
-export const runRequestSchema = z.strictObject({
+const legacyRunRequestSchema = z.strictObject({
   type: z.literal('run'),
   protocolVersion: z.literal(1),
   jobId: identifier,
@@ -51,10 +64,22 @@ export const runRequestSchema = z.strictObject({
   casesDigest: z.string().regex(/^[a-f0-9]{64}$/),
   runtimeVersion: z.string().min(1).max(50),
   source,
-  cases: z.array(caseSchema).min(1).max(12),
+  cases: z
+    .array(caseSchema.extend({ input: integerList, expected: integerList }))
+    .min(1)
+    .max(12),
   functionName: z.literal('positive_even'),
   technique: z.literal('list_comprehension'),
 });
+export const runRequestSchema = z.union([
+  legacyRunRequestSchema,
+  legacyRunRequestSchema.omit({ functionName: true }).extend({
+    protocolVersion: z.literal(2),
+    functionContract: functionContractSchema,
+    technique: z.enum(['none', 'list_comprehension', 'dict_comprehension']),
+    cases: z.array(caseSchema).min(1).max(12),
+  }),
+]);
 export const attemptSchema = z.strictObject({
   id: z.string().uuid(),
   revisionId: identifier,
@@ -72,6 +97,10 @@ export const sessionSchema = z.strictObject({
   draft: draftSchema,
   attempts: z.array(attemptSummarySchema).max(20),
   latestAttempt: attemptSchema.nullable(),
+  challenges: z
+    .array(z.strictObject({ revisionId: identifier, title: z.string().max(200) }))
+    .max(20)
+    .optional(),
 });
 export const envelopeSchema = z.strictObject({
   apiVersion: z.literal(API_VERSION),
