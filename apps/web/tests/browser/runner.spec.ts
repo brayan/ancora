@@ -1,7 +1,16 @@
 import { createServer, get as getHttp } from 'node:http';
 import { expect, test, type Page } from '@playwright/test';
 import { CHECK_CASES, REFERENCE_CODE } from '../../server/programming-practice/fixture';
-import type { RunnerResponse } from '../../runner/protocol.mjs';
+import type { FunctionContract } from '@ancora/schemas';
+import {
+  casesDigestText,
+  digestText,
+  RUNTIME_VERSION,
+  type GenericRunnerCase,
+  type RunRequest,
+  type RunnerResponse,
+  type Technique,
+} from '../../runner/protocol.mjs';
 
 async function ready(page: Page) {
   await page.goto('/practice');
@@ -14,64 +23,79 @@ async function execute(
   technique: 'list_comprehension' | 'none' = 'list_comprehension',
   sourceDigestOverride: string | null = null
 ): Promise<RunnerResponse> {
-  return page.evaluate(
-    async ({ source, cases, technique, sourceDigestOverride }) => {
-      const frame = document.querySelector('iframe')!;
-      const hash = async (text: string) =>
-        Array.from(
-          new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))),
-          (byte) => byte.toString(16).padStart(2, '0')
-        ).join('');
-      const jobId = crypto.randomUUID();
-      const request = {
-        type: 'run',
-        protocolVersion: 1,
-        jobId,
-        revisionId: 'synthetic-positive-even@1',
-        sourceDigest: sourceDigestOverride ?? (await hash(source)),
-        casesDigest: await hash(JSON.stringify(cases)),
-        runtimeVersion: '314.0.7',
-        source,
-        cases,
-        functionName: 'positive_even',
-        technique,
-      };
-
-      return new Promise<RunnerResponse>((resolve, reject) => {
-        const timer = setTimeout(() => {
-          window.removeEventListener('message', receive);
-          reject(new Error('Runner response deadline'));
-        }, 40_000);
-
-        function receive(event: MessageEvent) {
-          if (
-            event.origin !== 'http://127.0.0.1:3001' ||
-            event.source !== frame.contentWindow ||
-            event.data?.jobId !== jobId ||
-            !['result', 'failure'].includes(event.data.type)
-          ) {
-            return;
-          }
-          clearTimeout(timer);
-          window.removeEventListener('message', receive);
-          resolve(event.data);
-        }
-
-        window.addEventListener('message', receive);
-        frame.contentWindow!.postMessage(request, 'http://127.0.0.1:3001');
-      });
-    },
-    { source, cases: CHECK_CASES, technique, sourceDigestOverride }
-  );
+  return dispatch(page, {
+    type: 'run',
+    protocolVersion: 1,
+    jobId: crypto.randomUUID(),
+    revisionId: 'synthetic-positive-even@1',
+    sourceDigest: sourceDigestOverride ?? (await digestText(source)),
+    casesDigest: await digestText(casesDigestText(CHECK_CASES)),
+    runtimeVersion: RUNTIME_VERSION,
+    source,
+    cases: CHECK_CASES,
+    functionName: 'positive_even',
+    technique,
+  });
 }
 
-function successful(response: RunnerResponse) {
+async function executeGeneric(
+  page: Page,
+  source: string,
+  functionContract: FunctionContract,
+  cases: GenericRunnerCase[],
+  technique: Technique = 'none'
+): Promise<RunnerResponse> {
+  return dispatch(page, {
+    type: 'run',
+    protocolVersion: 2,
+    jobId: crypto.randomUUID(),
+    revisionId: 'synthetic-generic@1',
+    sourceDigest: await digestText(source),
+    casesDigest: await digestText(casesDigestText(cases, functionContract)),
+    runtimeVersion: RUNTIME_VERSION,
+    source,
+    cases,
+    functionContract,
+    technique,
+  });
+}
+
+async function dispatch(page: Page, request: RunRequest): Promise<RunnerResponse> {
+  return page.evaluate((request) => {
+    const frame = document.querySelector('iframe')!;
+    return new Promise<RunnerResponse>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        window.removeEventListener('message', receive);
+        reject(new Error('Runner response deadline'));
+      }, 40_000);
+
+      function receive(event: MessageEvent) {
+        if (
+          event.origin !== 'http://127.0.0.1:3001' ||
+          event.source !== frame.contentWindow ||
+          event.data?.jobId !== request.jobId ||
+          !['result', 'failure'].includes(event.data.type)
+        ) {
+          return;
+        }
+        clearTimeout(timer);
+        window.removeEventListener('message', receive);
+        resolve(event.data);
+      }
+
+      window.addEventListener('message', receive);
+      frame.contentWindow!.postMessage(request, 'http://127.0.0.1:3001');
+    });
+  }, request);
+}
+
+function successful(response: RunnerResponse, caseCount = CHECK_CASES.length) {
   expect(response.type).toBe('result');
   if (response.type !== 'result') {
     throw new Error(`Runner failed: ${response.code}`);
   }
   expect(response.error).toBeNull();
-  expect(response.cases).toHaveLength(CHECK_CASES.length);
+  expect(response.cases).toHaveLength(caseCount);
   return response;
 }
 
@@ -404,6 +428,181 @@ test('should recover after bounded allocation when a fresh worker runs the next 
   }
 
   console.log('Synthetic runner timings', JSON.stringify(measured));
+  expect(successful(await execute(page, REFERENCE_CODE)).cases.every((item) => item.passed)).toBe(
+    true
+  );
+});
+
+test('should evaluate varied function contracts when generated cases use strings dictionaries and integers', async ({
+  page,
+}) => {
+  await ready(page);
+  const examples: {
+    source: string;
+    contract: FunctionContract;
+    cases: GenericRunnerCase[];
+    technique: Technique;
+  }[] = [
+    {
+      source: 'def shout(text):\n    return text.upper()\n',
+      contract: { name: 'shout', parameter: { name: 'text', type: 'str' }, returns: 'str' },
+      cases: [{ id: 'mixed', input: 'Hello', expected: 'HELLO' }],
+      technique: 'none',
+    },
+    {
+      source: 'def add_one(value):\n    return value + 1\n',
+      contract: { name: 'add_one', parameter: { name: 'value', type: 'int' }, returns: 'int' },
+      cases: [{ id: 'negative', input: -2, expected: -1 }],
+      technique: 'none',
+    },
+    {
+      source: 'def word_sizes(words):\n    return {word: len(word) for word in words}\n',
+      contract: {
+        name: 'word_sizes',
+        parameter: { name: 'words', type: 'list[str]' },
+        returns: 'dict[str,int]',
+      },
+      cases: [{ id: 'duplicates', input: ['a', 'word', 'a'], expected: { a: 1, word: 4 } }],
+      technique: 'dict_comprehension',
+    },
+    {
+      source:
+        'def upper_values(mapping):\n    result = {key: value.upper() for key, value in mapping.items()}\n    return result\n',
+      contract: {
+        name: 'upper_values',
+        parameter: { name: 'mapping', type: 'dict[str,str]' },
+        returns: 'dict[str,str]',
+      },
+      cases: [{ id: 'mapping', input: { a: 'one', b: 'two' }, expected: { a: 'ONE', b: 'TWO' } }],
+      technique: 'dict_comprehension',
+    },
+  ];
+  for (const example of examples) {
+    const report = successful(
+      await executeGeneric(
+        page,
+        example.source,
+        example.contract,
+        example.cases,
+        example.technique
+      ),
+      example.cases.length
+    );
+    expect(report.protocolVersion).toBe(2);
+    expect(report.cases.every((item) => item.passed)).toBe(true);
+    expect(report.technique).toBe(example.technique === 'none' ? 'not_required' : 'passed');
+  }
+  expect(successful(await execute(page, REFERENCE_CODE)).cases.every((item) => item.passed)).toBe(
+    true
+  );
+});
+
+test('should reject mutation and unsupported return types when generic functions violate their contracts', async ({
+  page,
+}) => {
+  await ready(page);
+  const contract: FunctionContract = {
+    name: 'word_sizes',
+    parameter: { name: 'words', type: 'list[str]' },
+    returns: 'dict[str,int]',
+  };
+  const cases: GenericRunnerCase[] = [{ id: 'words', input: ['word'], expected: { word: 4 } }];
+  const mutated = successful(
+    await executeGeneric(
+      page,
+      'def word_sizes(words):\n    words.append("extra")\n    return {"word": 4}\n',
+      contract,
+      cases
+    ),
+    1
+  );
+  expect(mutated.cases[0]).toMatchObject({ passed: false, mutated: true });
+
+  const unsupported = successful(
+    await executeGeneric(
+      page,
+      'def word_sizes(words):\n    return {"word": True}\n',
+      contract,
+      cases
+    ),
+    1
+  );
+  expect(unsupported.cases[0]).toMatchObject({ passed: false, actual: null });
+
+  const wrongSignature = await executeGeneric(
+    page,
+    'def word_sizes(other):\n    return {"word": 4}\n',
+    contract,
+    cases
+  );
+  expect(wrongSignature.type === 'result' && wrongSignature.error).toContain('declared function');
+  expect(successful(await execute(page, REFERENCE_CODE)).cases.every((item) => item.passed)).toBe(
+    true
+  );
+});
+
+test('should reject action-shaped generic worker messages when capability data is forged then recover', async ({
+  page,
+}) => {
+  await ready(page);
+  const contract: FunctionContract = {
+    name: 'shout',
+    parameter: { name: 'text', type: 'str' },
+    returns: 'str',
+  };
+  const cases: GenericRunnerCase[] = [{ id: 'word', input: 'hello', expected: 'HELLO' }];
+  const forged = await executeGeneric(
+    page,
+    'def shout(text):\n    from js import self\n    self.postMessage("generate-paid-challenge")\n    while True:\n        pass\n',
+    contract,
+    cases
+  );
+  expect(forged.type === 'failure' && forged.code).toBe('invalid_message');
+
+  const recovered = successful(
+    await executeGeneric(page, 'def shout(text):\n    return text.upper()\n', contract, cases),
+    1
+  );
+  expect(recovered.cases[0].passed).toBe(true);
+  expect(successful(await execute(page, REFERENCE_CODE)).cases.every((item) => item.passed)).toBe(
+    true
+  );
+});
+
+test('should reject reordered dictionary output and input mutation when generic values retain wire order', async ({
+  page,
+}) => {
+  await ready(page);
+  const contract: FunctionContract = {
+    name: 'copy_scores',
+    parameter: { name: 'scores', type: 'dict[str,int]' },
+    returns: 'dict[str,int]',
+  };
+  const cases: GenericRunnerCase[] = [
+    { id: 'ordered', input: { first: 1, second: 2 }, expected: { first: 1, second: 2 } },
+  ];
+  const reversed = successful(
+    await executeGeneric(
+      page,
+      'def copy_scores(scores):\n    return {key: scores[key] for key in reversed(scores)}\n',
+      contract,
+      cases,
+      'dict_comprehension'
+    ),
+    1
+  );
+  expect(reversed.cases[0]).toMatchObject({ passed: false, mutated: false });
+
+  const mutated = successful(
+    await executeGeneric(
+      page,
+      'def copy_scores(scores):\n    first = scores.pop("first")\n    scores["first"] = first\n    return {"first": 1, "second": 2}\n',
+      contract,
+      cases
+    ),
+    1
+  );
+  expect(mutated.cases[0]).toMatchObject({ passed: false, mutated: true });
   expect(successful(await execute(page, REFERENCE_CODE)).cases.every((item) => item.passed)).toBe(
     true
   );

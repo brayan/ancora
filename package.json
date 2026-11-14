@@ -41,7 +41,13 @@
     "db:migrate": "pnpm --filter @ancora/web db:migrate",
     "contracts:generate": "pnpm --filter @ancora/web contracts:generate",
     "contracts:check": "pnpm --filter @ancora/web contracts:check",
-    "web:test:db": "pnpm --filter @ancora/web test:db"
+    "web:test:db": "pnpm --filter @ancora/web test:db",
+    "python:sync": "uv sync --frozen --all-packages --group dev",
+    "python:lint": "scripts/ci/run-python-checks.sh lint",
+    "python:format:check": "scripts/ci/run-python-checks.sh format",
+    "python:typecheck": "scripts/ci/run-python-checks.sh typecheck",
+    "python:test": "scripts/ci/run-python-checks.sh test",
+    "python:check": "scripts/ci/run-python-checks.sh all"
   },
   "devDependencies": {
     "eslint": "9.39.4",

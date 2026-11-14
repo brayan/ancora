@@ -17,7 +17,7 @@ DESCRIPTION
 done
 
 for file in AGENTS.md CONTEXT.md docs/agents/repo-manifest.yaml \
-  docs/agents/projects/web.yaml docs/agents/projects/practice-service.yaml \
+  docs/agents/projects/web.yaml docs/agents/projects/api.yaml \
   docs/agents/projects/eval-runner.yaml docs/adr/0011-focus-on-local-programming-practice.md \
   docs/product/programming-practice.md docs/exec-plans/programming-practice.md \
   docs/architecture/runner-spike.md apps/web/package.json apps/web/runner/worker.mjs \

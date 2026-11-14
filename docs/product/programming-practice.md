@@ -4,7 +4,7 @@
 
 Choose a concept/difficulty, receive a generated Python challenge, implement one pure function, run examples, check behavior/technique and optionally request help. This replaces the earlier account/source/flashcard product direction (ADR 0011).
 
-The current implementation exposes one fixed synthetic exercise, a plain code editor, PostgreSQL-backed drafts, exact submitted attempts, immutable revisions and reload/resume. Recent attempts can be inspected without replacing the draft. It has no live generation or coaching. No login is required. Difficulty and duration are targets, not measurements.
+The implementation includes concept/difficulty selection, bounded generation, reference validation, explicit challenge opening, a plain editor, PostgreSQL-backed drafts, exact submitted attempts, immutable revisions and reload/resume. The fixed synthetic exercise remains available. Recent attempts and ready challenges can be opened without discarding drafts. Coaching is deferred. No login is required. Difficulty and duration are targets, not measurements.
 
 ## Execution contract
 
@@ -22,6 +22,6 @@ Normal learner projections omit reference code and unrevealed cases, including H
 
 Generate a full draft, validate structure/cross-field agreement, persist a candidate, then run reference checks in the isolated runner. Next.js alone changes lifecycle state. Failed correction creates another revision. At most two provider dispatches total per generation, including framework/SDK/transport attempts. Closing a tab leaves the saved candidate pending; reopening resumes it. An uncertain paid call is marked interrupted/unknown and never silently repeated. Runner failure reports do not authorize paid correction.
 
-## Interaction requirements for later slices
+## Interaction requirements
 
-Concept/difficulty, generate, statement/contract/examples, editor, run examples, check, Stop, separate behavior/technique results, optional hints/coaching, explicit reveal and history. Preserve drafts across errors/reload and before changing exercise. AI completion defaults off. The existing textarea is retained for this persistence slice; CodeMirror remains a future editor enhancement. No marketing page, leaderboards, collaboration or arbitrary package installation.
+Concept/difficulty, generate, statement/contract/examples, editor, run examples, check, Stop, separate behavior/technique results, explicit reference reveal and history. Preserve drafts across errors/reload and before changing exercise. Optional hints/coaching and CodeMirror remain later enhancements. AI completion defaults off. No marketing page, leaderboards, collaboration or arbitrary package installation.

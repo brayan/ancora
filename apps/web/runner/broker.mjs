@@ -4,6 +4,7 @@ import {
   RUN_TIMEOUT_MS,
   PROTOCOL_VERSION,
   digestText,
+  casesDigestText,
   isRunRequest,
   isLoadedResponse,
   jobBinding,
@@ -42,7 +43,7 @@ async function start(request) {
 
   const [sourceDigest, casesDigest] = await Promise.all([
     digestText(request.source),
-    digestText(JSON.stringify(request.cases)),
+    digestText(casesDigestText(request.cases, request.functionContract)),
   ]);
   if (ticket !== sequence) {
     return;

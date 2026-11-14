@@ -1,1 +1,1 @@
-export { getSession as GET } from '@/server/programming-practice/http';
+export { getSession as GET, postSession as POST } from '@/server/programming-practice/http';

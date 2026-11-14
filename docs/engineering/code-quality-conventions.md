@@ -10,7 +10,7 @@ Use one blank line when a function changes responsibility: for example, validate
 
 Extract a direct multiline predicate call into a named boolean before an `if`. Mixed boolean expressions and single-line calls are allowed. Static TS/JS test titles use `should <outcome> when <condition>`; group test setup, execution and assertions into meaningful paragraphs without mechanical AAA comments.
 
-Prettier uses Sailtech's settings: single quotes, semicolons, ES5 trailing commas and a 100-column print width. It formats TS/JS and CSS under `apps/web`, `packages`, `scripts` and `tools`, plus the root ESLint config. Generated files and historical database migrations are excluded. Python harness paragraphs receive contextual review; Python-service lint/typecheck tooling remains a later slice.
+Prettier uses Sailtech's settings: single quotes, semicolons, ES5 trailing commas and a 100-column print width. It formats TS/JS and CSS under `apps/web`, `packages`, `scripts` and `tools`, plus the root ESLint config. Generated files and historical database migrations are excluded. Python harness paragraphs receive contextual review; Python service and harness checks follow [Python conventions](python-conventions.md).
 
 ## File roles and ownership
 

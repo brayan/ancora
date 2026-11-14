@@ -22,7 +22,15 @@ export default defineConfig({
       url: 'http://127.0.0.1:3001',
       reuseExistingServer: false,
       timeout: 30_000,
-      env: { APP_ORIGIN: 'http://127.0.0.1:3000', RUNNER_PORT: '3001' },
+      env: {
+        APP_ORIGIN: 'http://127.0.0.1:3000',
+        RUNNER_PORT: '3001',
+        DATABASE_URL: '',
+        PRACTICE_SERVICE_TOKEN: '',
+        OPENAI_API_KEY: '',
+        PRACTICE_GENERATION_ENABLED: '',
+        PRACTICE_MODEL: '',
+      },
     },
     {
       command: 'pnpm dev',

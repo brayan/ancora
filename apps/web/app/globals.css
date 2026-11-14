@@ -410,3 +410,79 @@ summary {
     flex-direction: column;
   }
 }
+
+.generationPanel {
+  padding-block: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.generationNote {
+  max-width: 75ch;
+  margin-block: 12px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.generationFields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 0;
+  margin: 20px 0;
+  border: 0;
+  min-width: 0;
+}
+.generationFields > div,
+.challengeHistory {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.generationFields input,
+.generationFields select,
+.challengeHistory select {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--ink);
+  padding: 8px 10px;
+  font: inherit;
+  font-weight: 400;
+}
+.generationFields input::placeholder {
+  color: var(--muted);
+}
+.generationFields:disabled {
+  opacity: 0.65;
+}
+.generationGoal {
+  grid-column: span 2;
+}
+.generationState {
+  margin-top: 24px;
+}
+.generationState h3 {
+  margin-block: 0 8px;
+  overflow-wrap: anywhere;
+}
+.generationState > p {
+  margin-bottom: 12px;
+}
+.challengeHistory {
+  max-width: 520px;
+  margin-top: 24px;
+}
+@media (max-width: 600px) {
+  .generationFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .generationGoal {
+    grid-column: auto;
+  }
+  .generationPanel .runActions .button {
+    max-width: 100%;
+  }
+}

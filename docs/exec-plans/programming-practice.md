@@ -2,7 +2,7 @@
 
 ## Goal and authorization
 
-Owner-approved local single-user pivot; selected Next.js/React/TypeScript + FastAPI/Pydantic AI. Current implementation scope: the completed pivot/runner spike plus owner-authorized fixed-exercise persistence on 2026-11-14. ADR 0011 is authoritative.
+Owner-approved local single-user pivot; selected Next.js/React/TypeScript + FastAPI/Pydantic AI. Current implementation scope: the completed pivot/runner and persistence slices plus owner-authorized generation and automated CI on 2026-11-14. ADR 0011 is authoritative.
 
 ## Sequence
 
@@ -10,7 +10,7 @@ Owner-approved local single-user pivot; selected Next.js/React/TypeScript + Fast
 2. Remove retired routes, UI, server helpers, contracts, auth dependencies and stale current-product tests. Preserve original checkout, historical SQL/snapshots and database volumes. Pause migration/seed commands pending persistence review.
 3. Prove an isolated, dedicated-origin disposable Pyodide worker with a fixed synthetic exercise, bound messages, Stop/timeouts/output caps/reset, no contamination and blocked application/external requests. Record Chrome evidence and memory/latency limitations.
 4. Implemented in the persistence worktree: fixed-exercise editor + durable draft/attempt/revision workflow, reviewed additive migration 0006, guarded ledger upgrades, runtime schemas with derived TS contracts and generated JSON Schema. See docs/architecture/practice-persistence.md.
-5. Later: FastAPI/Pydantic AI generation, versioned prompts, bounded correction, recent-exercise context and failure recovery. Select model and real-eval budget first; use typed fakes before paid calls.
+5. Implement bounded FastAPI/Pydantic AI generation, versioned prompts, explicit correction, recent-exercise context, recovery and GitHub Actions. See [active plan](challenge-generation.md) and ADR 0013. The owner selected gpt-6-luna and USD 1 total live evaluation budget; CI remains offline.
 6. Later: progressive hints, selected-attempt coaching, explicit reveal, assistance tracking and history.
 
 ## Runner acceptance
@@ -23,8 +23,8 @@ Narrow naming/lint/type/unit checks, dedicated real-Chrome browser suite, deskto
 
 ## Rollback and publication
 
-The original dirty checkout remains intact. Persistence adds tables without dropping history; never drop/reset an existing database as rollback. Revert the worktree's task-owned changes to recover this branch; do not reset/delete the original checkout. No database rollback is needed because no data/migrations are applied. Draft PR #6 introduces source ingestion; recommend a new pivot PR rather than silently repurposing it. Do not publish/commit or change that PR without a publication request. Review ADR/product first, removal scope second, runner capability/tests third.
+The original dirty checkout remains intact. Persistence adds tables without dropping history; never drop/reset an existing database as rollback. Revert the worktree's task-owned changes to recover this branch; do not reset/delete the original checkout. Custom additive migrations are tested on disposable databases; rollback never resets retained data. Draft PR #6 introduces source ingestion; recommend a new pivot PR rather than silently repurposing it. Do not publish/commit or change that PR without a publication request. Review ADR/product first, removal scope second, runner capability/tests third.
 
 ## Current handoff
 
-The fixed-practice persistence slice follows merged PR #7. It preserves original migrations and the dirty legacy checkout, uses a separate local practice database, and tests fresh and known-0005 migration histories. Source, exact submitted snapshots and results persist across reload; unfinished attempts remain visible. FastAPI/Pydantic AI and live provider calls remain deferred. See the persistence document for acceptance evidence and limitations.
+The fixed-practice persistence slice follows merged PR #7. It preserves original migrations and the dirty legacy checkout, uses a separate local practice database, and tests fresh and known-0005 migration histories. Source, exact submitted snapshots and results persist across reload; unfinished attempts remain visible. The next slice adds bounded generation under ADR 0013; coaching remains deferred. See the persistence document for acceptance evidence and limitations.

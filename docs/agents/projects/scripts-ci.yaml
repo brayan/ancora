@@ -1,5 +1,5 @@
 name: scripts-ci
-status: planned
+status: implemented
 primary_paths:
   - scripts
   - .github/workflows
@@ -17,6 +17,9 @@ related_paths:
   - Makefile
   - package.json
   - pnpm-workspace.yaml
+  - pyproject.toml
+  - uv.lock
+  - .python-version
   - tsconfig.base.json
   - .gitignore
   - .env.example
@@ -26,6 +29,8 @@ related_paths:
 read_first:
   - docs/engineering/git-conventions.md
   - docs/engineering/code-quality-conventions.md
+  - docs/engineering/python-conventions.md
+  - docs/engineering/continuous-integration.md
   - docs/architecture/practice-persistence.md
   - CONTEXT.md
   - docs/engineering/documentation-governance.md
@@ -61,6 +66,7 @@ validation:
     - pnpm contracts:check
     - pnpm web:test:db
     - pnpm code:check
+    - pnpm python:check
     - pnpm quality:test
     - pnpm repo:test:fast
     - pnpm repo:test:task

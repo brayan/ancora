@@ -1,5 +1,5 @@
 name: web
-status: fixed-practice-persistence
+status: challenge-generation
 primary_paths: [apps/web]
 related_paths: [packages/ui, packages/shared-types, packages/schemas]
 read_first:
@@ -10,12 +10,13 @@ read_first:
   - docs/frontend/nextjs-naming-convention.md
   - docs/architecture/runner-spike.md
   - docs/architecture/practice-persistence.md
+  - docs/architecture/challenge-generation.md
   - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
-role: Next.js UI/product boundary, future Drizzle persistence and isolated browser execution delivery.
+role: Next.js UI/product boundary, durable generation/practice records and isolated browser execution delivery.
 allowed_work:
   - Thin App Router routes and programming-practice UI
   - Bounded runner protocol, dedicated static origin and disposable workers
-  - Future product lifecycle, server clients and persistence within approved slices
+  - Durable generation lifecycle, bounded service client and approved additive persistence
 out_of_scope:
   - Authentication, account, source and card feature restoration
   - Provider/database credentials or privileged bridges in browser execution
