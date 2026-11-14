@@ -10,7 +10,7 @@ ADR 0013 introduced bounded challenge generation with a flat Python package. Its
 
 ## Decision
 
-Within `apps/practice-service/src/practice_service`, use these implemented boundaries:
+Within `apps/api/src/ancora`, use these implemented boundaries:
 
 ```text
 api/
@@ -46,6 +46,8 @@ main.py
 The domain and application import only the standard library and inward core modules. Pydantic, FastAPI, HTTP clients and provider SDKs stay outside them. Challenge cases use native finite Python values in the core; schema versions, camelCase aliases and JSON-string case encoding belong to the boundaries. The dataclasses are frozen, but nested case lists/dictionaries are ordinary values, not deeply immutable objects. Durable immutable revisions remain Next.js-owned.
 
 The API and LLM adapters own separate Pydantic schemas and explicit mappings. Both are checked against the existing canonical generation-v1 wire artifact to prevent drift. Serialization may normalize JSON whitespace/escapes inside case strings; values and dictionary order are preserved. Existing routes, schema fields, safe errors, limits and single-dispatch behavior remain unchanged. Payload byte limits are checked at the boundaries, while challenge consistency belongs to the domain.
+
+The owner subsequently named the backend folder `apps/api`, its Python package `ancora` and its distribution `ancora-api`. Router documentation uses summaries, tags, behavioral docstrings and error-response schemas. The schema can be generated in-process; documentation HTTP endpoints remain disabled. This naming/documentation update preserves the accepted runtime and storage boundaries.
 
 FastAPI `APIRouter` modules follow the official [bigger applications guidance](https://fastapi.tiangolo.com/tutorial/bigger-applications/). HTTP handlers map, call the service and project a response. Status reads the injected provider interface directly. Authentication of the trusted server and request byte checks remain pre-parse ASGI middleware. `bootstrap.py` creates concrete adapters and closes resources it owns; injected adapters remain caller-owned.
 

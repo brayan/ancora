@@ -84,13 +84,7 @@ try {
     });
     generationService = spawn(
       'uv',
-      [
-        'run',
-        '--frozen',
-        '--all-packages',
-        'python',
-        'apps/practice-service/tests/serve_synthetic.py',
-      ],
+      ['run', '--frozen', '--all-packages', 'python', 'apps/api/tests/serve_synthetic.py'],
       {
         cwd: repoRoot,
         stdio: 'inherit',

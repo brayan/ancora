@@ -31,7 +31,7 @@ canonical_docs:
 accepted_stack:
   web: Next.js App Router, React and TypeScript
   product: apps/web owns product orchestration and durable records
-  generation: Bounded FastAPI/Pydantic AI service in apps/practice-service; no DB writes
+  generation: Bounded FastAPI/Pydantic AI service in apps/api; no DB writes
   persistence: PostgreSQL and Drizzle; additive 0006/0007 with ledger preflight
   provider: OpenAI; owner selected gpt-6-luna and USD 1 total live-evaluation budget
   identity: Local single-user; no login or accounts
@@ -73,9 +73,9 @@ project_shards:
   - name: web
     file: docs/agents/projects/web.yaml
     routes: [apps/web/**, packages/ui/**, packages/shared-types/**, packages/schemas/**, prompts/**, docs/frontend/**]
-  - name: practice-service
-    file: docs/agents/projects/practice-service.yaml
-    routes: [apps/practice-service/**]
+  - name: api
+    file: docs/agents/projects/api.yaml
+    routes: [apps/api/**]
   - name: eval-runner
     file: docs/agents/projects/eval-runner.yaml
     routes: [tools/eval-runner/**, evals/**]

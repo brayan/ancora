@@ -22,6 +22,8 @@ The new practice Compose project uses loopback port 5433 and its own volume. Exi
 
 Open http://127.0.0.1:3000/practice; the static runner is http://127.0.0.1:3001 and the Python service binds http://127.0.0.1:8001. Use the exact loopback hostname. The default development database matches the URL above; set DATABASE_URL for another reviewed database. `pnpm docker:down` stops the practice database without removing its volume.
 
+The Python backend lives in [apps/api](apps/api/README.md), with import package `ancora` and distribution `ancora-api`. Run it separately with `uv run --frozen --all-packages python -m ancora.main`. Its router metadata documents success/error contracts in-process; Swagger/OpenAPI HTTP endpoints remain disabled.
+
 For generation, export a random `PRACTICE_SERVICE_TOKEN` of at least 32 characters to the trusted web/Python servers, plus `PRACTICE_MODEL=gpt-6-luna`, `OPENAI_API_KEY` and `PRACTICE_GENERATION_ENABLED=1` for Python. Example files list the configuration; Python does not automatically load dotenv files. `pnpm dev` passes provider configuration only to Python and removes credentials from the static runner environment. Without generation configuration, the fixed exercise still works. Generating is an explicit paid model action; CI uses a synthetic provider and needs no OpenAI key.
 
 ```sh

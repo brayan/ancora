@@ -1,6 +1,6 @@
 # Monorepo Conventions
 
-ADR 0011 defines the local programming-practice product. `apps/web` owns the Next.js UI/product API and PostgreSQL/Drizzle persistence. `apps/practice-service` owns bounded FastAPI/Pydantic AI generation, with no independent database/migration ownership. Optional coaching remains deferred. Create directories only for implemented slices.
+ADR 0011 defines the local programming-practice product. `apps/web` owns the Next.js UI/product API and PostgreSQL/Drizzle persistence. `apps/api` owns bounded FastAPI/Pydantic AI generation, with no independent database/migration ownership. Optional coaching remains deferred. Create directories only for implemented slices.
 
 Keep App Router files thin and feature UI under `features/programming-practice`. Follow docs/frontend naming/import rules; no web src/ layer or empty architecture scaffolds. Static execution delivery belongs to `apps/web/runner`, on a separate origin from the product UI. Generated Python never runs on the host/server.
 

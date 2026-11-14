@@ -14,7 +14,7 @@ case "$mode" in
   lint)
     uv run --frozen --all-packages ruff check .
     PYTHONDONTWRITEBYTECODE=1 uv run --frozen --all-packages python scripts/quality/python/check_parameter_layout.py \
-      apps/practice-service apps/web/runner/harness.py apps/web/tests/python scripts/quality/python
+      apps/api apps/web/runner/harness.py apps/web/tests/python scripts/quality/python
     ;;
   format) uv run --frozen --all-packages ruff format --check . ;;
   typecheck) uv run --frozen --all-packages pyright ;;

@@ -4,7 +4,7 @@ Ancora adapts the engineering playbook's [Python typing standard](https://github
 
 ## Runtime and dependency ownership
 
-The root uv workspace supports Python `>=3.13,<3.15`; `.python-version`, CI, Ruff's `py313` target and Pyright's `3.13` target select the minimum version. The browser's pinned Pyodide runtime is separate and must remain compatible with the harness. Install uv `0.11.18`, then run `pnpm python:sync` from the repository root. `uv.lock` locks the whole workspace. Root `pyproject.toml` owns the pinned quality/test tools; `apps/practice-service/pyproject.toml` owns its runtime dependencies. Review manifest changes, run `uv lock` intentionally, and commit the resulting lockfile together. Frozen commands never update it.
+The root uv workspace supports Python `>=3.13,<3.15`; `.python-version`, CI, Ruff's `py313` target and Pyright's `3.13` target select the minimum version. The browser's pinned Pyodide runtime is separate and must remain compatible with the harness. Install uv `0.11.18`, then run `pnpm python:sync` from the repository root. `uv.lock` locks the whole workspace. Root `pyproject.toml` owns the pinned quality/test tools; `apps/api/pyproject.toml` owns its runtime dependencies. Review manifest changes, run `uv lock` intentionally, and commit the resulting lockfile together. Frozen commands never update it.
 
 FastAPI delivers a bounded generation API, Pydantic validates untrusted HTTP/model output, and Pydantic AI stays behind a typed provider adapter. Keep HTTP thin, deterministic validation independently testable, and create packages only when they own real behavior. Python never owns product database writes. Provider configuration is explicit; SDK/framework retries cannot expand the durable generation allowance.
 
@@ -15,6 +15,8 @@ Follow [ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md).
 Domain models and application commands/results are plain dataclasses. Neither layer imports Pydantic, FastAPI, vendor SDKs or transport DTOs. Application services coordinate operations with meaningful orchestration; application-owned `interfaces/` use typed `Protocol` dependencies and plain core models. Name provider interfaces separately from the services that consume them. Deterministic domain rules can remain functions. Avoid forwarding-only use-case classes and repositories for non-persistence operations.
 
 API and infrastructure Pydantic models validate untrusted data, then map explicitly to/from core values. Wire versions and JSON case encoding stay at those boundaries. The HTTP and LLM schemas each have parity tests against the canonical versioned artifact. Pytest also guards import direction and imports the core without site packages; add new core modules under that coverage.
+
+The backend folder is `apps/api`, its import package is `ancora`, and its distribution is `ancora-api`. Keep workspace, startup, test and agent-routing paths aligned when moving it. Each HTTP operation declares a summary, router tag, response model and error-response metadata, with a concise docstring explaining meaningful behavior and side effects. Document provider dispatch separately from readiness and configuration availability separately from health checks. Schema/model fields carry structural details; comments explain non-obvious constraints. OpenAPI metadata is testable in-process while documentation HTTP routes remain disabled. See [the backend contract](../../apps/api/README.md).
 
 ## Maintained code and strict checks
 

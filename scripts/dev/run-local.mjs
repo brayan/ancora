@@ -32,7 +32,7 @@ const web = spawn(
 
 const generation = spawn(
   'uv',
-  ['run', '--frozen', '--all-packages', 'python', '-m', 'practice_service.main'],
+  ['run', '--frozen', '--all-packages', 'python', '-m', 'ancora.main'],
   {
     cwd: root,
     stdio: 'inherit',

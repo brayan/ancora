@@ -19,7 +19,7 @@ Adapt Sailtech `apps/platform/ops-agent/pyproject.toml` at `e2a6ce0` and the eng
 
 - Root: shared generation contracts, Next.js durable lifecycle/migration/API/UI, browser integration tests and canonical product/architecture docs.
 - CI leaf: GitHub workflows, root Python tooling/lockfile, top-level command wrappers and Python/CI convention docs. Coordinate dependency manifests before locking; do not mutate service source or runner behavior.
-- Python leaf: `apps/practice-service`, versioned prompt and synthetic generation eval artifacts. Own service runtime dependency manifest; coordinate with the CI lockfile owner.
+- Python leaf: `apps/api`, versioned prompt and synthetic generation eval artifacts. Own service runtime dependency manifest; coordinate with the CI lockfile owner.
 - Runner leaf: versioned runner protocol, Python harness/worker and focused runner tests. Preserve v1 and capability limits. Host pytest covers only safe AST/contract rules, never execution of submitted/generated code.
 
 No overlapping file writes, Git/index operations or final validation while writers are active. Root integrates and verifies all claims. Preserve historical migrations, existing volumes, original dirty checkout, auth retirement and unrelated work.
@@ -33,6 +33,8 @@ Cover genuinely varying generated function names/types; structural/example/refer
 The owner selected `gpt-6-luna` and a hard USD 1 total budget on 2026-11-14. CI continues to use typed synthetic fakes with no API credentials or calls. A separate bounded pilot follows deterministic checks and an independently reviewed metadata-only budget guard; no paid retry is implicit. Live responses require review before quality acceptance.
 
 ## Current evidence
+
+PR #9 naming/documentation follow-up: rename the backend to `apps/api`, import package `ancora` and distribution `ancora-api`; update workspace/lock, startup, synthetic browser service, quality scopes and project shard together. Document generation/status operations and their existing error bodies without exposing documentation HTTP endpoints. Validate package startup, unchanged wire schemas, offline documentation behavior, Python quality/tests and Chrome generation integration before committing/pushing. The lockfile rename retains every third-party package record; no provider calls or migrations belong to this follow-up.
 
 PR #9 follow-up: the owner authorized the framework-free refactor in ADR 0014. Replace the flat Python contracts/HTTP/provider layout with capability routers, application services and application-owned provider interfaces, pure domain models/rules, separate API/LLM Pydantic mappings and bootstrap resource ownership. Preserve generation-v1 routes/contracts, error codes, prompt, provider budget/retry settings and all Next.js persistence/runner behavior. Validate import direction, core imports without frameworks, schema parity, mapping semantics, service/provider/HTTP tests and Chrome generation integration before committing/pushing to the existing branch. No dependencies, migrations or paid calls are part of this follow-up.
 
