@@ -38,13 +38,14 @@ export function usePracticeSession() {
   );
   const current = useRef({ revisionId: '', source: '', savedSource: '', version: 0 });
   const blocked = useRef(false);
+  const unconfirmedSave = useRef(false);
   const inFlight = useRef<Promise<boolean> | null>(null);
   const mounted = useRef(false);
 
   const recover = useCallback(() => {
     const value = current.current;
     try {
-      if (value.source === value.savedSource) {
+      if (value.source === value.savedSource && !unconfirmedSave.current) {
         sessionStorage.removeItem(recoveryKey(value.revisionId));
       } else {
         sessionStorage.setItem(
@@ -96,21 +97,22 @@ export function usePracticeSession() {
         savedSource: draft.source,
         version: recovery && hasConflict ? recovery.version : draft.version,
       };
+      // A matching read cannot rule out an older write whose response was lost.
+      unconfirmedSave.current = recovery !== null;
+      const needsSave = localSource !== draft.source || unconfirmedSave.current;
 
       setSession(saved);
       setSource(localSource);
       setPendingReport(readPendingReport(draft.revisionId));
       blocked.current = hasConflict;
       setConflict(blocked.current ? draft : null);
-      setSaveState(
-        blocked.current ? 'conflict' : localSource === draft.source ? 'saved' : 'unsaved'
-      );
+      setSaveState(blocked.current ? 'conflict' : needsSave ? 'unsaved' : 'saved');
       setMessage(
         blocked.current
           ? 'Another tab saved a different draft. Choose which version to keep.'
-          : localSource === draft.source
-            ? 'Draft saved to your local database.'
-            : 'Recovered edits. Saving your draft…'
+          : needsSave
+            ? 'Recovered edits. Saving your draft…'
+            : 'Draft saved to your local database.'
       );
       recover();
     },
@@ -168,12 +170,18 @@ export function usePracticeSession() {
     }
     if (inFlight.current) {
       const previous = await inFlight.current;
-      return previous && current.current.source === current.current.savedSource;
+      return (
+        previous &&
+        !unconfirmedSave.current &&
+        current.current.source === current.current.savedSource
+      );
     }
 
     const task = (async () => {
-      while (current.current.source !== current.current.savedSource) {
+      while (unconfirmedSave.current || current.current.source !== current.current.savedSource) {
         const snapshot = { ...current.current };
+        unconfirmedSave.current = true;
+        recover();
         setSaveState('saving');
         setMessage('Saving draft…');
         try {
@@ -185,7 +193,10 @@ export function usePracticeSession() {
           });
           if (response.status === 409 && data && typeof data === 'object' && 'draft' in data) {
             const remote = draftSchema.parse(data.draft);
+            current.current.savedSource = remote.source;
+            unconfirmedSave.current = false;
             blocked.current = true;
+            recover();
             setConflict(remote);
             setSaveState('conflict');
             setMessage('Another tab saved a different draft. Your edits are still here.');
@@ -197,6 +208,7 @@ export function usePracticeSession() {
           const saved = draftSchema.parse(data);
           current.current.version = saved.version;
           current.current.savedSource = saved.source;
+          unconfirmedSave.current = false;
           recover();
         } catch {
           setSaveState('error');
@@ -229,7 +241,7 @@ export function usePracticeSession() {
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
-      if (current.current.source !== current.current.savedSource) {
+      if (unconfirmedSave.current || current.current.source !== current.current.savedSource) {
         event.preventDefault();
       }
     };
@@ -247,6 +259,7 @@ export function usePracticeSession() {
       current.current.source = conflict.source;
       setSource(conflict.source);
     }
+    unconfirmedSave.current = false;
     blocked.current = false;
     setConflict(null);
     setSaveState(keepLocal ? 'unsaved' : 'saved');

@@ -19,6 +19,8 @@ The default practice database uses its own Compose project, named volume and loo
 - Attempt stores an idempotent submission ID, exact source snapshot, immutable revision/runtime/job/digest bindings and mode. A bounded report can be attached once. Pending report recovery uses one browser key per attempt, so tabs do not overwrite each other; blocked browser storage is disclosed. The source and completed report cannot be rewritten or deleted. A submission with no report remains visibly unfinished after reload.
 - Run examples and Check solution create durable attempts before browser execution. Reports must match the saved job, revision, source/cases digests, mode and runtime. Replayed completion is idempotent; a conflicting report is rejected. Browser results remain untrusted self-study evidence.
 
+In-flight or uncertain draft writes retain recovery and unload protection even when edits return to the last acknowledged source. Recovered copies are reconciled through an optimistic save, including when a session read already matches them; a read alone cannot rule out a delayed older write. A successful acknowledgment clears recovery, while a stale version still requires an explicit conflict choice.
+
 Versioned Zod runtime schemas own HTTP data shapes and derive TypeScript contracts; export JSON Schema artifacts for inspection and later Python integration. The normal session view excludes references and unrevealed cases. A separate run envelope carries the exact evaluation cases to the local owner. Explicit reference execution stays separate from learner attempts.
 
 ## Local capability and privacy boundary

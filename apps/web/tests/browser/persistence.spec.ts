@@ -217,6 +217,98 @@ test('should resume the latest database draft when another tab saves after local
   }
 });
 
+test('should preserve the final editor state when an undone save commits before its acknowledgment is lost', async ({
+  page,
+  request,
+}) => {
+  await open(page);
+  page.on('dialog', (dialog) => dialog.accept());
+  const originalSource = '# Synthetic acknowledged source before undo\n' + REFERENCE_CODE;
+  await save(page, originalSource);
+  let confirmCommit!: () => void;
+  const committed = new Promise<void>((resolve) => (confirmCommit = resolve));
+  let releaseResponse!: () => void;
+  const released = new Promise<void>((resolve) => (releaseResponse = resolve));
+  await page.route('**/api/practice/draft', async (route) => {
+    const response = await route.fetch({
+      headers: { ...route.request().headers(), origin: 'http://127.0.0.1:3000' },
+    });
+    expect(response.ok()).toBe(true);
+    confirmCommit();
+    await released;
+    await route.abort().catch(() => undefined);
+  });
+
+  try {
+    const pendingSource = '# Synthetic save later undone in editor\n' + REFERENCE_CODE;
+    await page.getByLabel('Python solution').fill(pendingSource);
+    await committed;
+    expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(
+      pendingSource
+    );
+    await page.getByLabel('Python solution').fill(originalSource);
+    const warnsBeforeLeaving = await page.evaluate(() => {
+      const event = new Event('beforeunload', { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    });
+    releaseResponse();
+    await expect(page.getByRole('button', { name: 'Retry save', exact: true })).toBeVisible();
+    await page.unroute('**/api/practice/draft');
+    await page.reload();
+
+    await expect(page.getByLabel('Python solution')).toHaveValue(originalSource);
+    await expect(page.getByRole('button', { name: 'Keep my edits', exact: true })).toBeVisible();
+    expect(warnsBeforeLeaving).toBe(true);
+    expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(
+      pendingSource
+    );
+
+    await page.getByRole('button', { name: 'Keep my edits', exact: true }).click();
+    await expect(page.locator('#draft-status')).toHaveText('Draft saved to your local database.');
+    expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(
+      originalSource
+    );
+  } finally {
+    releaseResponse();
+  }
+});
+
+test('should reconcile an uncertain reverted save when reload observes the original database draft', async ({
+  page,
+  request,
+}) => {
+  await open(page);
+  page.on('dialog', (dialog) => dialog.accept());
+  const originalSource = '# Synthetic original before uncertain write\n' + REFERENCE_CODE;
+  await save(page, originalSource);
+  const original = (await (await request.get('/api/practice/session')).json()).draft;
+  await page.route('**/api/practice/draft', (route) => route.abort());
+  const pendingSource = '# Synthetic delayed write with an older version\n' + REFERENCE_CODE;
+  await page.getByLabel('Python solution').fill(pendingSource);
+  await expect(page.getByRole('button', { name: 'Retry save', exact: true })).toBeVisible();
+
+  await page.getByLabel('Python solution').fill(originalSource);
+  await page.unroute('**/api/practice/draft');
+  const reconciled = page.waitForResponse(
+    (response) =>
+      response.url().endsWith('/api/practice/draft') && response.request().method() === 'PUT',
+    { timeout: 10_000 }
+  );
+  await page.reload();
+  expect((await reconciled).ok()).toBe(true);
+  await expect(page.locator('#draft-status')).toHaveText('Draft saved to your local database.');
+
+  const delayed = await request.put('/api/practice/draft', {
+    headers: { Origin: 'http://127.0.0.1:3000' },
+    data: { apiVersion: 1, ...original, source: pendingSource },
+  });
+  expect(delayed.status()).toBe(409);
+  expect((await (await request.get('/api/practice/session')).json()).draft.source).toBe(
+    originalSource
+  );
+});
+
 test('should retain a completed result for retry when the result endpoint is unavailable across reload', async ({
   page,
   request,
