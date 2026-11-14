@@ -9,7 +9,7 @@ Use narrow checks and synthetic code. The current implementation retires auth/so
 | pnpm web:lint | Web naming, imports, architecture, size and ESLint for app/static delivery. |
 | pnpm web:typecheck | TypeScript contracts and UI/browser tests. |
 | pnpm web:test | Runner protocol limits/bindings and preserved historical migration checks. |
-| pnpm web:test:browser | Installed Google Chrome: real Pyodide execution, UI states, Stop/timeout/output/reset, mutation/technique, stale messages, network canary, static server and retired-route checks. |
+| pnpm web:test:browser | Installed Google Chrome: real Pyodide execution, UI states, Stop/timeout/output/reset, mutation/technique, stale messages, network canary, static server restrictions, malformed-request survival and retired-route checks. |
 | pnpm packages:typecheck | Shared packages. |
 | pnpm repo:test:context | Governance presence/language only. |
 | pnpm repo:test:task | Code quality fixtures plus static/unit/eval scaffold completion lane. |

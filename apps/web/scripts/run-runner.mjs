@@ -55,7 +55,14 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  const url = new URL(request.url, runnerOrigin);
+  let url;
+  try {
+    url = new URL(request.url, runnerOrigin);
+  } catch {
+    response.writeHead(400).end();
+    return;
+  }
+
   if (url.search || url.hash) {
     response.writeHead(404).end();
     return;

@@ -24,6 +24,7 @@ related_paths:
   - config
   - packages/config
 read_first:
+  - docs/engineering/git-conventions.md
   - docs/engineering/code-quality-conventions.md
   - CONTEXT.md
   - docs/engineering/documentation-governance.md

@@ -15,6 +15,7 @@ canonical_docs:
   runner_spike: docs/architecture/runner-spike.md
   architecture_decisions: docs/adr
   documentation_governance: docs/engineering/documentation-governance.md
+  git_conventions: docs/engineering/git-conventions.md
   code_quality: docs/engineering/code-quality-conventions.md
   monorepo_conventions: docs/engineering/monorepo-conventions.md
   nextjs_feature_first_convention: docs/frontend/nextjs-feature-first-convention.md

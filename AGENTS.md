@@ -12,6 +12,10 @@ Use the [engineering-playbook](https://github.com/brayan/engineering-playbook) a
 4. Build small slices. Do not scaffold empty services or architecture layers. Docs-only tasks must not add executable code, dependencies or migrations.
 5. Follow docs/engineering/code-quality-conventions.md: braces for every TS/JS control-flow body, contextual blank-line grouping, and the shared naming/structure rules. Apply task-owned self-review before narrow checks; formatting does not replace paragraph review.
 
+## Git conventions
+
+Follow docs/engineering/git-conventions.md for branch names, commit subjects and PR metadata. New work branches use `<type>/<slug>` with a lowercase, hyphenated slug, matching Sailtech's convention. Apply it across the monorepo, including future Python work; do not add tool-specific default prefixes. Preserve existing PR head branches during follow-up work.
+
 ## Architecture
 
 - Next.js App Router, React and TypeScript own UI/product orchestration.

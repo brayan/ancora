@@ -1,4 +1,4 @@
-import { createServer } from 'node:http';
+import { createServer, get as getHttp } from 'node:http';
 import { expect, test, type Page } from '@playwright/test';
 import { CHECK_CASES, REFERENCE_CODE } from '../../features/programming-practice/constants';
 import type { RunnerResponse } from '../../runner/protocol.mjs';
@@ -347,6 +347,39 @@ test('should keep the runner static and remove retired routes when probing HTTP 
   ]) {
     expect((await request.get(path)).status()).toBe(404);
   }
+});
+
+test('should reject malformed request targets when the runner receives raw HTTP then continue running', async ({
+  page,
+  request,
+}) => {
+  // A raw client preserves targets that browser URL parsers may normalize or reject first.
+  for (const path of ['//', '//[', 'http://[']) {
+    const response = await new Promise<{ status: number | undefined; bytes: number }>(
+      (resolve, reject) => {
+        const client = getHttp(
+          { hostname: '127.0.0.1', port: 3001, path, agent: false },
+          (reply) => {
+            let bytes = 0;
+            reply.on('data', (chunk: Buffer) => {
+              bytes += chunk.length;
+            });
+            reply.once('end', () => resolve({ status: reply.statusCode, bytes }));
+            reply.once('error', reject);
+          }
+        );
+        client.setTimeout(5_000, () => client.destroy(new Error('Synthetic request deadline')));
+        client.once('error', reject);
+      }
+    );
+
+    expect(response).toEqual({ status: 400, bytes: 0 });
+    expect((await request.get('http://127.0.0.1:3001/worker.mjs')).status()).toBe(200);
+  }
+
+  await ready(page);
+  const report = successful(await execute(page, REFERENCE_CODE));
+  expect(report.cases.every((item) => item.passed)).toBe(true);
 });
 
 test('should recover after bounded allocation when a fresh worker runs the next job', async ({
