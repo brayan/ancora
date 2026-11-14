@@ -75,7 +75,10 @@ class OpenAIChallengeProvider:
 
         self._agent.instrument = False
 
-    async def generate(self, command: GenerationCommand) -> GenerationResult:
+    async def generate(
+        self,
+        command: GenerationCommand,
+    ) -> GenerationResult:
         try:
             async with asyncio.timeout(65.0):
                 outcome = await self._agent.run(

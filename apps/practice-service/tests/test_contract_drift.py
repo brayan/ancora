@@ -14,7 +14,10 @@ from practice_service.infrastructure.llm import schemas as provider_schemas
 from pydantic import BaseModel
 
 
-def normalize(value: object, root: dict[str, object]) -> object:
+def normalize(
+    value: object,
+    root: dict[str, object],
+) -> object:
     if isinstance(value, list):
         return [normalize(element, root) for element in cast(list[object], value)]
     if not isinstance(value, dict):

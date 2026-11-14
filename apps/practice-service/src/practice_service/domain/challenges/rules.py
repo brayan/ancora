@@ -14,7 +14,10 @@ from practice_service.domain.challenges.models import (
 from practice_service.domain.challenges.values import validate_case_value
 
 
-def _annotation_matches(annotation: ast.expr | None, kind: PythonType) -> bool:
+def _annotation_matches(
+    annotation: ast.expr | None,
+    kind: PythonType,
+) -> bool:
     try:
         return (
             annotation is not None and ast.unparse(annotation).replace(" ", "") == kind
@@ -74,7 +77,10 @@ def _validate_reference(draft: ChallengeDraft) -> None:
         raise DraftInvalid("reference_technique_invalid")
 
 
-def validate_draft(draft: ChallengeDraft, request: GenerationRequest) -> None:
+def validate_draft(
+    draft: ChallengeDraft,
+    request: GenerationRequest,
+) -> None:
     if draft.concept != request.concept or draft.difficulty != request.difficulty:
         raise DraftInvalid("request_mismatch")
     contract = draft.function_contract

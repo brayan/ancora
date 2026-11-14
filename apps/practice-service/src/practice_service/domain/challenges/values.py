@@ -24,13 +24,19 @@ def _string_units(value: str) -> int:
     return len(value.encode("utf-16-le", errors="surrogatepass")) // 2
 
 
-def _scalar_matches(value: object, kind: str) -> bool:
+def _scalar_matches(
+    value: object,
+    kind: str,
+) -> bool:
     if kind == "int":
         return type(value) is int and abs(value) <= 1_000_000
     return type(value) is str and _string_units(value) <= 2000
 
 
-def parse_case_value(source: str, kind: PythonType) -> CaseValue:
+def parse_case_value(
+    source: str,
+    kind: PythonType,
+) -> CaseValue:
     try:
         value: object = json.loads(
             source, parse_constant=_reject_constant, object_pairs_hook=_unique_object
@@ -41,7 +47,10 @@ def parse_case_value(source: str, kind: PythonType) -> CaseValue:
     return validate_case_value(value, kind)
 
 
-def validate_case_value(value: object, kind: PythonType) -> CaseValue:
+def validate_case_value(
+    value: object,
+    kind: PythonType,
+) -> CaseValue:
     if kind in ("int", "str"):
         valid = _scalar_matches(value, kind)
     elif kind.startswith("list"):

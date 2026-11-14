@@ -6,7 +6,7 @@
 |---|---|---|
 | Repository checks | `pnpm repo:test:pr` | Context, code conventions, contracts, TypeScript, unit tests, disposable PostgreSQL integration and offline eval smoke. |
 | Google Chrome integration | `pnpm web:test:browser` | Real Chrome, separate web/runner origins, synthetic service provider and disposable PostgreSQL. |
-| Python quality and tests | `pnpm python:sync` then `pnpm python:check` | Frozen workspace, Ruff lint/format, strict Pyright and offline pytest. |
+| Python quality and tests | `pnpm python:sync` then `pnpm python:check` | Frozen workspace, Ruff lint/format, shared parameter-layout checker, strict Pyright and offline pytest. |
 
 Node jobs install the `packageManager` version from `package.json` and run `pnpm install --frozen-lockfile`; Python jobs use uv `0.11.18`, Python `3.13` and `uv.lock`. Browser checks also install the frozen Python workspace for the synthetic service. Updating either dependency manifest requires its lockfile update. See [Python conventions](python-conventions.md) for maintained paths and strict typing policy.
 

@@ -111,7 +111,10 @@ class SyntheticChallengeProvider:
     def __init__(self) -> None:
         self.calls = 0
 
-    async def generate(self, command: GenerationCommand) -> GenerationResult:
+    async def generate(
+        self,
+        command: GenerationCommand,
+    ) -> GenerationResult:
         self.calls += 1
         draft = draft_for(generation_input(command.request.concept))
         if (

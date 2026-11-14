@@ -10,15 +10,29 @@ import pytest
 
 class HarnessRules(Protocol):
     def technique_result(
-        self, tree: ast.Module, required: str, function_name: str = "positive_even"
+        self,
+        tree: ast.Module,
+        required: str,
+        function_name: str = "positive_even",
     ) -> str: ...
 
-    def contract_matches(self, tree: ast.Module, contract: object) -> bool: ...
+    def contract_matches(
+        self,
+        tree: ast.Module,
+        contract: object,
+    ) -> bool: ...
 
-    def same_case_value(self, actual: object, expected: object) -> bool: ...
+    def same_case_value(
+        self,
+        actual: object,
+        expected: object,
+    ) -> bool: ...
 
     def supported_value(
-        self, value: object, declared_type: str, limit: int = 100
+        self,
+        value: object,
+        declared_type: str,
+        limit: int = 100,
     ) -> bool: ...
 
 
@@ -81,7 +95,9 @@ rules = load_rules()
     ],
 )
 def test_should_classify_returned_technique_when_syntax_is_supported(
-    source: str, required: str, expected: str
+    source: str,
+    required: str,
+    expected: str,
 ) -> None:
     tree = ast.parse(source)
 
@@ -103,7 +119,8 @@ def test_should_classify_returned_technique_when_syntax_is_supported(
     ],
 )
 def test_should_match_declared_argument_when_function_signature_is_exact(
-    signature: str, expected: bool
+    signature: str,
+    expected: bool,
 ) -> None:
     contract = {
         "name": "word_sizes",
@@ -142,7 +159,9 @@ def test_should_match_declared_argument_when_function_signature_is_exact(
     ],
 )
 def test_should_bound_values_when_declared_types_are_checked(
-    value: object, declared_type: str, expected: bool
+    value: object,
+    declared_type: str,
+    expected: bool,
 ) -> None:
     assert rules.supported_value(value, declared_type) is expected
 

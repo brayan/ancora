@@ -12,7 +12,8 @@ router = APIRouter()
 
 @router.post("/generate", response_model=GeneratorOutput)
 async def generate(
-    payload: GeneratorInput, service: GenerationService
+    payload: GeneratorInput,
+    service: GenerationService,
 ) -> GeneratorOutput:
     result = await service.generate(command_from_request(payload))
     return response_from_result(result)

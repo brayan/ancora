@@ -18,21 +18,23 @@ API and infrastructure Pydantic models validate untrusted data, then map explici
 
 ## Maintained code and strict checks
 
-Root Ruff and Pyright configuration covers service source/tests, `apps/web/runner/harness.py` and AST-only host tests under `apps/web/tests/python`. Ruff retains its defaults and adds `ANN`, `B`, `I`, `UP` and `SIM`. Pyright checks all these paths in strict mode, including typed fixtures and fakes. No maintained path is excluded or globally weakened for a dynamic dependency.
+Root Ruff and Pyright configuration covers service source/tests, `apps/web/runner/harness.py`, AST-only host tests under `apps/web/tests/python` and the shared checker/fixtures under `scripts/quality/python`. Ruff retains its defaults and adds `ANN`, `B`, `I`, `UP` and `SIM`. Pyright checks all these paths in strict mode, including typed fixtures and fakes. No maintained path is excluded or globally weakened for a dynamic dependency.
 
 Declare parameter and return annotations, parameterize collections, and narrow unknown values at validation boundaries. Prefer `object`, typed models and small `Protocol` interfaces over propagating `Any`. Unavoidable exceptions need an exact-line, rule-specific Ruff or Pyright suppression and a reason; Pyright rejects stale ignores and ignores generic `type: ignore` comments. Keep untyped SDK behavior inside its adapter. Runtime validation must enforce exact types and bounds rather than relying on static annotations or coercion.
 
 Use `test_should_<outcome>_when_<condition>` for pytest functions and meaningful setup/execution/assertion paragraphs. Typed fakes keep provider tests deterministic and offline. Host pytest may parse and inspect synthetic Python ASTs; it must never execute learner submissions or generated solutions. Actual challenge execution belongs only to the isolated browser runner. Do not put private code/material in fixtures, logs, snapshots or evals.
+
+Follow the playbook's [Python parameter layout](https://github.com/brayan/engineering-playbook/blob/1f005f7777c619ec0db7f6421ca5df656c3345fe/docs/engineering/python-parameter-layout.md): definitions with two or more declared parameters put each on a new line, with the closing parenthesis on a separate line and a trailing comma. Count `self`/`cls`, keyword-only and variadic parameters. Calls and lambdas are outside this rule. The committed shared checker under `scripts/quality/python` runs in `python:lint`, so `python:check` and the existing Python GitHub Actions job reject violations. Ruff preserves the layout through magic trailing commas. See the [local provenance and update instructions](../../scripts/quality/python/README.md).
 
 ## Commands
 
 | Command | Scope |
 |---|---|
 | `pnpm python:sync` | Frozen uv workspace install, including development tools. |
-| `pnpm python:lint` | Ruff check over maintained Python. |
+| `pnpm python:lint` | Ruff and deterministic definition-parameter layout checks over maintained Python. |
 | `pnpm python:format:check` | Read-only Ruff formatting check over the same paths. |
 | `pnpm python:typecheck` | Strict Pyright over maintained source and tests. |
-| `pnpm python:test` | Offline pytest: service behavior and safe harness AST checks. |
+| `pnpm python:test` | Offline pytest: service behavior, safe harness AST checks and shared parameter-layout fixtures. |
 | `pnpm python:check` | Lint, formatting, strict types, then pytest. |
 
 These use the same locked environment locally and in [CI](continuous-integration.md). Perform contextual self-review before running checks; formatter success does not prove paragraph quality. Service/host tests cannot establish isolation or generation quality. Real Chrome checks establish browser behavior; paid quality evaluation is separate and requires an explicit model and remaining budget.

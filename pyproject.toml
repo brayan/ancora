@@ -26,8 +26,9 @@ include = [
     "apps/practice-service/tests",
     "apps/web/runner/harness.py",
     "apps/web/tests/python",
+    "scripts/quality/python",
 ]
-extraPaths = ["apps/practice-service/src", "apps/web/runner"]
+extraPaths = ["apps/practice-service/src", "apps/web/runner", "scripts/quality/python"]
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.13"
@@ -41,14 +42,17 @@ useLibraryCodeForTypes = true
 
 [tool.ruff]
 target-version = "py313"
-include = ["apps/practice-service/**/*.py", "apps/web/runner/harness.py", "apps/web/tests/python/**/*.py"]
+include = ["apps/practice-service/**/*.py", "apps/web/runner/harness.py", "apps/web/tests/python/**/*.py", "scripts/quality/python/**/*.py"]
 
 [tool.ruff.lint]
 extend-select = ["ANN", "B", "I", "UP", "SIM"]
 
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+
 [tool.pytest.ini_options]
-testpaths = ["apps/practice-service/tests", "apps/web/tests/python"]
-pythonpath = ["apps/practice-service/src", "apps/web/runner"]
+testpaths = ["apps/practice-service/tests", "apps/web/tests/python", "scripts/quality/python/tests"]
+pythonpath = ["apps/practice-service/src", "apps/web/runner", "scripts/quality/python"]
 addopts = "--strict-config --strict-markers"
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"

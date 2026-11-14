@@ -11,7 +11,7 @@ Use the [engineering-playbook](https://github.com/brayan/engineering-playbook) a
 3. Keep App Router delivery thin; use the existing feature-first/naming conventions and no new web src/ layer.
 4. Build small slices. Do not scaffold empty services or architecture layers. Docs-only tasks must not add executable code, dependencies or migrations.
 5. Follow docs/engineering/code-quality-conventions.md: braces for every TS/JS control-flow body, contextual blank-line grouping, and the shared naming/structure rules. Apply task-owned self-review before narrow checks; formatting does not replace paragraph review.
-6. Python follows docs/engineering/python-conventions.md: typed source/tests, strict Pyright, Ruff and pytest from the locked uv workspace. Apply the same contextual paragraph and test naming rules.
+6. Python follows docs/engineering/python-conventions.md: typed source/tests, strict Pyright, Ruff and pytest from the locked uv workspace. Definitions with 2+ parameters use one per line and a trailing comma; `python:lint` enforces the shared playbook rule. Apply the same contextual paragraph and test naming rules.
 7. ADR 0014 owns Python layering: plain domain/application models, application services and application-owned provider interfaces; Pydantic only in API/infrastructure boundaries with explicit mappings. Split API routers by capability.
 
 ## Git conventions

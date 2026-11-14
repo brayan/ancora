@@ -60,7 +60,8 @@ def test_should_spend_one_dispatch_when_explicit_correction_is_supplied() -> Non
     "headers,status", [({}, 401), ({**HEADERS, "Origin": "http://127.0.0.1:3000"}, 403)]
 )
 def test_should_reject_untrusted_requests_before_dispatch(
-    headers: dict[str, str], status: int
+    headers: dict[str, str],
+    status: int,
 ) -> None:
     generator = SyntheticChallengeProvider()
     with TestClient(create_app(SETTINGS, generator)) as client:
@@ -97,7 +98,10 @@ def test_should_report_unavailable_without_selected_provider_configuration() -> 
 
 def test_should_consume_uncertain_dispatch_without_retry_when_provider_fails() -> None:
     class InterruptedGenerator(SyntheticChallengeProvider):
-        async def generate(self, command: GenerationCommand) -> GenerationResult:
+        async def generate(
+            self,
+            command: GenerationCommand,
+        ) -> GenerationResult:
             self.calls += 1
             raise ProviderInterrupted("private provider output")
 
@@ -125,7 +129,8 @@ def test_should_consume_uncertain_dispatch_without_retry_when_provider_fails() -
     ],
 )
 def test_should_reject_unsafe_case_values_when_type_or_json_is_invalid(
-    source: str, kind: str
+    source: str,
+    kind: str,
 ) -> None:
     from typing import cast
 
@@ -158,7 +163,8 @@ def test_should_reject_unsafe_case_values_when_type_or_json_is_invalid(
     ],
 )
 def test_should_reject_reference_contradictions_without_execution(
-    source: str, issue: str
+    source: str,
+    issue: str,
 ) -> None:
     request = generation_input()
     draft = draft_for(request).model_copy(update={"reference_source": source})
@@ -221,7 +227,8 @@ def test_should_reject_missing_server_token_before_exposing_status() -> None:
     ],
 )
 def test_should_reject_case_bounds_when_collection_or_string_exceeds_limit(
-    kind: str, source: str
+    kind: str,
+    source: str,
 ) -> None:
     from typing import cast
 

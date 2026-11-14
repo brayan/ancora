@@ -10,11 +10,20 @@ from practice_service.settings import Settings
 
 
 class TrustedServerBoundary:
-    def __init__(self, app: ASGIApp, settings: Settings) -> None:
+    def __init__(
+        self,
+        app: ASGIApp,
+        settings: Settings,
+    ) -> None:
         self.app = app
         self.settings = settings
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+    async def __call__(
+        self,
+        scope: Scope,
+        receive: Receive,
+        send: Send,
+    ) -> None:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return

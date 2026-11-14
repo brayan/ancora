@@ -35,7 +35,10 @@ class CaseResult(TypedDict):
     mutated: bool
 
 
-def declared_function(tree: ast.Module, name: str) -> ast.FunctionDef | None:
+def declared_function(
+    tree: ast.Module,
+    name: str,
+) -> ast.FunctionDef | None:
     functions = [
         node
         for node in tree.body
@@ -44,7 +47,10 @@ def declared_function(tree: ast.Module, name: str) -> ast.FunctionDef | None:
     return functions[0] if len(functions) == 1 else None
 
 
-def contract_matches(tree: ast.Module, contract: FunctionContract) -> bool:
+def contract_matches(
+    tree: ast.Module,
+    contract: FunctionContract,
+) -> bool:
     function = declared_function(tree, contract["name"])
     if function is None or function.decorator_list:
         return False
@@ -63,7 +69,9 @@ def contract_matches(tree: ast.Module, contract: FunctionContract) -> bool:
 
 
 def technique_result(
-    tree: ast.Module, required: Technique, function_name: str = "positive_even"
+    tree: ast.Module,
+    required: Technique,
+    function_name: str = "positive_even",
 ) -> TechniqueResult:
     if required == "none":
         return "not_required"
@@ -110,7 +118,11 @@ def bounded_string(value: object) -> bool:
     return type(value) is str and wire_string_length(value) <= 2_000
 
 
-def supported_value(value: object, declared_type: PythonType, limit: int = 100) -> bool:
+def supported_value(
+    value: object,
+    declared_type: PythonType,
+    limit: int = 100,
+) -> bool:
     if declared_type == "int":
         return bounded_integer(value)
     if declared_type == "str":
@@ -132,7 +144,10 @@ def supported_value(value: object, declared_type: PythonType, limit: int = 100) 
     )
 
 
-def same_case_value(actual: object, expected: object) -> bool:
+def same_case_value(
+    actual: object,
+    expected: object,
+) -> bool:
     if type(actual) is dict and type(expected) is dict:
         actual_items = cast(dict[object, object], actual).items()
         expected_items = cast(dict[object, object], expected).items()

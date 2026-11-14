@@ -9,10 +9,16 @@ from practice_service.domain.challenges.rules import validate_draft
 
 
 class ChallengeGenerationService:
-    def __init__(self, provider: ChallengeGenerationProvider) -> None:
+    def __init__(
+        self,
+        provider: ChallengeGenerationProvider,
+    ) -> None:
         self._provider = provider
 
-    async def generate(self, command: GenerationCommand) -> GenerationResult:
+    async def generate(
+        self,
+        command: GenerationCommand,
+    ) -> GenerationResult:
         if not self._provider.available:
             raise GenerationUnavailable
 

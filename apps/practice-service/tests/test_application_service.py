@@ -25,11 +25,17 @@ class RecordingProvider:
     available: bool = True
     model: str | None = "synthetic-offline"
 
-    def __init__(self, result: GenerationResult) -> None:
+    def __init__(
+        self,
+        result: GenerationResult,
+    ) -> None:
         self.result = result
         self.commands: list[GenerationCommand] = []
 
-    async def generate(self, command: GenerationCommand) -> GenerationResult:
+    async def generate(
+        self,
+        command: GenerationCommand,
+    ) -> GenerationResult:
         self.commands.append(command)
         return self.result
 
@@ -102,7 +108,10 @@ async def test_should_preserve_interruption_when_provider_outcome_is_uncertain()
     None
 ):
     class InterruptedProvider(RecordingProvider):
-        async def generate(self, command: GenerationCommand) -> GenerationResult:
+        async def generate(
+            self,
+            command: GenerationCommand,
+        ) -> GenerationResult:
             self.commands.append(command)
             raise ProviderInterrupted
 

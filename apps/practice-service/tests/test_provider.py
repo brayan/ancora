@@ -16,7 +16,10 @@ from synthetic import draft_for, generation_input
 
 
 def provider_response(
-    text: str, *, refusal: bool = False, incomplete: bool = False
+    text: str,
+    *,
+    refusal: bool = False,
+    incomplete: bool = False,
 ) -> dict[str, object]:
     content: dict[str, object] = (
         {"type": "refusal", "refusal": "synthetic refusal"}

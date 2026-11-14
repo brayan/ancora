@@ -6,5 +6,8 @@ class UnavailableChallengeProvider:
     model: str | None = None
     available: bool = False
 
-    async def generate(self, command: GenerationCommand) -> GenerationResult:
+    async def generate(
+        self,
+        command: GenerationCommand,
+    ) -> GenerationResult:
         raise GenerationUnavailable
