@@ -18,6 +18,7 @@ canonical_docs:
   selected_attempt_coaching: docs/architecture/selected-attempt-coaching.md
   challenge_generation: docs/architecture/challenge-generation.md
   python_conventions: docs/engineering/python-conventions.md
+  python_condition_layout: docs/engineering/python-condition-layout.md
   continuous_integration: docs/engineering/continuous-integration.md
   runner_spike: docs/architecture/runner-spike.md
   architecture_decisions: docs/adr

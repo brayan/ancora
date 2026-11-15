@@ -96,19 +96,24 @@ def check_source(source: str) -> list[Violation]:
         for parameter, default in spans:
             # AST columns use UTF-8 bytes, unlike tokenize's character columns.
             prefix = lines[parameter.lineno - 1].encode("utf-8")[: parameter.col_offset]
-            if parameter.lineno <= previous_end or prefix.strip() not in (
-                b"",
-                b"*",
-                b"**",
-            ):
+            has_invalid_parameter_line = (
+                parameter.lineno <= previous_end
+                or prefix.strip()
+                not in (
+                    b"",
+                    b"*",
+                    b"**",
+                )
+            )
+            if has_invalid_parameter_line:
                 valid = False
             previous_end = (default or parameter).end_lineno or parameter.lineno
 
         close = tokens[closing]
-        if (
-            close.start[0] <= previous_end
-            or lines[close.start[0] - 1][: close.start[1]].strip()
-        ):
+        has_invalid_closing_line = close.start[0] <= previous_end or bool(
+            lines[close.start[0] - 1][: close.start[1]].strip()
+        )
+        if has_invalid_closing_line:
             valid = False
         significant = [
             token

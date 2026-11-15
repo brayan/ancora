@@ -10,10 +10,11 @@ from synthetic_coaching import SyntheticCoachingProvider
 
 
 def main() -> None:
-    if (
+    is_synthetic_boundary_missing = (
         os.environ.get("ANCORA_SYNTHETIC_DATABASE") != "1"
         or os.environ.get("ANCORA_SYNTHETIC_PROVIDER") != "1"
-    ):
+    )
+    if is_synthetic_boundary_missing:
         raise RuntimeError(
             "Synthetic service requires both explicit synthetic boundary flags"
         )

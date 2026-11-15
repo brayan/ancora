@@ -133,6 +133,7 @@ test('should run the local practice UI without login when opened on desktop and 
   await page.getByLabel('Python solution').focus();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Save draft', exact: true })).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Run examples', exact: true })).toBeEnabled();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Run examples', exact: true })).toBeFocused();
   await page.screenshot({

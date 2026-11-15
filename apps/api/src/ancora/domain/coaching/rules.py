@@ -9,10 +9,11 @@ def validate_feedback(feedback: CoachingFeedback) -> None:
         raise CoachingInvalid
     for text in texts:
         units = len(text.encode("utf-16-le", errors="surrogatepass")) // 2
-        if (
+        is_invalid_feedback_text = (
             not text.strip()
             or units > 900
             or "```" in text
-            or re.search(r"\b(?:async\s+)?def\s+\w+\s*\(", text)
-        ):
+            or re.search(r"\b(?:async\s+)?def\s+\w+\s*\(", text) is not None
+        )
+        if is_invalid_feedback_text:
             raise CoachingInvalid

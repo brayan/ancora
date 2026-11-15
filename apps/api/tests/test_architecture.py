@@ -54,11 +54,12 @@ def test_should_reject_outward_imports_when_layer_dependencies_are_inspected(
                 external_framework = (
                     pure_layer and name.split(".")[0] not in sys.stdlib_module_names
                 )
-                if (
+                is_outward_dependency = (
                     (own_package and not allowed_internal)
                     or (not own_package and external_framework)
                     or name == "relative-import"
-                ):
+                )
+                if is_outward_dependency:
                     violations.append(
                         f"{path.relative_to(PACKAGE)}:{node.lineno}: {name}"
                     )

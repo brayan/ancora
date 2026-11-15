@@ -30,10 +30,12 @@ Follow the playbook's [Python parameter layout](https://github.com/brayan/engine
 
 ## Commands
 
+Follow [Python condition layout](python-condition-layout.md): extract multiline `if`/`elif` conditions into meaningful named predicates and keep branch headers on one physical line. Preserve operand/branch evaluation order. The AST/token checker runs in `python:lint` across all maintained Python scopes, so existing `python:check` and offline CI reject violations. It reports file/line failures without auto-fixing names or side effects; `while`, conditional expressions, comprehension filters and match guards are outside this rule.
+
 | Command | Scope |
 |---|---|
 | `pnpm python:sync` | Frozen uv workspace install, including development tools. |
-| `pnpm python:lint` | Ruff and deterministic definition-parameter layout checks over maintained Python. |
+| `pnpm python:lint` | Ruff and deterministic definition-parameter/if-condition layout checks over maintained Python. |
 | `pnpm python:format:check` | Read-only Ruff formatting check over the same paths. |
 | `pnpm python:typecheck` | Strict Pyright over maintained source and tests. |
 | `pnpm python:test` | Offline pytest: service behavior, safe harness AST checks and shared parameter-layout fixtures. |

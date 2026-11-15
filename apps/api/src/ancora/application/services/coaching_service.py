@@ -26,7 +26,7 @@ class CoachingService:
 
         units = len(command.source.encode("utf-16-le", errors="surrogatepass")) // 2
         evidence = command.evidence
-        if (
+        has_invalid_coaching_input = (
             not command.source.strip()
             or units > 12000
             or type(evidence.passed) is not int
@@ -44,7 +44,8 @@ class CoachingService:
             }
             or evidence.technique
             not in {"passed", "failed", "inconclusive", "not_required"}
-        ):
+        )
+        if has_invalid_coaching_input:
             raise CoachingInvalid
         try:
             contract = command.challenge.function_contract
@@ -56,10 +57,11 @@ class CoachingService:
 
         result = await self._provider.generate(command)
         validate_feedback(result.feedback)
-        if (
+        has_invalid_provenance = (
             result.model.name != self._provider.model
             or result.model.provider != "openai"
             or result.model.prompt_version != "programming-coaching-v1"
-        ):
+        )
+        if has_invalid_provenance:
             raise CoachingInvalid
         return result
