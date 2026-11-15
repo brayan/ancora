@@ -9,7 +9,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 IGNORED_DIRECTORIES = {".git", ".venv", ".tox", "__pycache__", "node_modules"}
 Function = ast.FunctionDef | ast.AsyncFunctionDef
 
@@ -98,12 +98,7 @@ def check_source(source: str) -> list[Violation]:
             prefix = lines[parameter.lineno - 1].encode("utf-8")[: parameter.col_offset]
             has_invalid_parameter_line = (
                 parameter.lineno <= previous_end
-                or prefix.strip()
-                not in (
-                    b"",
-                    b"*",
-                    b"**",
-                )
+                or prefix.strip() not in (b"", b"*", b"**")
             )
             if has_invalid_parameter_line:
                 valid = False

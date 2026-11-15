@@ -1,23 +1,18 @@
-# Python convention checkers
+# Shared Python convention checkers
 
-## Shared parameter-layout checker
+Version `0.2.0` is copied byte-for-byte from the engineering playbook's canonical `scripts/python-conventions` package. Both the parameter and condition rules, their implementations and fixtures are shared standards, not Ancora overlays. See the [shared package](https://github.com/brayan/engineering-playbook/tree/a275d193cadddfaea63156724c3626430f63c60a/scripts/python-conventions), [parameter layout](https://github.com/brayan/engineering-playbook/blob/a275d193cadddfaea63156724c3626430f63c60a/docs/engineering/python-parameter-layout.md) and [condition layout](https://github.com/brayan/engineering-playbook/blob/a275d193cadddfaea63156724c3626430f63c60a/docs/engineering/python-condition-layout.md).
 
-Version `0.1.0`, adapted without layout-behavior changes from the engineering playbook's `scripts/python-conventions` at commit `4e2a26c9e208164041827da8c0e6daf46f3ab801`, merged in [PR #24](https://github.com/brayan/engineering-playbook/pull/24). Pinned source: [shared checker](https://github.com/brayan/engineering-playbook/tree/4e2a26c9e208164041827da8c0e6daf46f3ab801/scripts/python-conventions); rule: [Python parameter layout](https://github.com/brayan/engineering-playbook/blob/4e2a26c9e208164041827da8c0e6daf46f3ab801/docs/engineering/python-parameter-layout.md). The local script has a predicate-extraction patch so it also follows Ancora’s condition rule; its upstream source checksum is `ddf8a2a6c8ff9684d600d9945d0e2b1b48dda90a643800a731f629fc855c3336`. The original fixtures are unchanged. These checksums identify the installed bytes; local validation is independent of that PR's merge state.
+Source: [engineering-playbook commit `a275d193cadddfaea63156724c3626430f63c60a`](https://github.com/brayan/engineering-playbook/tree/a275d193cadddfaea63156724c3626430f63c60a/scripts/python-conventions), published in [draft PR #26](https://github.com/brayan/engineering-playbook/pull/26). This is an immutable source pin for version 0.2.0; the shared PR remains under review. These hashes identify the exact copied source without requiring the sibling checkout during checks.
 
 | File | SHA-256 |
 |---|---|
-| `check_parameter_layout.py` | `b5741b00d47a9613fc2a113e5587e9bcbc195f219e3d66f927fbf3bd5ecfb35c` |
+| `check_parameter_layout.py` | `d718fe95faef1bfec9d801b11bf05d0539fc8ca2ae6ed4816f384d7550ddefad` |
+| `check_condition_layout.py` | `c580ada7b4bf330333fc3ee7df7e2760638abdc628123fb935ca69f60908f441` |
 | `tests/test_parameter_layout.py` | `93bfaa100826fda3d7d738891bd246adf5da3f1558072a03e46b4220163a6328` |
+| `tests/test_condition_layout.py` | `9d1f309de9467a7a896c10aa17a6304539eceb55f790ff8a2ae38a2d0149c34a` |
 
-`pnpm python:lint` runs the committed checker against service source/tests, the runner harness, its host tests and this tool. `pnpm python:test` includes its positive/negative fixtures. Ruff and strict Pyright cover the tool and fixtures too. The existing Python GitHub Actions job runs these through `pnpm python:check`; no sibling checkout or network download is required.
+`pnpm python:lint` runs both committed checkers over service source/tests, the runner harness, AST-only host tests and this tool directory. `pnpm python:test`, Ruff and strict Pyright cover both tools and their fixtures. The existing Python GitHub Actions job inherits the checks through `python:check` and remains offline. The branch's parameter-checker predicate extraction now matches the shared package; no local source patch remains.
 
-The checker is read-only, parses AST/tokens, and never imports or executes scanned source. Exit 0 means compliant, 1 means layout violations, 2 means invalid input/syntax. Calls, lambdas and code snippets inside strings are not checked. Empty and missing targets fail. The host interpreter must support the scanned syntax.
+The tools are read-only and never import/execute scanned source. Exit 0 means compliant, 1 means violations, and 2 means invalid input/syntax. Both require explicit maintained paths; empty/missing selections fail closed. See [local condition-check integration](../../../docs/engineering/python-condition-layout.md).
 
-To update, review the canonical source and local diff, explicitly copy the checker and `tests/test_parameter_layout.py` preserving relative placement, update version/checksums here, then run `pnpm python:check`. Preserve the local CI wrapper and configured scopes. Standalone fixtures can also run with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts/quality/python/tests`. Preserve/review the documented local predicate patch until it is adopted upstream; retain exact upstream fixture bytes. Normal validation does not read upstream.
-
-
-## Ancora condition-layout checker
-
-`check_condition_layout.py` version `0.1.0` enforces [Python condition layout](../../../docs/engineering/python-condition-layout.md). It checks complete `if`/`elif` headers, requires a named predicate for multiline conditions and leaves names/semantics to the developer. It reuses the trusted parameter checker's file selection without importing scanned files. This local overlay is not represented as an upstream playbook release.
-
-`pnpm python:lint` runs both tools over the same maintained scopes. Ruff, strict Pyright and `pnpm python:test` include `tests/test_condition_layout.py`; the existing Python CI job inherits both checks through `python:check` and stays offline. The condition CLI uses the same exit codes: 0 compliant, 1 violations, 2 input/syntax error. Its fixtures cover multiline calls, wrapped names, explicit continuations, `elif`/nested branches, Unicode/encoding, nested colons, excluded expression forms and read-only fail-closed CLI behavior.
+To update, review the canonical package and downstream diff, copy all four files together preserving relative placement, update version/publication status/checksums here, then run `pnpm python:check`. Preserve Ancora's wrappers and scan paths. Standalone fixtures run with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s scripts/quality/python/tests`. Normal validation reads only the committed local copy and never downloads policy code or requires another repository.

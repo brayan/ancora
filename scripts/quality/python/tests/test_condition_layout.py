@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-# Allow the same standalone unittest discovery as the pinned parameter checker.
+# Keep standalone unittest discovery independent of downstream import settings.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from check_condition_layout import check_source, main
 
