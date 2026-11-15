@@ -140,7 +140,13 @@ test('should run the local practice UI without login when opened on desktop and 
     fullPage: true,
   });
 
-  await page.getByText('Runner spike tools and limits', { exact: true }).click();
+  const reveal = page.getByRole('button', { name: 'Reveal solution', exact: true });
+  if (await reveal.count()) {
+    await reveal.click();
+    await page.getByRole('button', { name: 'Reveal and record assistance', exact: true }).click();
+  } else {
+    await page.getByRole('button', { name: 'Show revealed solution', exact: true }).click();
+  }
   await page.getByRole('button', { name: 'Run reference separately', exact: true }).click();
   await expect(
     page.getByRole('heading', {

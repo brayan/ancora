@@ -1,5 +1,5 @@
 name: web
-status: challenge-generation
+status: practice-assistance
 primary_paths: [apps/web]
 related_paths: [packages/ui, packages/shared-types, packages/schemas]
 read_first:
@@ -10,6 +10,7 @@ read_first:
   - docs/frontend/nextjs-naming-convention.md
   - docs/architecture/runner-spike.md
   - docs/architecture/practice-persistence.md
+  - docs/architecture/practice-assistance.md
   - docs/architecture/challenge-generation.md
   - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
 role: Next.js UI/product boundary, durable generation/practice records and isolated browser execution delivery.

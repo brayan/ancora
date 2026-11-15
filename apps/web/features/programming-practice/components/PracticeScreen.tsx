@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { StatusBadge } from '@ancora/ui';
+import type { RunEnvelope } from '@ancora/shared-types';
 import {
   MAX_SOURCE_LENGTH,
   isRunRequest,
@@ -13,8 +14,9 @@ import { usePracticeRunner } from '@/features/programming-practice/hooks/usePrac
 import { usePracticeSession } from '@/features/programming-practice/hooks/usePracticeSession';
 import { GenerationPanel } from '@/features/programming-practice/components/GenerationPanel';
 import { PracticeResults } from '@/features/programming-practice/components/PracticeResults';
+import { ReferenceSolution } from '@/features/programming-practice/components/ReferenceSolution';
 
-type Display = { report: RunnerResponse | null; label: string; source: string };
+type Display = { report: RunnerResponse | null; label: string; source: string | undefined };
 
 export function PracticeScreen() {
   const practice = usePracticeSession();
@@ -22,12 +24,13 @@ export function PracticeScreen() {
   const runner = usePracticeRunner(frameRef);
   const [preparing, setPreparing] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [assisting, setAssisting] = useState(false);
   const [display, setDisplay] = useState<Display | null>(null);
   const [error, setError] = useState('');
   const submission = useRef<{ id: string; source: string; mode: 'examples' | 'check' } | null>(
     null
   );
-  const busy = preparing || runner.busy || generating || practice.reportSaving;
+  const busy = preparing || runner.busy || generating || assisting || practice.reportSaving;
   const available = !['connecting', 'unavailable'].includes(runner.state.status);
   const validSource =
     practice.source.trim().length > 0 && practice.source.length <= MAX_SOURCE_LENGTH;
@@ -70,22 +73,17 @@ export function PracticeScreen() {
     }
   };
 
-  const reference = async (load: boolean) => {
+  const reference = async (envelope: RunEnvelope) => {
     setPreparing(true);
     setError('');
     try {
-      const envelope = await practice.reference();
       if (!isRunRequest(envelope.request)) {
         throw new Error('invalid_run_request');
       }
-      if (load) {
-        practice.edit(envelope.request.source);
-      } else {
-        setDisplay({ report: null, label: 'Reference solution', source: envelope.request.source });
-        setPreparing(false);
-        const report = await runner.run(envelope.request);
-        setDisplay({ report, label: 'Reference solution', source: envelope.request.source });
-      }
+      setDisplay({ report: null, label: 'Reference solution', source: undefined });
+      setPreparing(false);
+      const report = await runner.run(envelope.request);
+      setDisplay({ report, label: 'Reference solution', source: undefined });
     } catch {
       setError('The reference could not open. Your draft is preserved; try again.');
     } finally {
@@ -98,7 +96,7 @@ export function PracticeScreen() {
       const saved = await practice.viewAttempt(id);
       setDisplay({
         report: parseRunnerResponse(saved.report),
-        label: 'Saved attempt',
+        label: saved.solutionRevealed ? 'Saved attempt · reference revealed' : 'Saved attempt',
         source: saved.source,
       });
       setError(
@@ -165,7 +163,13 @@ export function PracticeScreen() {
             onSelect={selectChallenge}
             run={runner.run}
             onBusyChange={setGenerating}
-            blocked={preparing || runner.busy || practice.reportSaving || !!practice.pendingReport}
+            blocked={
+              preparing ||
+              assisting ||
+              runner.busy ||
+              practice.reportSaving ||
+              !!practice.pendingReport
+            }
             runnerAvailable={available}
             currentRevisionId={practice.session.challenge.revisionId}
             challenges={practice.session.challenges ?? []}
@@ -347,10 +351,19 @@ export function PracticeScreen() {
               )}
             </section>
           </div>
+          <ReferenceSolution
+            key={practice.session.challenge.revisionId}
+            revealedAt={practice.session.solutionRevealedAt}
+            blocked={busy}
+            runnerAvailable={available}
+            onReveal={practice.reference}
+            onRun={reference}
+            onBusyChange={setAssisting}
+          />
           <PracticeResults
             response={response}
             label={display?.label ?? 'Latest saved attempt'}
-            source={display?.source ?? latest?.source}
+            source={display ? display.source : latest?.source}
             technique={practice.session.challenge.technique}
           />
           {!display && latest && !latest.report && (
@@ -370,6 +383,11 @@ export function PracticeScreen() {
                       {attempt.mode === 'check' ? 'Check solution' : 'Run examples'} ·{' '}
                       {new Date(attempt.createdAt).toLocaleString()} ·{' '}
                       {attempt.completed ? 'Saved' : 'Unfinished'}
+                      <span className="attemptAssistance">
+                        {attempt.solutionRevealed
+                          ? 'Reference revealed before submission'
+                          : 'No recorded reveal before submission'}
+                      </span>
                     </span>
                     <button
                       type="button"
@@ -393,28 +411,6 @@ export function PracticeScreen() {
               evidence. The browser has no hard memory quota. Reference runs are separate from your
               saved attempts.
             </p>
-            <div className="runActions">
-              <button
-                type="button"
-                className="button secondary"
-                disabled={busy}
-                onClick={() => {
-                  void reference(true);
-                }}
-              >
-                Load reference solution
-              </button>
-              <button
-                type="button"
-                className="button secondary"
-                disabled={busy || !available}
-                onClick={() => {
-                  void reference(false);
-                }}
-              >
-                Run reference separately
-              </button>
-            </div>
           </details>
         </>
       )}

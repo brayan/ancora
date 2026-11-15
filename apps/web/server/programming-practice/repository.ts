@@ -23,8 +23,12 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
     practiceRevisions: revisions,
     practiceDrafts: drafts,
     practiceAttempts: attempts,
+    practiceSolutionReveals: reveals,
   } = schema;
-  type NewAttempt = typeof attempts.$inferInsert;
+  type NewAttempt = Omit<
+    typeof attempts.$inferInsert,
+    'solutionRevealed' | 'createdAt' | 'report' | 'completedAt'
+  >;
 
   async function revision(revisionId: string) {
     const [row] = await database.select().from(revisions).where(eq(revisions.id, revisionId));
@@ -108,7 +112,22 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
   }
 
   async function submit(value: NewAttempt) {
-    await database.insert(attempts).values(value).onConflictDoNothing();
+    await database.transaction(async (transaction) => {
+      // Serialize reveal and submission so assistance reflects the order accepted by the server.
+      await transaction
+        .select({ id: revisions.id })
+        .from(revisions)
+        .where(eq(revisions.id, value.revisionId))
+        .for('no key update');
+      await transaction
+        .insert(attempts)
+        .values({
+          ...value,
+          solutionRevealed: sql`EXISTS (SELECT 1 FROM ${reveals} WHERE ${reveals.revisionId} = ${value.revisionId})`,
+          createdAt: sql`clock_timestamp()`,
+        })
+        .onConflictDoNothing();
+    });
     const saved = await attempt(value.id);
     for (const key of [
       'revisionId',
@@ -123,6 +142,25 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
       }
     }
     return saved;
+  }
+
+  async function solutionRevealedAt(revisionId: string) {
+    const [row] = await database.select().from(reveals).where(eq(reveals.revisionId, revisionId));
+    return row?.createdAt.toISOString() ?? null;
+  }
+
+  async function recordSolutionReveal(revisionId: string) {
+    await database.transaction(async (transaction) => {
+      await transaction
+        .select({ id: revisions.id })
+        .from(revisions)
+        .where(eq(revisions.id, revisionId))
+        .for('no key update');
+      await transaction
+        .insert(reveals)
+        .values({ revisionId, createdAt: sql`clock_timestamp()` })
+        .onConflictDoNothing();
+    });
   }
 
   async function complete(id: string, report: RunnerResponse) {
@@ -207,6 +245,8 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
     submit,
     complete,
     recent,
+    solutionRevealedAt,
+    recordSolutionReveal,
   };
 }
 

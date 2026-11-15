@@ -190,6 +190,8 @@ test('should preserve the active draft until selection when a generated revision
   assert.equal(pending.state, 'validating');
   assert.equal(pending.title, null);
   await assert.rejects(practice.select(revisionId), /candidate_not_ready/);
+  await assert.rejects(practice.reference(revisionId), /candidate_not_ready/);
+  assert.equal(await practiceRepository.solutionRevealedAt(revisionId), null);
   await assert.rejects(
     practice.submit({
       apiVersion: 1,
@@ -445,79 +447,98 @@ test('should interrupt stale generating reservations when opening a generation a
   assert.equal(stale.calls.length, 1);
 });
 
-test('should retain fixed drafts attempts and migration ledger when upgrading from 0006 to 0007', async () => {
-  const temporary = await mkdtemp(path.join(os.tmpdir(), 'ancora-generation-upgrade-'));
-  const name = `ancora_upgrade_${randomUUID().replaceAll('-', '')}`;
-  assert.match(name, /^[a-z0-9_]+$/);
-  const url = new URL(adminUrl);
-  url.pathname = `/${name}`;
-  await admin.query(`CREATE DATABASE ${name}`);
-  const upgrade = new Pool({ connectionString: url.toString() });
-  try {
-    const journal = JSON.parse(
-      await readFile(path.join(migrationsFolder, 'meta/_journal.json'), 'utf8')
-    ) as { entries: { idx: number; tag: string }[] };
-    journal.entries = journal.entries.filter((entry) => entry.idx <= 6);
-    await mkdir(path.join(temporary, 'meta'));
-    await writeFile(path.join(temporary, 'meta/_journal.json'), JSON.stringify(journal));
-    for (const entry of journal.entries) {
-      await copyFile(
-        path.join(migrationsFolder, `${entry.tag}.sql`),
-        path.join(temporary, `${entry.tag}.sql`)
-      );
-    }
-    await migratePracticeDatabase(upgrade, temporary);
-    const old = createPracticeRepository(drizzle(upgrade, { schema }));
-    await old.initialize();
-    const originalDraft = await old.draft(FIXED_REVISION.revisionId);
-    const draft = await old.saveDraft(
-      originalDraft.revisionId,
-      '# Synthetic draft before 0007\n',
-      originalDraft.version
-    );
-    const attemptId = randomUUID();
-    const request = buildRunRequest(
-      FIXED_REVISION,
-      FIXED_REVISION.referenceSource,
-      'check',
-      attemptId
-    );
-    await old.submit({
-      id: attemptId,
-      revisionId: FIXED_REVISION.revisionId,
-      source: request.source,
-      mode: 'check',
-      sourceDigest: request.sourceDigest,
-      casesDigest: request.casesDigest,
-      runtimeVersion: request.runtimeVersion,
-    });
-    await old.complete(attemptId, passingReport(request));
-    const attempt = await old.attempt(attemptId);
-    const ledger = await upgrade.query<{ hash: string; created_at: string }>(
-      'SELECT hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at'
-    );
-
-    await migratePracticeDatabase(upgrade, migrationsFolder);
-    await migratePracticeDatabase(upgrade, migrationsFolder);
-    const upgraded = createPracticeService(createPracticeRepository(drizzle(upgrade, { schema })));
-    assert.deepEqual(await upgraded.draft(FIXED_REVISION.revisionId), draft);
-    assert.deepEqual(await old.attempt(attemptId), attempt);
-    assert.deepEqual((await old.revision(FIXED_REVISION.revisionId)).content, FIXED_REVISION);
-    const upgradedLedger = await upgrade.query<{ hash: string; created_at: string }>(
-      'SELECT hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at'
-    );
-    assert.deepEqual(upgradedLedger.rows.slice(0, ledger.rows.length), ledger.rows);
-    assert.equal(upgradedLedger.rows.length, ledger.rows.length + 1);
-    assert.equal((await upgraded.session()).challenge.revisionId, FIXED_REVISION.revisionId);
-  } finally {
-    await upgrade.end();
+for (const baseline of [6, 7]) {
+  test(`should retain fixed drafts attempts and migration ledger when upgrading from 000${baseline}`, async () => {
+    const temporary = await mkdtemp(path.join(os.tmpdir(), 'ancora-generation-upgrade-'));
+    const name = `ancora_upgrade_${randomUUID().replaceAll('-', '')}`;
+    assert.match(name, /^[a-z0-9_]+$/);
+    const url = new URL(adminUrl);
+    url.pathname = `/${name}`;
+    await admin.query(`CREATE DATABASE ${name}`);
+    const upgrade = new Pool({ connectionString: url.toString() });
     try {
-      await admin.query(`DROP DATABASE ${name}`);
+      const journal = JSON.parse(
+        await readFile(path.join(migrationsFolder, 'meta/_journal.json'), 'utf8')
+      ) as { entries: { idx: number; tag: string }[] };
+      journal.entries = journal.entries.filter((entry) => entry.idx <= baseline);
+      await mkdir(path.join(temporary, 'meta'));
+      await writeFile(path.join(temporary, 'meta/_journal.json'), JSON.stringify(journal));
+      for (const entry of journal.entries) {
+        await copyFile(
+          path.join(migrationsFolder, `${entry.tag}.sql`),
+          path.join(temporary, `${entry.tag}.sql`)
+        );
+      }
+      await migratePracticeDatabase(upgrade, temporary);
+      const old = createPracticeRepository(drizzle(upgrade, { schema }));
+      await old.initialize();
+      const originalDraft = await old.draft(FIXED_REVISION.revisionId);
+      const draft = await old.saveDraft(
+        originalDraft.revisionId,
+        `# Synthetic draft before assistance from 000${baseline}\n`,
+        originalDraft.version
+      );
+      const attemptId = randomUUID();
+      const request = buildRunRequest(
+        FIXED_REVISION,
+        FIXED_REVISION.referenceSource,
+        'check',
+        attemptId
+      );
+      // Use the historical table shape; the current repository requires the assistance migration.
+      await upgrade.query(
+        `INSERT INTO practice_attempts (id, revision_id, source, mode, source_digest, cases_digest, runtime_version)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          attemptId,
+          FIXED_REVISION.revisionId,
+          request.source,
+          'check',
+          request.sourceDigest,
+          request.casesDigest,
+          request.runtimeVersion,
+        ]
+      );
+      await upgrade.query(
+        'UPDATE practice_attempts SET report = $1::jsonb, completed_at = now() WHERE id = $2',
+        [JSON.stringify(passingReport(request)), attemptId]
+      );
+      const attempt = (
+        await upgrade.query('SELECT * FROM practice_attempts WHERE id = $1', [attemptId])
+      ).rows[0];
+      const ledger = await upgrade.query<{ hash: string; created_at: string }>(
+        'SELECT hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at'
+      );
+
+      await migratePracticeDatabase(upgrade, migrationsFolder);
+      await migratePracticeDatabase(upgrade, migrationsFolder);
+      const upgraded = createPracticeService(
+        createPracticeRepository(drizzle(upgrade, { schema }))
+      );
+      assert.deepEqual(await upgraded.draft(FIXED_REVISION.revisionId), draft);
+      const migrated = (
+        await upgrade.query('SELECT * FROM practice_attempts WHERE id = $1', [attemptId])
+      ).rows[0];
+      const { solution_revealed: recordedReveal, ...retainedAttempt } = migrated;
+      assert.equal(recordedReveal, false);
+      assert.deepEqual(retainedAttempt, attempt);
+      assert.deepEqual((await old.revision(FIXED_REVISION.revisionId)).content, FIXED_REVISION);
+      const upgradedLedger = await upgrade.query<{ hash: string; created_at: string }>(
+        'SELECT hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at'
+      );
+      assert.deepEqual(upgradedLedger.rows.slice(0, ledger.rows.length), ledger.rows);
+      assert.equal(upgradedLedger.rows.length, ledger.rows.length + (8 - baseline));
+      assert.equal((await upgraded.session()).challenge.revisionId, FIXED_REVISION.revisionId);
     } finally {
-      await rm(temporary, { recursive: true, force: true });
+      await upgrade.end();
+      try {
+        await admin.query(`DROP DATABASE ${name}`);
+      } finally {
+        await rm(temporary, { recursive: true, force: true });
+      }
     }
-  }
-});
+  });
+}
 
 test('should withhold invalid candidates when provider metadata contradicts the requested concept', async () => {
   let dispatch = 0;

@@ -403,6 +403,22 @@ summary {
 .submittedSource {
   margin-top: 1rem;
 }
+.referenceSolution {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.referenceCode {
+  max-height: 320px;
+}
+.assistanceStatus,
+.attemptAssistance {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.attemptAssistance {
+  display: block;
+}
 @media (max-width: 600px) {
   .draftStatus,
   .attemptHistory li {

@@ -85,6 +85,7 @@ export const attemptSchema = z.strictObject({
   revisionId: identifier,
   source,
   mode: modeSchema,
+  solutionRevealed: z.boolean(),
   createdAt: z.string().datetime(),
   report: z.record(z.string(), z.unknown()).nullable(),
 });
@@ -97,6 +98,7 @@ export const sessionSchema = z.strictObject({
   draft: draftSchema,
   attempts: z.array(attemptSummarySchema).max(20),
   latestAttempt: attemptSchema.nullable(),
+  solutionRevealedAt: z.string().datetime().nullable(),
   challenges: z
     .array(z.strictObject({ revisionId: identifier, title: z.string().max(200) }))
     .max(20)

@@ -1,11 +1,11 @@
 # Shared Python parameter-layout checker
 
-Version `0.1.0`, copied without behavioral changes from the engineering playbook's `scripts/python-conventions` at commit `1f005f7777c619ec0db7f6421ca5df656c3345fe`, published in [draft PR #24](https://github.com/brayan/engineering-playbook/pull/24). Pinned source: [shared checker](https://github.com/brayan/engineering-playbook/tree/1f005f7777c619ec0db7f6421ca5df656c3345fe/scripts/python-conventions); rule: [Python parameter layout](https://github.com/brayan/engineering-playbook/blob/1f005f7777c619ec0db7f6421ca5df656c3345fe/docs/engineering/python-parameter-layout.md). These checksums identify the exact copied bytes; local validation is independent of that PR's merge state.
+Version `0.1.0`, copied without behavioral changes from the engineering playbook's `scripts/python-conventions` at commit `4e2a26c9e208164041827da8c0e6daf46f3ab801`, merged in [PR #24](https://github.com/brayan/engineering-playbook/pull/24). Pinned source: [shared checker](https://github.com/brayan/engineering-playbook/tree/4e2a26c9e208164041827da8c0e6daf46f3ab801/scripts/python-conventions); rule: [Python parameter layout](https://github.com/brayan/engineering-playbook/blob/4e2a26c9e208164041827da8c0e6daf46f3ab801/docs/engineering/python-parameter-layout.md). These checksums identify the exact copied bytes; local validation is independent of that PR's merge state.
 
 | File | SHA-256 |
 |---|---|
-| `check_parameter_layout.py` | `bac282cb968741ab24e7b6e5efefc1b380efac591e3a4125acf0aaffd65658f4` |
-| `tests/test_parameter_layout.py` | `bedb30abd142c6fc1568c3c9b4f3bd6537233d61129c38776edd12b462f973f2` |
+| `check_parameter_layout.py` | `ddf8a2a6c8ff9684d600d9945d0e2b1b48dda90a643800a731f629fc855c3336` |
+| `tests/test_parameter_layout.py` | `93bfaa100826fda3d7d738891bd246adf5da3f1558072a03e46b4220163a6328` |
 
 `pnpm python:lint` runs the committed checker against service source/tests, the runner harness, its host tests and this tool. `pnpm python:test` includes its positive/negative fixtures. Ruff and strict Pyright cover the tool and fixtures too. The existing Python GitHub Actions job runs these through `pnpm python:check`; no sibling checkout or network download is required.
 
