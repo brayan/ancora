@@ -9,7 +9,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 IGNORED_DIRECTORIES = {".git", ".venv", ".tox", "__pycache__", "node_modules"}
 Function = ast.FunctionDef | ast.AsyncFunctionDef
 

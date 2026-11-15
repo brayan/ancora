@@ -22,7 +22,6 @@ class ApiErrorResponse(BaseModel):
 
 class DraftInvalidResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-
     error: Literal["draft_invalid"]
     issues: Annotated[
         list[Annotated[str, Field(min_length=1, max_length=100)]],

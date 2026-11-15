@@ -17,6 +17,8 @@ case "$mode" in
       apps/api apps/web/runner/harness.py apps/web/tests/python scripts/quality/python
     PYTHONDONTWRITEBYTECODE=1 uv run --frozen --all-packages python scripts/quality/python/check_condition_layout.py \
       apps/api apps/web/runner/harness.py apps/web/tests/python scripts/quality/python
+    PYTHONDONTWRITEBYTECODE=1 uv run --frozen --all-packages python scripts/quality/python/check_class_declaration_spacing.py \
+      apps/api apps/web/runner/harness.py apps/web/tests/python scripts/quality/python
     ;;
   format) uv run --frozen --all-packages ruff format --check . ;;
   typecheck) uv run --frozen --all-packages pyright ;;

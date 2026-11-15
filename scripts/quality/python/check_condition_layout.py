@@ -11,7 +11,7 @@ from pathlib import Path
 
 from check_parameter_layout import python_files
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 
 
 @dataclass(frozen=True)

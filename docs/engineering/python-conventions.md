@@ -26,16 +26,18 @@ Declare parameter and return annotations, parameterize collections, and narrow u
 
 Use `test_should_<outcome>_when_<condition>` for pytest functions and meaningful setup/execution/assertion paragraphs. Typed fakes keep provider tests deterministic and offline. Host pytest may parse and inspect synthetic Python ASTs; it must never execute learner submissions or generated solutions. Actual challenge execution belongs only to the isolated browser runner. Do not put private code/material in fixtures, logs, snapshots or evals.
 
-Follow the playbook's [Python parameter layout](https://github.com/brayan/engineering-playbook/blob/a275d193cadddfaea63156724c3626430f63c60a/docs/engineering/python-parameter-layout.md): definitions with two or more declared parameters put each on a new line, with the closing parenthesis on a separate line and a trailing comma. Count `self`/`cls`, keyword-only and variadic parameters. Calls and lambdas are outside this rule. The committed shared checker under `scripts/quality/python` runs in `python:lint`, so `python:check` and the existing Python GitHub Actions job reject violations. Ruff preserves the layout through magic trailing commas. See the [local provenance and update instructions](../../scripts/quality/python/README.md).
+Follow the playbook's [Python parameter layout](https://github.com/brayan/engineering-playbook/blob/b6d8ae17a005fb64f3440605dbdc8d2912fef46e/docs/engineering/python-parameter-layout.md): definitions with two or more declared parameters put each on a new line, with the closing parenthesis on a separate line and a trailing comma. Count `self`/`cls`, keyword-only and variadic parameters. Calls and lambdas are outside this rule. The committed shared checker under `scripts/quality/python` runs in `python:lint`, so `python:check` and the existing Python GitHub Actions job reject violations. Ruff preserves the layout through magic trailing commas. See the [local provenance and update instructions](../../scripts/quality/python/README.md).
 
 ## Commands
 
-Follow the playbook’s [Python Condition Layout](https://github.com/brayan/engineering-playbook/blob/a275d193cadddfaea63156724c3626430f63c60a/docs/engineering/python-condition-layout.md): extract multiline `if`/`elif` conditions into named predicates while preserving evaluation order. The shared rule/checker owns its scope and exclusions. See [Ancora’s lint/CI integration](python-condition-layout.md) and [copied-source provenance](../../scripts/quality/python/README.md); no local rule fork remains.
+Follow the shared [Python Class Declaration Spacing](https://github.com/brayan/engineering-playbook/blob/b6d8ae17a005fb64f3440605dbdc8d2912fef46e/docs/engineering/python-class-declaration-spacing.md) standard. Ancora explicitly enables its checker through `python:lint` over the same maintained Python scopes as the other layout rules. The shared standard owns multiline/section-comment exceptions; local commands and provenance stay here.
+
+Follow the playbook’s [Python Condition Layout](https://github.com/brayan/engineering-playbook/blob/b6d8ae17a005fb64f3440605dbdc8d2912fef46e/docs/engineering/python-condition-layout.md): extract multiline `if`/`elif` conditions into named predicates while preserving evaluation order. The shared rule/checker owns its scope and exclusions. See [Ancora’s lint/CI integration](python-condition-layout.md) and [copied-source provenance](../../scripts/quality/python/README.md); no local rule fork remains.
 
 | Command | Scope |
 |---|---|
 | `pnpm python:sync` | Frozen uv workspace install, including development tools. |
-| `pnpm python:lint` | Ruff and deterministic definition-parameter/if-condition layout checks over maintained Python. |
+| `pnpm python:lint` | Ruff and deterministic parameter, condition and class declaration spacing checks over maintained Python. |
 | `pnpm python:format:check` | Read-only Ruff formatting check over the same paths. |
 | `pnpm python:typecheck` | Strict Pyright over maintained source and tests. |
 | `pnpm python:test` | Offline pytest: service behavior, safe harness AST checks and shared parameter-layout fixtures. |
