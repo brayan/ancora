@@ -528,3 +528,36 @@ summary {
     max-width: 100%;
   }
 }
+
+.coachingPanel {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.5rem;
+}
+.coachingPanel select {
+  display: block;
+  max-width: 100%;
+  margin-block: 0.5rem 1rem;
+}
+.coachingPanel:focus-within {
+  scroll-margin-top: 1rem;
+}
+.coachingContent {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.coachingConsent {
+  margin-block: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+}
+.coachingSource {
+  max-height: 18rem;
+  overflow: auto;
+  white-space: pre;
+  padding: 1rem;
+}
+.attemptCoachingAssistance {
+  display: block;
+  font-size: 0.85rem;
+}

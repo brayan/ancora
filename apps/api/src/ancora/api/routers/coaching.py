@@ -1,0 +1,70 @@
+from fastapi import APIRouter
+
+from ancora.api.dependencies import CoachingGenerator, CoachingProviderDependency
+from ancora.api.mappers.coaching import command_from_request, response_from_result
+from ancora.api.responses import TRUSTED_SERVER_RESPONSES
+from ancora.api.schemas.coaching import (
+    CoachingAvailability,
+    CoachingInput,
+    CoachingOutput,
+)
+from ancora.api.schemas.errors import ApiErrorResponse
+
+router = APIRouter(tags=["coaching"])
+
+
+@router.get(
+    "/coaching/status",
+    summary="Read coaching availability",
+    response_model=CoachingAvailability,
+    responses=TRUSTED_SERVER_RESPONSES,
+)
+async def status(provider: CoachingProviderDependency) -> CoachingAvailability:
+    """Read coaching configuration without a provider call or product writes.
+
+    Requires the trusted server token and no Origin header. Availability does not
+    establish provider reachability, remaining credit or an available dispatch.
+    """
+    return CoachingAvailability(available=provider.available, model=provider.model)
+
+
+@router.post(
+    "/coaching",
+    summary="Generate selected-attempt coaching",
+    response_model=CoachingOutput,
+    response_description="Advisory feedback and provenance; no replacement verdict or solution.",
+    responses={
+        **TRUSTED_SERVER_RESPONSES,
+        422: {
+            "model": ApiErrorResponse,
+            "description": "Invalid coaching input, output or bounded payload.",
+            "content": {"application/json": {"example": {"error": "coaching_invalid"}}},
+        },
+        502: {
+            "model": ApiErrorResponse,
+            "description": "Uncertain dispatch; no automatic retry.",
+            "content": {
+                "application/json": {"example": {"error": "provider_interrupted"}}
+            },
+        },
+        503: {
+            "model": ApiErrorResponse,
+            "description": "Coaching is not configured.",
+            "content": {
+                "application/json": {"example": {"error": "coaching_unavailable"}}
+            },
+        },
+    },
+)
+async def generate(
+    payload: CoachingInput,
+    service: CoachingGenerator,
+) -> CoachingOutput:
+    """Make one bounded call for an attempt explicitly shared through Next.js.
+
+    Receives saved source, public challenge context and aggregate execution data.
+    Next.js owns sharing confirmation, persistence and dispatch allowance. This
+    service never executes source or changes a verdict. Provider retries are off;
+    failures expose bounded codes without source or provider exception details.
+    """
+    return response_from_result(await service.generate(command_from_request(payload)))

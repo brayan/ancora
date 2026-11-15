@@ -32,6 +32,11 @@ export function AttemptHistory({
                     ? `Hint level ${attempt.hintLevel} recorded before submission`
                     : 'No recorded hints before submission'}
                 </span>
+                <span className="attemptCoachingAssistance">
+                  {attempt.coachingAvailable
+                    ? 'Coaching available before submission'
+                    : 'No recorded coaching before submission'}
+                </span>
               </span>
               <button
                 type="button"

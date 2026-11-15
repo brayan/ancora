@@ -40,3 +40,5 @@ Follow the playbook's [Python parameter layout](https://github.com/brayan/engine
 | `pnpm python:check` | Lint, formatting, strict types, then pytest. |
 
 These use the same locked environment locally and in [CI](continuous-integration.md). Perform contextual self-review before running checks; formatter success does not prove paragraph quality. Service/host tests cannot establish isolation or generation quality. Real Chrome checks establish browser behavior; paid quality evaluation is separate and requires an explicit model and remaining budget.
+
+Selected-attempt coaching applies the same plain-core/provider boundary; source arrives only through explicit Next.js sharing and is never executed by host tests or the service. See [ADR 0016](../adr/0016-persist-selected-attempt-coaching.md).

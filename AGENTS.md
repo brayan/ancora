@@ -21,7 +21,7 @@ Follow docs/engineering/git-conventions.md for branch names, commit subjects and
 ## Architecture
 
 - Next.js App Router, React and TypeScript own UI/product orchestration.
-- FastAPI/Pydantic AI in `apps/api` (Python package `ancora`, distribution `ancora-api`) own bounded programming generation and requested progressive hints; coaching remains deferred. ADRs 0013/0015 own generation/CI and hint details.
+- FastAPI/Pydantic AI in `apps/api` (Python package `ancora`, distribution `ancora-api`) own bounded programming generation and requested progressive hints and selected-attempt coaching. ADRs 0013/0015/0016 own generation/CI and assistance details.
 - PostgreSQL/Drizzle remain the single durable-store/migration owner. No Python database writer.
 - No authentication, accounts, Sources, decks/cards or RAG in the current product.
 - Generated/submitted Python runs only in the isolated browser runner, never in server/host Python.

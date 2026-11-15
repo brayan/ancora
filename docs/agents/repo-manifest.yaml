@@ -1,6 +1,6 @@
-version: 0.7
+version: 0.8
 project: ancora
-status: progressive-hints
+status: selected-attempt-coaching
 description: Local single-user Python programming practice with generated challenges.
 startup:
   root_guidance: AGENTS.md
@@ -15,6 +15,7 @@ canonical_docs:
   practice_persistence: docs/architecture/practice-persistence.md
   practice_assistance: docs/architecture/practice-assistance.md
   progressive_hints: docs/architecture/progressive-hints.md
+  selected_attempt_coaching: docs/architecture/selected-attempt-coaching.md
   challenge_generation: docs/architecture/challenge-generation.md
   python_conventions: docs/engineering/python-conventions.md
   continuous_integration: docs/engineering/continuous-integration.md
@@ -34,7 +35,7 @@ accepted_stack:
   web: Next.js App Router, React and TypeScript
   product: apps/web owns product orchestration and durable records
   generation: Bounded FastAPI/Pydantic AI service in apps/api; no DB writes
-  persistence: PostgreSQL and Drizzle; additive 0006–0009 with ledger preflight
+  persistence: PostgreSQL and Drizzle; additive 0006–0010 with ledger preflight
   provider: OpenAI; gpt-6-luna with separate USD 1 generation and hint evaluation caps in their plans
   identity: Local single-user; no login or accounts
   runner: Disposable Pyodide worker on separate loopback static origin
@@ -90,4 +91,5 @@ adr_index:
   - docs/adr/0013-bounded-generation-and-automated-checks.md
   - docs/adr/0014-layer-generation-around-a-framework-free-core.md
   - docs/adr/0015-persist-bounded-progressive-hints.md
+  - docs/adr/0016-persist-selected-attempt-coaching.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

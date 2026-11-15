@@ -27,7 +27,7 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
   } = schema;
   type NewAttempt = Omit<
     typeof attempts.$inferInsert,
-    'solutionRevealed' | 'hintLevel' | 'createdAt' | 'report' | 'completedAt'
+    'solutionRevealed' | 'hintLevel' | 'coachingAvailable' | 'createdAt' | 'report' | 'completedAt'
   >;
 
   async function revision(revisionId: string) {
@@ -125,6 +125,7 @@ export function createPracticeRepository(database: NodePgDatabase<typeof schema>
           ...value,
           solutionRevealed: sql`EXISTS (SELECT 1 FROM ${reveals} WHERE ${reveals.revisionId} = ${value.revisionId})`,
           hintLevel: sql`COALESCE((SELECT max(level) FROM ${schema.practiceHintRequests} WHERE revision_id = ${value.revisionId} AND state = 'ready'), 0)`,
+          coachingAvailable: sql`EXISTS (SELECT 1 FROM ${schema.practiceCoachingRequests} WHERE revision_id = ${value.revisionId} AND state = 'ready')`,
           createdAt: sql`clock_timestamp()`,
         })
         .onConflictDoNothing();

@@ -26,3 +26,5 @@ Solution-reveal checks cover cancellation, lost responses, reload, cross-tab ass
 [Code quality conventions](../engineering/code-quality-conventions.md) distinguish automated checks from contextual paragraph review. Run the latter before checks; a formatter pass does not prove that code is grouped by responsibility.
 
 Generation checks add strict Python source/fixture typing, schema parity and mocked-provider retry tests, real PostgreSQL claim/correction/revision/report lifecycle tests, and Chrome generation/recovery flows. GitHub Actions runs local entry points; see [CI](../engineering/continuous-integration.md). Paid quality evaluation is a separate owner-authorized pilot, never a CI step.
+
+Selected-attempt coaching adds affirmative sharing/cancel/retry, exact saved-source projection, hidden/report-text exclusion, two-dispatch concurrency/recovery, immutable feedback/attempt snapshots, 0009 upgrades, wire parity and Google Chrome reload/keyboard/mobile regressions. All automated inputs/providers are synthetic. Manual coaching quality evaluation remains separately authorized and is not implied by CI.

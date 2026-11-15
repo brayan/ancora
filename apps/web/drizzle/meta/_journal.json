@@ -64,6 +64,13 @@
       "when": 1794715780111,
       "tag": "0009_progressive-hints",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794767800000,
+      "tag": "0010_selected-attempt-coaching",
+      "breakpoints": true
     }
   ]
 }

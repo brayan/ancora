@@ -152,6 +152,7 @@ try {
         OPENAI_API_KEY: '',
         PRACTICE_GENERATION_ENABLED: '',
         PRACTICE_HINTS_ENABLED: '',
+        PRACTICE_COACHING_ENABLED: '',
       },
     });
     child.once('error', reject);

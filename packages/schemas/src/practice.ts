@@ -87,6 +87,7 @@ export const attemptSchema = z.strictObject({
   mode: modeSchema,
   solutionRevealed: z.boolean(),
   hintLevel: z.number().int().min(0).max(3),
+  coachingAvailable: z.boolean(),
   createdAt: z.string().datetime(),
   report: z.record(z.string(), z.unknown()).nullable(),
 });

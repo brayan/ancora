@@ -1,3 +1,4 @@
 export * from './practice';
 export * from './generation';
 export * from './hints';
+export * from './coaching';

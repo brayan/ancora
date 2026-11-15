@@ -56,6 +56,8 @@ class TrustedServerBoundary:
                 response = JSONResponse(
                     {"error": "hint_invalid"}
                     if scope["path"] == "/v1/hints"
+                    else {"error": "coaching_invalid"}
+                    if scope["path"] == "/v1/coaching"
                     else {"error": "draft_invalid", "issues": ["request_too_large"]},
                     status_code=422,
                 )

@@ -12,6 +12,7 @@ class Settings:
     model: str | None = None
     api_key: str | None = None
     hints_enabled: bool = False
+    coaching_enabled: bool = False
 
     @property
     def authenticated(self) -> bool:
@@ -24,6 +25,10 @@ class Settings:
     @property
     def hints_available(self) -> bool:
         return self.hints_enabled and self.provider_configured
+
+    @property
+    def coaching_available(self) -> bool:
+        return self.coaching_enabled and self.provider_configured
 
     @property
     def provider_configured(self) -> bool:
@@ -43,4 +48,5 @@ class Settings:
             model=os.environ.get("PRACTICE_MODEL"),
             api_key=os.environ.get("OPENAI_API_KEY"),
             hints_enabled=os.environ.get("PRACTICE_HINTS_ENABLED") == "1",
+            coaching_enabled=os.environ.get("PRACTICE_COACHING_ENABLED") == "1",
         )

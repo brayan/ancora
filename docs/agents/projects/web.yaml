@@ -1,5 +1,5 @@
 name: web
-status: progressive-hints
+status: selected-attempt-coaching
 primary_paths: [apps/web]
 related_paths: [packages/ui, packages/shared-types, packages/schemas]
 read_first:
@@ -12,6 +12,8 @@ read_first:
   - docs/architecture/practice-persistence.md
   - docs/architecture/practice-assistance.md
   - docs/architecture/progressive-hints.md
+  - docs/architecture/selected-attempt-coaching.md
+  - docs/adr/0016-persist-selected-attempt-coaching.md
   - docs/architecture/challenge-generation.md
   - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
 role: Next.js UI/product boundary, durable generation/practice records and isolated browser execution delivery.

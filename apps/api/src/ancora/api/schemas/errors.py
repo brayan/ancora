@@ -15,6 +15,8 @@ class ApiErrorResponse(BaseModel):
         "provider_interrupted",
         "hint_invalid",
         "hints_unavailable",
+        "coaching_invalid",
+        "coaching_unavailable",
     ]
 
 
