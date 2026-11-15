@@ -74,6 +74,80 @@ class ParameterLayoutTests(unittest.TestCase):
         with self.assertRaises(SyntaxError):
             check_source("def broken(")
 
+    def test_should_preserve_physical_lines_when_literals_contain_other_separators(
+        self,
+    ) -> None:
+        for separator in (
+            "\u2028",
+            "\u2029",
+            "\x85",
+            "\v",
+            "\f",
+            "\x1c",
+            "\x1d",
+            "\x1e",
+        ):
+            examples = [
+                f'text = "hello{separator}world"\ndef pair(\n    left,\n    right,\n): pass',
+                f'def pair(\n    left="hello{separator}world",\n    right=2,\n): pass',
+            ]
+            for source in examples:
+                with self.subTest(separator=repr(separator), source=source):
+                    self.assertEqual(check_source(source), [])
+
+    def test_should_accept_compliant_definitions_when_indentation_contains_form_feed(
+        self,
+    ) -> None:
+        source = "def pair(\n\f    left,\n\f    right,\n\f): pass"
+        self.assertEqual(check_source(source), [])
+
+    def test_should_report_physical_line_when_a_violation_follows_unicode_text(
+        self,
+    ) -> None:
+        source = 'text = "hello\u2028world"\ndef pair(left, right): pass'
+        violations = check_source(source)
+        self.assertEqual(
+            [(violation.line, violation.function) for violation in violations],
+            [(2, "pair")],
+        )
+
+    def test_should_find_definition_when_async_headers_use_line_continuations(
+        self,
+    ) -> None:
+        examples = [
+            "async \\\ndef pair(\n    left,\n    right,\n): pass",
+            "def first(value): pass\nasync \\\ndef pair(\n    left,\n    right,\n): pass",
+            "def outer():\n    async \\\n    def pair(\n        left,\n        right,\n    ): pass",
+        ]
+        for source in examples:
+            with self.subTest(source=source):
+                self.assertEqual(check_source(source), [])
+
+    def test_should_report_layout_violation_when_async_header_is_continued(
+        self,
+    ) -> None:
+        violations = check_source("async \\\ndef pair(left, right): pass")
+        self.assertEqual(
+            [(violation.line, violation.function) for violation in violations],
+            [(1, "pair")],
+        )
+
+    def test_should_scan_later_files_when_a_compliant_async_header_is_continued(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "a_good.py").write_text(
+                "async \\\ndef pair(\n    left,\n    right,\n): pass"
+            )
+            (root / "b_bad.py").write_text("def pair(left, right): pass")
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                status = main([str(root)])
+
+            self.assertEqual(status, 1)
+            self.assertIn("b_bad.py:1:", output.getvalue())
+            self.assertNotIn("a_good.py", output.getvalue())
+
     def test_should_check_files_without_mutation_or_execution_when_cli_runs(
         self,
     ) -> None:

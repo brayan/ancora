@@ -2,7 +2,7 @@
 
 The owner authorized this slice on 2026-11-14. Next.js and Drizzle own all product writes; no Python service or execution on the host is introduced.
 
-The subsequent [generation extension](challenge-generation.md) appends migration 0007 and preserves these records and migration files. Its Python service has no database writer or solution execution.
+The subsequent [generation extension](challenge-generation.md) appends migration 0007 and preserves these records and migration files. Its Python service has no database writer or solution execution. The [assistance extension](practice-assistance.md) adds migration 0008 for first-reveal records and immutable attempt assistance snapshots.
 
 ## Migration review
 

@@ -65,6 +65,7 @@ export function createPracticeService(repository: PracticeRepository) {
         mode: item.mode,
         createdAt: item.createdAt.toISOString(),
         completed: item.report !== null,
+        solutionRevealed: item.solutionRevealed,
       })),
       latestAttempt: latest
         ? {
@@ -74,9 +75,11 @@ export function createPracticeService(repository: PracticeRepository) {
             mode: latest.mode,
             createdAt: latest.createdAt.toISOString(),
             report: latest.report,
+            solutionRevealed: latest.solutionRevealed,
           }
         : null,
       challenges: await repository.readyChallenges(revision.id),
+      solutionRevealedAt: await repository.solutionRevealedAt(revision.id),
     });
   }
 
@@ -108,6 +111,7 @@ export function createPracticeService(repository: PracticeRepository) {
 
   async function reference(revisionId: string) {
     const revision = await repository.usableRevision(revisionId);
+    await repository.recordSolutionReveal(revisionId);
     return {
       apiVersion: 1,
       attemptId: null,
@@ -130,6 +134,7 @@ export function createPracticeService(repository: PracticeRepository) {
       mode: saved.mode,
       createdAt: saved.createdAt.toISOString(),
       report: saved.report,
+      solutionRevealed: saved.solutionRevealed,
     };
   }
 

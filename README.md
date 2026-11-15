@@ -4,7 +4,7 @@ Local Python programming practice. Next.js App Router, React and TypeScript prov
 
 ## Current slice
 
-Choose a concept and difficulty, generate a challenge, validate its reference in the isolated runner, and explicitly open the ready revision. Drafts, immutable challenge revisions and exact attempts survive reloads. Failed generation preserves the current editor; pending validation can resume, and one correction is an explicit action. The fixed synthetic exercise remains available without a model. No login or accounts are required.
+Choose a concept and difficulty, generate a challenge, validate its reference in the isolated runner, and explicitly open the ready revision. Drafts, immutable challenge revisions and exact attempts survive reloads. Failed generation preserves the current editor; pending validation can resume, and one correction is an explicit action. Confirmed solution reveal preserves your draft, records the first reveal and marks later attempts as assisted. The fixed synthetic exercise remains available without a model. No login or accounts are required.
 
 ## Local startup
 
@@ -45,6 +45,7 @@ Database/browser test wrappers create disposable PostgreSQL containers with tmpf
 - [Persistence decision](docs/adr/0012-persist-fixed-practice-with-additive-migrations.md)
 - [Generation decision](docs/adr/0013-bounded-generation-and-automated-checks.md)
 - [Generation lifecycle](docs/architecture/challenge-generation.md)
+- [Solution reveal and assistance](docs/architecture/practice-assistance.md)
 - [Python conventions](docs/engineering/python-conventions.md)
 - [Continuous integration](docs/engineering/continuous-integration.md)
 - [Persistence contract and migration review](docs/architecture/practice-persistence.md)

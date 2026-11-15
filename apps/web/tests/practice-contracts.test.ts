@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { saveDraftSchema, submitAttemptSchema, completeAttemptSchema } from '@ancora/schemas';
+import {
+  saveDraftSchema,
+  submitAttemptSchema,
+  completeAttemptSchema,
+  referenceSchema,
+} from '@ancora/schemas';
 import { randomUUID } from 'node:crypto';
 
 test('should preserve empty draft edits when execution still requires nonblank bounded source', () => {
@@ -29,4 +34,23 @@ test('should reject unsupported versions and authority fields when parsing produ
   );
   assert.equal(completeAttemptSchema.safeParse({ apiVersion: 1 }).success, false);
   assert.equal(completeAttemptSchema.safeParse({ apiVersion: 1, report: null }).success, false);
+});
+
+test('should reject client assistance claims when requesting a reference or submitting an attempt', () => {
+  const reference = { apiVersion: 1, revisionId: 'synthetic-positive-even@1' };
+  assert.equal(referenceSchema.safeParse(reference).success, true);
+  assert.equal(
+    referenceSchema.safeParse({ ...reference, solutionRevealedAt: null }).success,
+    false
+  );
+  assert.equal(
+    submitAttemptSchema.safeParse({
+      ...reference,
+      submissionId: randomUUID(),
+      source: 'pass',
+      mode: 'check',
+      solutionRevealed: false,
+    }).success,
+    false
+  );
 });

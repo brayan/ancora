@@ -39,12 +39,14 @@ def signature_parentheses(
     function: Function,
     tokens: Sequence[tokenize.TokenInfo],
 ) -> tuple[int, int]:
+    # An async header can continue onto another physical line before the def token.
+    start = (function.lineno, function.col_offset)
     definition = next(
         index
         for index, token in enumerate(tokens)
         if token.type == tokenize.NAME
         and token.string == "def"
-        and token.start[0] == function.lineno
+        and token.start >= start
     )
     # Skip generic type parameters, whose bounds may contain parentheses.
     brackets = 0
@@ -78,7 +80,8 @@ def signature_parentheses(
 def check_source(source: str) -> list[Violation]:
     module = ast.parse(source)
     tokens = list(tokenize.generate_tokens(io.StringIO(source).readline))
-    lines = source.splitlines()
+    # Unicode string separators and form feeds are not Python physical newlines.
+    lines = source.split("\n")
     violations: list[Violation] = []
     for function in ast.walk(module):
         if not isinstance(function, (ast.FunctionDef, ast.AsyncFunctionDef)):

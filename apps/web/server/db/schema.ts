@@ -61,6 +61,13 @@ export const practiceDrafts = pgTable('practice_drafts', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const practiceSolutionReveals = pgTable('practice_solution_reveals', {
+  revisionId: text('revision_id')
+    .primaryKey()
+    .references(() => practiceRevisions.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 export const practiceAttempts = pgTable('practice_attempts', {
   id: text('id').primaryKey(),
   revisionId: text('revision_id')
@@ -71,6 +78,7 @@ export const practiceAttempts = pgTable('practice_attempts', {
   sourceDigest: text('source_digest').notNull(),
   casesDigest: text('cases_digest').notNull(),
   runtimeVersion: text('runtime_version').notNull(),
+  solutionRevealed: boolean('solution_revealed').notNull().default(false),
   report: jsonb('report').$type<StoredReport>(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   completedAt: timestamp('completed_at', { withTimezone: true }),

@@ -1,6 +1,6 @@
-version: 0.5
+version: 0.6
 project: ancora
-status: challenge-generation
+status: practice-assistance
 description: Local single-user Python programming practice with generated challenges.
 startup:
   root_guidance: AGENTS.md
@@ -13,6 +13,7 @@ canonical_docs:
   programming_practice: docs/product/programming-practice.md
   system_overview: docs/architecture/system-overview.md
   practice_persistence: docs/architecture/practice-persistence.md
+  practice_assistance: docs/architecture/practice-assistance.md
   challenge_generation: docs/architecture/challenge-generation.md
   python_conventions: docs/engineering/python-conventions.md
   continuous_integration: docs/engineering/continuous-integration.md
@@ -32,7 +33,7 @@ accepted_stack:
   web: Next.js App Router, React and TypeScript
   product: apps/web owns product orchestration and durable records
   generation: Bounded FastAPI/Pydantic AI service in apps/api; no DB writes
-  persistence: PostgreSQL and Drizzle; additive 0006/0007 with ledger preflight
+  persistence: PostgreSQL and Drizzle; additive 0006–0008 with ledger preflight
   provider: OpenAI; owner selected gpt-6-luna and USD 1 total live-evaluation budget
   identity: Local single-user; no login or accounts
   runner: Disposable Pyodide worker on separate loopback static origin

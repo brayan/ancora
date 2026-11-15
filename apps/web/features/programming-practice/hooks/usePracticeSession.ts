@@ -354,7 +354,9 @@ export function usePracticeSession() {
     if (!response.ok) {
       throw new Error('reference_unavailable');
     }
-    return envelopeSchema.parse(data);
+    const envelope = envelopeSchema.parse(data);
+    setSession(await refresh());
+    return envelope;
   };
 
   const select = async (revisionId: string) => {
