@@ -66,6 +66,7 @@ export function createPracticeService(repository: PracticeRepository) {
         createdAt: item.createdAt.toISOString(),
         completed: item.report !== null,
         solutionRevealed: item.solutionRevealed,
+        hintLevel: item.hintLevel,
       })),
       latestAttempt: latest
         ? {
@@ -76,6 +77,7 @@ export function createPracticeService(repository: PracticeRepository) {
             createdAt: latest.createdAt.toISOString(),
             report: latest.report,
             solutionRevealed: latest.solutionRevealed,
+            hintLevel: latest.hintLevel,
           }
         : null,
       challenges: await repository.readyChallenges(revision.id),
@@ -135,6 +137,7 @@ export function createPracticeService(repository: PracticeRepository) {
       createdAt: saved.createdAt.toISOString(),
       report: saved.report,
       solutionRevealed: saved.solutionRevealed,
+      hintLevel: saved.hintLevel,
     };
   }
 

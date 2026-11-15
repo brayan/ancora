@@ -11,6 +11,7 @@ class Settings:
     enabled: bool = False
     model: str | None = None
     api_key: str | None = None
+    hints_enabled: bool = False
 
     @property
     def authenticated(self) -> bool:
@@ -18,9 +19,16 @@ class Settings:
 
     @property
     def available(self) -> bool:
+        return self.enabled and self.provider_configured
+
+    @property
+    def hints_available(self) -> bool:
+        return self.hints_enabled and self.provider_configured
+
+    @property
+    def provider_configured(self) -> bool:
         return (
             self.authenticated
-            and self.enabled
             and self.api_key is not None
             and bool(self.api_key.strip())
             and self.model is not None
@@ -34,4 +42,5 @@ class Settings:
             enabled=os.environ.get("PRACTICE_GENERATION_ENABLED") == "1",
             model=os.environ.get("PRACTICE_MODEL"),
             api_key=os.environ.get("OPENAI_API_KEY"),
+            hints_enabled=os.environ.get("PRACTICE_HINTS_ENABLED") == "1",
         )

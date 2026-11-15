@@ -4,7 +4,7 @@ Local Python programming practice. Next.js App Router, React and TypeScript prov
 
 ## Current slice
 
-Choose a concept and difficulty, generate a challenge, validate its reference in the isolated runner, and explicitly open the ready revision. Drafts, immutable challenge revisions and exact attempts survive reloads. Failed generation preserves the current editor; pending validation can resume, and one correction is an explicit action. Confirmed solution reveal preserves your draft, records the first reveal and marks later attempts as assisted. The fixed synthetic exercise remains available without a model. No login or accounts are required.
+Choose a concept and difficulty, generate a challenge, validate its reference in the isolated runner, and explicitly open the ready revision. Drafts, immutable challenge revisions and exact attempts survive reloads. Failed generation preserves the current editor; pending validation can resume, and one correction is an explicit action. Confirmed solution reveal preserves your draft, records the first reveal and marks later attempts as assisted. Requested progressive hints are saved per revision and mark subsequent attempts; they send public challenge context and earlier hints, never your code. The fixed synthetic exercise remains available without a model. No login or accounts are required.
 
 ## Local startup
 
@@ -24,7 +24,7 @@ Open http://127.0.0.1:3000/practice; the static runner is http://127.0.0.1:3001 
 
 The Python backend lives in [apps/api](apps/api/README.md), with import package `ancora` and distribution `ancora-api`. Run it separately with `uv run --frozen --all-packages python -m ancora.main`. Its router metadata documents success/error contracts in-process; Swagger/OpenAPI HTTP endpoints remain disabled.
 
-For generation, export a random `PRACTICE_SERVICE_TOKEN` of at least 32 characters to the trusted web/Python servers, plus `PRACTICE_MODEL=gpt-6-luna`, `OPENAI_API_KEY` and `PRACTICE_GENERATION_ENABLED=1` for Python. Example files list the configuration; Python does not automatically load dotenv files. `pnpm dev` passes provider configuration only to Python and removes credentials from the static runner environment. Without generation configuration, the fixed exercise still works. Generating is an explicit paid model action; CI uses a synthetic provider and needs no OpenAI key.
+For generation, export a random `PRACTICE_SERVICE_TOKEN` of at least 32 characters to the trusted web/Python servers, plus `PRACTICE_MODEL=gpt-6-luna`, `OPENAI_API_KEY` and `PRACTICE_GENERATION_ENABLED=1` for Python. Example files list the configuration; Python does not automatically load dotenv files. `pnpm dev` passes provider configuration only to Python and removes credentials from the static runner environment. Without generation configuration, the fixed exercise still works. Enable hint requests independently with `PRACTICE_HINTS_ENABLED=1` in Python. Generating or requesting hints is an explicit paid model action; CI uses a synthetic provider and needs no OpenAI key.
 
 ```sh
 pnpm code:check
@@ -46,6 +46,7 @@ Database/browser test wrappers create disposable PostgreSQL containers with tmpf
 - [Generation decision](docs/adr/0013-bounded-generation-and-automated-checks.md)
 - [Generation lifecycle](docs/architecture/challenge-generation.md)
 - [Solution reveal and assistance](docs/architecture/practice-assistance.md)
+- [Progressive hints](docs/architecture/progressive-hints.md)
 - [Python conventions](docs/engineering/python-conventions.md)
 - [Continuous integration](docs/engineering/continuous-integration.md)
 - [Persistence contract and migration review](docs/architecture/practice-persistence.md)

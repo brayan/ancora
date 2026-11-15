@@ -26,6 +26,20 @@ HEADERS = {"Authorization": f"Bearer {TOKEN}"}
             "GeneratorOutput",
             {"401", "403", "422", "502", "503"},
         ),
+        (
+            "/v1/hints/status",
+            "get",
+            "hints",
+            "HintAvailability",
+            {"401", "403", "422", "503"},
+        ),
+        (
+            "/v1/hints",
+            "post",
+            "hints",
+            "HintOutput",
+            {"401", "403", "422", "502", "503"},
+        ),
     ],
 )
 def test_should_describe_the_http_contract_when_openapi_is_generated_offline(
@@ -41,7 +55,12 @@ def test_should_describe_the_http_contract_when_openapi_is_generated_offline(
     operation = schema["paths"][path][method]
 
     assert schema["info"]["title"] == "Ancora API"
-    assert set(schema["paths"]) == {"/v1/generate", "/v1/status"}
+    assert set(schema["paths"]) == {
+        "/v1/generate",
+        "/v1/status",
+        "/v1/hints",
+        "/v1/hints/status",
+    }
     assert operation["summary"]
     assert operation["description"]
     assert operation["tags"] == [tag]
@@ -53,7 +72,11 @@ def test_should_describe_the_http_contract_when_openapi_is_generated_offline(
     )
     for code in error_codes:
         response = responses[code]
-        model = DraftInvalidResponse if code == "422" else ApiErrorResponse
+        model = (
+            DraftInvalidResponse
+            if code == "422" and path != "/v1/hints"
+            else ApiErrorResponse
+        )
         assert response["description"]
         assert (
             response["content"]["application/json"]["schema"]["$ref"]

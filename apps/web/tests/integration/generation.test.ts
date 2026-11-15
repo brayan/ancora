@@ -447,7 +447,7 @@ test('should interrupt stale generating reservations when opening a generation a
   assert.equal(stale.calls.length, 1);
 });
 
-for (const baseline of [6, 7]) {
+for (const baseline of [6, 7, 8]) {
   test(`should retain fixed drafts attempts and migration ledger when upgrading from 000${baseline}`, async () => {
     const temporary = await mkdtemp(path.join(os.tmpdir(), 'ancora-generation-upgrade-'));
     const name = `ancora_upgrade_${randomUUID().replaceAll('-', '')}`;
@@ -519,15 +519,13 @@ for (const baseline of [6, 7]) {
       const migrated = (
         await upgrade.query('SELECT * FROM practice_attempts WHERE id = $1', [attemptId])
       ).rows[0];
-      const { solution_revealed: recordedReveal, ...retainedAttempt } = migrated;
-      assert.equal(recordedReveal, false);
-      assert.deepEqual(retainedAttempt, attempt);
+      assert.deepEqual(migrated, { ...attempt, solution_revealed: false, hint_level: 0 });
       assert.deepEqual((await old.revision(FIXED_REVISION.revisionId)).content, FIXED_REVISION);
       const upgradedLedger = await upgrade.query<{ hash: string; created_at: string }>(
         'SELECT hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at'
       );
       assert.deepEqual(upgradedLedger.rows.slice(0, ledger.rows.length), ledger.rows);
-      assert.equal(upgradedLedger.rows.length, ledger.rows.length + (8 - baseline));
+      assert.equal(upgradedLedger.rows.length, ledger.rows.length + (9 - baseline));
       assert.equal((await upgraded.session()).challenge.revisionId, FIXED_REVISION.revisionId);
     } finally {
       await upgrade.end();

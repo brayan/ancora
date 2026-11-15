@@ -7,9 +7,11 @@ from fastapi import Depends, Request
 from ancora.application.interfaces.challenge_generation_provider import (
     ChallengeGenerationProvider,
 )
+from ancora.application.interfaces.hint_provider import HintProvider
 from ancora.application.services.challenge_generation_service import (
     ChallengeGenerationService,
 )
+from ancora.application.services.hint_service import HintService
 
 
 def get_generation_service(request: Request) -> ChallengeGenerationService:
@@ -26,3 +28,15 @@ GenerationService = Annotated[
 GenerationProvider = Annotated[
     ChallengeGenerationProvider, Depends(get_generation_provider)
 ]
+
+
+def get_hint_service(request: Request) -> HintService:
+    return cast(HintService, request.app.state.hint_service)
+
+
+def get_hint_provider(request: Request) -> HintProvider:
+    return cast(HintProvider, request.app.state.hint_provider)
+
+
+HintGenerator = Annotated[HintService, Depends(get_hint_service)]
+HintProviderDependency = Annotated[HintProvider, Depends(get_hint_provider)]

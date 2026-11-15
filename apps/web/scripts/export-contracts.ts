@@ -1,7 +1,8 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { exportPracticeSchemas, exportGenerationSchemas } from '@ancora/schemas';
+import { exportPracticeSchemas, exportGenerationSchemas, exportHintSchemas } from '@ancora/schemas';
 
 const artifacts = [
+  { name: 'hints-v1.schema.json', schema: { schemaVersion: 1, contracts: exportHintSchemas() } },
   {
     name: 'practice-v1.schema.json',
     schema: { apiVersion: 1, contracts: exportPracticeSchemas() },

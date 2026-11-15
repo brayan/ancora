@@ -322,6 +322,11 @@
               "solutionRevealed": {
                 "type": "boolean"
               },
+              "hintLevel": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
               "createdAt": {
                 "type": "string",
                 "format": "date-time",
@@ -336,6 +341,7 @@
               "revisionId",
               "mode",
               "solutionRevealed",
+              "hintLevel",
               "createdAt",
               "completed"
             ],
@@ -370,6 +376,11 @@
                 "solutionRevealed": {
                   "type": "boolean"
                 },
+                "hintLevel": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 3
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time",
@@ -396,6 +407,7 @@
                 "source",
                 "mode",
                 "solutionRevealed",
+                "hintLevel",
                 "createdAt",
                 "report"
               ],

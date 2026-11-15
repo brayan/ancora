@@ -151,6 +151,7 @@ try {
         PRACTICE_SERVICE_TOKEN: mode === 'browser' ? serviceToken : '',
         OPENAI_API_KEY: '',
         PRACTICE_GENERATION_ENABLED: '',
+        PRACTICE_HINTS_ENABLED: '',
       },
     });
     child.once('error', reject);

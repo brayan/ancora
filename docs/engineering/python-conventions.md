@@ -6,7 +6,7 @@ Ancora adapts the engineering playbook's [Python typing standard](https://github
 
 The root uv workspace supports Python `>=3.13,<3.15`; `.python-version`, CI, Ruff's `py313` target and Pyright's `3.13` target select the minimum version. The browser's pinned Pyodide runtime is separate and must remain compatible with the harness. Install uv `0.11.18`, then run `pnpm python:sync` from the repository root. `uv.lock` locks the whole workspace. Root `pyproject.toml` owns the pinned quality/test tools; `apps/api/pyproject.toml` owns its runtime dependencies. Review manifest changes, run `uv lock` intentionally, and commit the resulting lockfile together. Frozen commands never update it.
 
-FastAPI delivers a bounded generation API, Pydantic validates untrusted HTTP/model output, and Pydantic AI stays behind a typed provider adapter. Keep HTTP thin, deterministic validation independently testable, and create packages only when they own real behavior. Python never owns product database writes. Provider configuration is explicit; SDK/framework retries cannot expand the durable generation allowance.
+FastAPI delivers bounded generation and hint APIs, Pydantic validates untrusted HTTP/model output, and Pydantic AI stays behind a typed provider adapter. Keep HTTP thin, deterministic validation independently testable, and create packages only when they own real behavior. Python never owns product database writes. Provider configuration is explicit; SDK/framework retries cannot expand the durable generation allowance.
 
 ## Package structure and dependency direction
 

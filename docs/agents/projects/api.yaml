@@ -9,7 +9,9 @@ read_first:
   - docs/adr/0014-layer-generation-around-a-framework-free-core.md
   - docs/engineering/python-conventions.md
   - docs/architecture/challenge-generation.md
-role: Bounded FastAPI/Pydantic AI challenge generation and explicitly requested coaching.
+  - docs/architecture/progressive-hints.md
+  - docs/adr/0015-persist-bounded-progressive-hints.md
+role: Bounded FastAPI/Pydantic AI challenge generation and progressive hints; coaching remains deferred.
 allowed_work:
   - Framework-free domain/application services and application-owned provider interfaces
   - API capability routers and independent API/infrastructure Pydantic mappings

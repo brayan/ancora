@@ -9,7 +9,9 @@ from ancora.application.errors import (
     GenerationUnavailable,
     ProviderInterrupted,
 )
+from ancora.application.hints import HintsUnavailable
 from ancora.domain.challenges.errors import DraftInvalid
+from ancora.domain.hints.models import HintInvalid
 
 
 def register_error_handlers(app: FastAPI) -> None:
@@ -19,7 +21,10 @@ def register_error_handlers(app: FastAPI) -> None:
         _error: RequestValidationError,
     ) -> JSONResponse:
         return JSONResponse(
-            {"error": "draft_invalid", "issues": ["request_invalid"]}, status_code=422
+            {"error": "hint_invalid"}
+            if _request.url.path == "/v1/hints"
+            else {"error": "draft_invalid", "issues": ["request_invalid"]},
+            status_code=422,
         )
 
     @app.exception_handler(ValidationError)
@@ -28,7 +33,10 @@ def register_error_handlers(app: FastAPI) -> None:
         _error: ValidationError,
     ) -> JSONResponse:
         return JSONResponse(
-            {"error": "draft_invalid", "issues": ["structure_invalid"]}, status_code=422
+            {"error": "hint_invalid"}
+            if _request.url.path == "/v1/hints"
+            else {"error": "draft_invalid", "issues": ["structure_invalid"]},
+            status_code=422,
         )
 
     @app.exception_handler(DraftInvalid)
@@ -53,3 +61,17 @@ def register_error_handlers(app: FastAPI) -> None:
         _error: ProviderInterrupted,
     ) -> JSONResponse:
         return JSONResponse({"error": "provider_interrupted"}, status_code=502)
+
+    @app.exception_handler(HintInvalid)
+    async def hint_invalid(
+        _request: Request,
+        _error: HintInvalid,
+    ) -> JSONResponse:
+        return JSONResponse({"error": "hint_invalid"}, status_code=422)
+
+    @app.exception_handler(HintsUnavailable)
+    async def hints_unavailable(
+        _request: Request,
+        _error: HintsUnavailable,
+    ) -> JSONResponse:
+        return JSONResponse({"error": "hints_unavailable"}, status_code=503)

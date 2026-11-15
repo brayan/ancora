@@ -1,6 +1,6 @@
 # Practice assistance: solution reveal
 
-This is the first assistance slice after merged generation PR #9. ADRs 0011–0014 retain runtime, privacy and storage ownership. Progressive provider hints and selected-attempt coaching follow separately; this slice makes no provider calls and sends no submitted code externally.
+This describes the solution-reveal slice after merged generation PR #9. The [progressive-hints extension](progressive-hints.md) adds separately requested hints and attempt hint snapshots. ADRs 0011–0014 retain runtime, privacy and storage ownership. Progressive provider hints and selected-attempt coaching follow separately; this slice makes no provider calls and sends no submitted code externally.
 
 ## Behavior and contracts
 

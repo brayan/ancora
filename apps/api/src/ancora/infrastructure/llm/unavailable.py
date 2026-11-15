@@ -1,4 +1,5 @@
 from ancora.application.errors import GenerationUnavailable
+from ancora.application.hints import HintCommand, HintResult, HintsUnavailable
 from ancora.application.models import GenerationCommand, GenerationResult
 
 
@@ -11,3 +12,14 @@ class UnavailableChallengeProvider:
         command: GenerationCommand,
     ) -> GenerationResult:
         raise GenerationUnavailable
+
+
+class UnavailableHintProvider:
+    available: bool = False
+    model: str | None = None
+
+    async def generate(
+        self,
+        command: HintCommand,
+    ) -> HintResult:
+        raise HintsUnavailable
