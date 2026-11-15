@@ -12,6 +12,9 @@ import type {
   GenerationRequest,
   GenerationState,
   GeneratorOutput,
+  HintOutput,
+  HintView,
+  HintError,
 } from '@ancora/schemas';
 import type { ChallengeView } from '@ancora/shared-types';
 import type { GenericRunnerCase } from '@/runner/protocol.mjs';
@@ -79,6 +82,7 @@ export const practiceAttempts = pgTable('practice_attempts', {
   casesDigest: text('cases_digest').notNull(),
   runtimeVersion: text('runtime_version').notNull(),
   solutionRevealed: boolean('solution_revealed').notNull().default(false),
+  hintLevel: integer('hint_level').notNull().default(0),
   report: jsonb('report').$type<StoredReport>(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   completedAt: timestamp('completed_at', { withTimezone: true }),
@@ -126,3 +130,24 @@ export const practiceSessionSelection = pgTable('practice_session_selection', {
     .notNull()
     .references(() => practiceRevisions.id),
 });
+
+export const practiceHintRequests = pgTable(
+  'practice_hint_requests',
+  {
+    id: text('id').primaryKey(),
+    revisionId: text('revision_id')
+      .notNull()
+      .references(() => practiceRevisions.id),
+    level: integer('level').notNull(),
+    state: text('state').$type<HintView['state']>().notNull(),
+    dispatches: integer('dispatches').notNull(),
+    output: jsonb('output').$type<HintOutput>(),
+    error: text('error').$type<HintError>(),
+    events: jsonb('events')
+      .$type<{ dispatch: number; outcome: string; at: string; error?: HintError }[]>()
+      .notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex('practice_hint_revision_level_unique').on(table.revisionId, table.level)]
+);

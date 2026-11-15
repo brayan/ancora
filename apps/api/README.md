@@ -1,6 +1,6 @@
 # Ancora API
 
-The backend lives in `apps/api`, imports as `ancora`, and is installed as the `ancora-api` distribution. FastAPI owns one bounded challenge-generation dispatch. Next.js owns durable lifecycle, initial plus one explicit correction allowance and all database writes. Reference and learner Python execute only in the isolated browser runner; this service only parses reference AST and JSON cases.
+The backend lives in `apps/api`, imports as `ancora`, and is installed as the `ancora-api` distribution. FastAPI owns bounded challenge-generation and progressive-hint dispatches. Next.js owns durable lifecycle, initial plus one explicit correction allowance and all database writes. Reference and learner Python execute only in the isolated browser runner; this service only parses reference AST and JSON cases.
 
 The package separates `api/` routers/schemas/mappers, `application/services/` orchestration and `application/interfaces/` provider dependencies, framework-free `domain/challenges/` models/rules, and `infrastructure/llm/` adapters/schemas/mappers. `bootstrap.create_app` wires resources; `main` starts the service. Neither domain nor application imports Pydantic. See [ADR 0014](../../docs/adr/0014-layer-generation-around-a-framework-free-core.md) for structure and dependency rules.
 
@@ -29,3 +29,9 @@ uv run --frozen --all-packages pytest apps/api/tests
 For disposable browser integration only, run `uv run --frozen --all-packages python apps/api/tests/serve_synthetic.py` with both `ANCORA_SYNTHETIC_DATABASE=1` and `ANCORA_SYNTHETIC_PROVIDER=1` and a valid service token. This explicit test module injects a typed synthetic generator; it is outside the production package. No provider credentials are needed. Do not use its authored exercises as production content. No database dependencies or code-execution helpers exist here.
 
 API behavior is checked offline against the installed locked Pydantic AI/OpenAI packages. The initial manual pilot and owner acceptance are recorded separately in [the generation plan](../../docs/exec-plans/challenge-generation.md); CI and this structural refactor make no paid calls.
+
+## Progressive hints
+
+Enable independently with `PRACTICE_HINTS_ENABLED=1` and the existing model/key/token environment. `GET /v1/hints/status` reports hint configuration without contacting the provider. `POST /v1/hints` accepts only public challenge context, the requested level and earlier hints; it makes one bounded dispatch and returns hint text/provenance. Neither endpoint accepts learner code or reference/hidden material. Next.js owns persistence, sequential levels, shared initial/retry allowances and attempt assistance snapshots. `hint_invalid` (422), `hints_unavailable` (503) and `provider_interrupted` (502) are bounded outcomes; no automatic retry or solution execution occurs.
+
+The hints capability follows ADR 0014's plain core and independent API/infrastructure Pydantic boundaries. Routers document success/error responses in-process. See [ADR 0015](../../docs/adr/0015-persist-bounded-progressive-hints.md) and [the lifecycle](../../docs/architecture/progressive-hints.md). The synthetic browser service injects both generation and hint providers, with no real credentials. Coaching remains deferred.

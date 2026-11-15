@@ -13,6 +13,8 @@ class ApiErrorResponse(BaseModel):
         "origin_forbidden",
         "generation_unavailable",
         "provider_interrupted",
+        "hint_invalid",
+        "hints_unavailable",
     ]
 
 

@@ -4,9 +4,9 @@ ADR 0011 replaces the earlier source-grounded flashcard architecture with local 
 
 | Boundary | Owner and status |
 |---|---|
-| apps/web | Next.js App Router/React/TypeScript UI, browser product boundary and durable generation/practice orchestration. |
+| apps/web | Next.js App Router/React/TypeScript UI, browser product boundary and durable generation/practice/hint orchestration. |
 | apps/web/runner | Dedicated-origin static browser execution broker and disposable Pyodide worker; v1 fixed and v2 generated contracts. |
-| apps/api | FastAPI/Pydantic AI generator; optional coaching deferred. No DB writes. |
+| apps/api | FastAPI/Pydantic AI generator and progressive hints; coaching deferred. No DB writes. |
 | apps/web/server/db | PostgreSQL/Drizzle persistence owner for immutable revisions, versioned drafts and exact attempt/assistance snapshots. Historical SQL/snapshots retained. |
 | packages/ui, shared-types, schemas, config | Thin shared UI/contracts/configuration; no hidden product workflows. |
 | prompts, evals, tools/eval-runner | First-class versioned synthetic evidence. The existing CLI smoke is only a scaffold. |
@@ -18,3 +18,5 @@ Local-only deployment is the supported scope. Credentials remain server-side and
 Fixed practice now persists through the reviewed [PostgreSQL/Drizzle boundary](practice-persistence.md) under [ADR 0012](../adr/0012-persist-fixed-practice-with-additive-migrations.md). Browser execution remains separate from product writes.
 
 [ADR 0013](../adr/0013-bounded-generation-and-automated-checks.md) adds bounded generation, immutable candidates, resumable reference validation and automated checks. See the [generation lifecycle](challenge-generation.md). [Solution reveal](practice-assistance.md) adds explicit, durable assistance without provider calls or draft replacement.
+
+[Progressive hints](progressive-hints.md) adds durable sequential levels and bounded explicit retries under ADR 0015, without sharing learner code or changing execution verdicts.

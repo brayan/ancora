@@ -10,6 +10,7 @@ Ancora provides short programming challenges for a learner practising locally. P
 - **Practice Draft:** mutable editor content tied to a challenge revision, preserved separately from a submitted attempt.
 - **Attempt:** exact submitted code snapshot and behavioral, technique and execution results tied to a revision/runtime.
 - **Assistance:** an explicitly requested hint, coaching response or solution reveal, tied to the selected revision/attempt.
+- **Hint Request:** one revision/level record with initial plus one explicit retry allowance, saved text/provenance and generating/ready/failed/interrupted lifecycle. Attempts snapshot the highest ready hint level.
 - **Execution Job:** bounded runner request identified by job ID, revision, source/case digests and runtime version.
 - **Prompt Version / Trace Reference / Eval Run:** versioned instructions, privacy-safe observability reference and evaluation evidence.
 

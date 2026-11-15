@@ -15,6 +15,8 @@ import { usePracticeSession } from '@/features/programming-practice/hooks/usePra
 import { GenerationPanel } from '@/features/programming-practice/components/GenerationPanel';
 import { PracticeResults } from '@/features/programming-practice/components/PracticeResults';
 import { ReferenceSolution } from '@/features/programming-practice/components/ReferenceSolution';
+import { HintsPanel } from '@/features/programming-practice/components/HintsPanel';
+import { AttemptHistory } from '@/features/programming-practice/components/AttemptHistory';
 
 type Display = { report: RunnerResponse | null; label: string; source: string | undefined };
 
@@ -25,12 +27,14 @@ export function PracticeScreen() {
   const [preparing, setPreparing] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [assisting, setAssisting] = useState(false);
+  const [hinting, setHinting] = useState(false);
   const [display, setDisplay] = useState<Display | null>(null);
   const [error, setError] = useState('');
   const submission = useRef<{ id: string; source: string; mode: 'examples' | 'check' } | null>(
     null
   );
-  const busy = preparing || runner.busy || generating || assisting || practice.reportSaving;
+  const busy =
+    preparing || runner.busy || generating || assisting || hinting || practice.reportSaving;
   const available = !['connecting', 'unavailable'].includes(runner.state.status);
   const validSource =
     practice.source.trim().length > 0 && practice.source.length <= MAX_SOURCE_LENGTH;
@@ -166,6 +170,7 @@ export function PracticeScreen() {
             blocked={
               preparing ||
               assisting ||
+              hinting ||
               runner.busy ||
               practice.reportSaving ||
               !!practice.pendingReport
@@ -351,6 +356,12 @@ export function PracticeScreen() {
               )}
             </section>
           </div>
+          <HintsPanel
+            key={`hints:${practice.session.challenge.revisionId}`}
+            revisionId={practice.session.challenge.revisionId}
+            blocked={busy}
+            onBusyChange={setHinting}
+          />
           <ReferenceSolution
             key={practice.session.challenge.revisionId}
             revealedAt={practice.session.solutionRevealedAt}
@@ -371,39 +382,11 @@ export function PracticeScreen() {
               Your last submission has no saved result. Run again to create another attempt.
             </p>
           )}
-          <section className="attemptHistory" aria-labelledby="history-heading">
-            <h2 id="history-heading">Recent attempts</h2>
-            {practice.session.attempts.length === 0 ? (
-              <p>Run examples or check your solution to save your first attempt.</p>
-            ) : (
-              <ul>
-                {practice.session.attempts.map((attempt) => (
-                  <li key={attempt.id}>
-                    <span>
-                      {attempt.mode === 'check' ? 'Check solution' : 'Run examples'} ·{' '}
-                      {new Date(attempt.createdAt).toLocaleString()} ·{' '}
-                      {attempt.completed ? 'Saved' : 'Unfinished'}
-                      <span className="attemptAssistance">
-                        {attempt.solutionRevealed
-                          ? 'Reference revealed before submission'
-                          : 'No recorded reveal before submission'}
-                      </span>
-                    </span>
-                    <button
-                      type="button"
-                      className="button secondary"
-                      disabled={busy}
-                      onClick={() => {
-                        void viewAttempt(attempt.id);
-                      }}
-                    >
-                      View attempt
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+          <AttemptHistory
+            attempts={practice.session.attempts}
+            disabled={busy}
+            onView={viewAttempt}
+          />
           <details className="spikeTools">
             <summary>Runner spike tools and limits</summary>
             <p>

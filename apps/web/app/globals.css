@@ -408,6 +408,32 @@ summary {
   padding-top: 24px;
   border-top: 1px solid var(--line);
 }
+.hintsPanel {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.hintHistory {
+  list-style: none;
+  padding: 0;
+}
+.hintHistory li {
+  padding-block: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.hintHistory h3 {
+  margin-top: 0;
+}
+.hintContent {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 80ch;
+}
+.attemptHintAssistance {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
 .referenceCode {
   max-height: 320px;
 }

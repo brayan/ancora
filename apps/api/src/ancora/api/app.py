@@ -5,13 +5,15 @@ from starlette.types import Lifespan
 
 from ancora.api.errors import register_error_handlers
 from ancora.api.middleware import TrustedServerBoundary
-from ancora.api.routers import generation, status
+from ancora.api.routers import generation, hints, status
 from ancora.application.interfaces.challenge_generation_provider import (
     ChallengeGenerationProvider,
 )
+from ancora.application.interfaces.hint_provider import HintProvider
 from ancora.application.services.challenge_generation_service import (
     ChallengeGenerationService,
 )
+from ancora.application.services.hint_service import HintService
 from ancora.settings import Settings
 
 
@@ -20,6 +22,8 @@ def create_api(
     provider: ChallengeGenerationProvider,
     service: ChallengeGenerationService,
     lifespan: Lifespan[FastAPI],
+    hint_provider: HintProvider,
+    hint_service: HintService,
 ) -> FastAPI:
     app = FastAPI(
         title="Ancora API",
@@ -31,9 +35,12 @@ def create_api(
     )
     app.state.generation_provider = provider
     app.state.generation_service = service
+    app.state.hint_provider = hint_provider
+    app.state.hint_service = hint_service
 
     app.add_middleware(TrustedServerBoundary, settings=settings)
     register_error_handlers(app)
     app.include_router(status.router, prefix="/v1")
     app.include_router(generation.router, prefix="/v1")
+    app.include_router(hints.router, prefix="/v1")
     return app

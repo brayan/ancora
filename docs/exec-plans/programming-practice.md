@@ -2,7 +2,7 @@
 
 ## Goal and authorization
 
-Owner-approved local single-user pivot; selected Next.js/React/TypeScript + FastAPI/Pydantic AI. Current implementation scope: the completed pivot/runner, persistence and generation/CI slices plus solution reveal and assistance tracking after PR #9. ADR 0011 is authoritative.
+Owner-approved local single-user pivot; selected Next.js/React/TypeScript + FastAPI/Pydantic AI. Current implementation scope: the completed pivot/runner, persistence and generation/CI slices plus merged solution reveal/tracking and the owner-authorized progressive-hints slice. ADR 0011 is authoritative.
 
 ## Sequence
 
@@ -11,8 +11,9 @@ Owner-approved local single-user pivot; selected Next.js/React/TypeScript + Fast
 3. Prove an isolated, dedicated-origin disposable Pyodide worker with a fixed synthetic exercise, bound messages, Stop/timeouts/output caps/reset, no contamination and blocked application/external requests. Record Chrome evidence and memory/latency limitations.
 4. Implemented in the persistence worktree: fixed-exercise editor + durable draft/attempt/revision workflow, reviewed additive migration 0006, guarded ledger upgrades, runtime schemas with derived TS contracts and generated JSON Schema. See docs/architecture/practice-persistence.md.
 5. Implemented: bounded FastAPI/Pydantic AI generation, versioned prompts, explicit correction, recent-exercise context, recovery and GitHub Actions. See [active plan](challenge-generation.md) and ADR 0013. The owner selected gpt-6-luna and USD 1 total live evaluation budget; CI remains offline.
-6. Current slice: confirmed solution reveal, durable first-reveal records, attempt assistance snapshots and recent history. See [assistance](../architecture/practice-assistance.md). Sync the merged shared parameter checker with exact upstream provenance.
-7. Next: progressive provider hints and selected-attempt coaching, with explicit source sharing and separately approved live evaluation.
+6. Implemented in PR #10: confirmed solution reveal, durable first-reveal records, attempt assistance snapshots and recent history. See [assistance](../architecture/practice-assistance.md). Sync the merged shared parameter checker with exact upstream provenance.
+7. Current slice: progressive hints, durable requests, bounded retries and assistance snapshots under ADR 0015. Manual gpt-6-luna quality evaluation has a separate USD 1 total cap; CI stays offline.
+8. Next: selected-attempt coaching, with explicit source sharing and separately approved live evaluation.
 
 ## Runner acceptance
 
@@ -28,4 +29,4 @@ The original dirty checkout remains intact. Persistence adds tables without drop
 
 ## Current handoff
 
-PRs #7–#9 delivered the pivot/runner, persistence and bounded generation with offline CI. This branch adds solution reveal and assistance tracking under the existing storage/runtime boundaries. No Python service behavior, provider calls or dependencies change. Migration 0008 is additive and tested only on disposable databases; no existing local database is migrated by this task. Provider hints and selected-attempt coaching remain the next separate slice.
+PRs #7–#10 delivered runner isolation, durable practice, generation/CI and explicit solution reveal. This branch adds progressive hints with migration 0009 and no dependency changes. Only disposable databases are migrated by tests. Coaching is excluded; manual hint-quality evaluation and owner output acceptance remain distinct from deterministic software checks. See [hint ownership, lifecycle and evaluation](../architecture/progressive-hints.md).

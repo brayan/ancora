@@ -54,7 +54,9 @@ class TrustedServerBoundary:
             body.extend(message.get("body", b""))
             if len(body) > 200_000:
                 response = JSONResponse(
-                    {"error": "draft_invalid", "issues": ["request_too_large"]},
+                    {"error": "hint_invalid"}
+                    if scope["path"] == "/v1/hints"
+                    else {"error": "draft_invalid", "issues": ["request_too_large"]},
                     status_code=422,
                 )
                 await response(scope, receive, send)

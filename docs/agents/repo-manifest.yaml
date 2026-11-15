@@ -1,6 +1,6 @@
-version: 0.6
+version: 0.7
 project: ancora
-status: practice-assistance
+status: progressive-hints
 description: Local single-user Python programming practice with generated challenges.
 startup:
   root_guidance: AGENTS.md
@@ -14,6 +14,7 @@ canonical_docs:
   system_overview: docs/architecture/system-overview.md
   practice_persistence: docs/architecture/practice-persistence.md
   practice_assistance: docs/architecture/practice-assistance.md
+  progressive_hints: docs/architecture/progressive-hints.md
   challenge_generation: docs/architecture/challenge-generation.md
   python_conventions: docs/engineering/python-conventions.md
   continuous_integration: docs/engineering/continuous-integration.md
@@ -33,8 +34,8 @@ accepted_stack:
   web: Next.js App Router, React and TypeScript
   product: apps/web owns product orchestration and durable records
   generation: Bounded FastAPI/Pydantic AI service in apps/api; no DB writes
-  persistence: PostgreSQL and Drizzle; additive 0006–0008 with ledger preflight
-  provider: OpenAI; owner selected gpt-6-luna and USD 1 total live-evaluation budget
+  persistence: PostgreSQL and Drizzle; additive 0006–0009 with ledger preflight
+  provider: OpenAI; gpt-6-luna with separate USD 1 generation and hint evaluation caps in their plans
   identity: Local single-user; no login or accounts
   runner: Disposable Pyodide worker on separate loopback static origin
 privacy_boundary: Submitted code and private material must not leak to logs, traces, screenshots, fixtures or eval artifacts.
@@ -88,4 +89,5 @@ adr_index:
   - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
   - docs/adr/0013-bounded-generation-and-automated-checks.md
   - docs/adr/0014-layer-generation-around-a-framework-free-core.md
+  - docs/adr/0015-persist-bounded-progressive-hints.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

@@ -17,7 +17,12 @@ const runner = spawn(process.execPath, ['apps/web/scripts/run-runner.mjs'], {
 
 const require = createRequire(path.join(root, 'apps/web/package.json'));
 const webEnvironment = { ...process.env };
-for (const key of ['OPENAI_API_KEY', 'PRACTICE_MODEL', 'PRACTICE_GENERATION_ENABLED']) {
+for (const key of [
+  'OPENAI_API_KEY',
+  'PRACTICE_MODEL',
+  'PRACTICE_GENERATION_ENABLED',
+  'PRACTICE_HINTS_ENABLED',
+]) {
   delete webEnvironment[key];
 }
 const web = spawn(
@@ -46,6 +51,7 @@ const generation = spawn(
         'PRACTICE_SERVICE_TOKEN',
         'PRACTICE_MODEL',
         'PRACTICE_GENERATION_ENABLED',
+        'PRACTICE_HINTS_ENABLED',
       ].flatMap((key) => (process.env[key] === undefined ? [] : [[key, process.env[key]]]))
     ),
   }

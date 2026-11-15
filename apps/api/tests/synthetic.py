@@ -1,16 +1,77 @@
 """Authored synthetic drafts; never imported by the production provider."""
 
+import asyncio
 import json
 from dataclasses import replace
 
 from ancora.api.mappers.generation import draft_to_domain
 from ancora.api.schemas.generation import ChallengeDraft, GeneratorInput
+from ancora.api.schemas.hints import HintInput
+from ancora.application.hints import HintCommand, HintProvenance, HintResult
 from ancora.application.models import (
     GenerationCommand,
     GenerationResult,
     ModelProvenance,
 )
 from ancora.domain.challenges.models import PythonType
+from ancora.domain.hints.models import Hint
+
+HINT_TEXTS = (
+    "Identify the relationship between the input and expected output in each public example.",
+    "Plan a transformation that preserves the challenge's ordering and mutation rules.",
+    "READ each input value\nAPPLY the stated rule\nBUILD a separate result\nRETURN that result",
+)
+
+
+def hint_input(level: int = 1) -> HintInput:
+    draft = draft_for(generation_input())
+    return HintInput.model_validate(
+        {
+            "schemaVersion": 1,
+            "level": level,
+            "challenge": {
+                "title": draft.title,
+                "objective": draft.objective,
+                "statement": draft.statement,
+                "requirements": draft.requirements,
+                "functionContract": draft.function_contract.model_dump(by_alias=True),
+                "technique": draft.technique,
+                "publicCases": [
+                    {
+                        "id": case.id,
+                        "input": json.loads(case.input_json),
+                        "expected": json.loads(case.expected_json),
+                    }
+                    for case in draft.public_cases
+                ],
+            },
+            "previousHints": list(HINT_TEXTS[: level - 1]),
+        }
+    )
+
+
+class SyntheticHintProvider:
+    available: bool = True
+    model: str = "synthetic-offline"
+
+    def __init__(
+        self,
+        delay_seconds: float = 0.0,
+    ) -> None:
+        self.calls: list[HintCommand] = []
+        self.delay_seconds = delay_seconds
+
+    async def generate(
+        self,
+        command: HintCommand,
+    ) -> HintResult:
+        self.calls.append(command)
+        if self.delay_seconds:
+            await asyncio.sleep(self.delay_seconds)
+        return HintResult(
+            Hint(command.level, HINT_TEXTS[command.level - 1]),
+            HintProvenance("openai", self.model, "programming-hints-v1"),
+        )
 
 
 def draft_for(generation_input: GeneratorInput) -> ChallengeDraft:
