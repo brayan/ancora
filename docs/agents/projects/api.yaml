@@ -19,6 +19,7 @@ allowed_work:
   - API capability routers and independent API/infrastructure Pydantic mappings
   - Complete typed challenge generation and structural/contract validation
   - Bounded correction under the Next.js-owned durable allowance
+  - Public-context hints and explicitly shared saved-attempt coaching under ADRs 0015/0016
   - Versioned wire-schema export and provider adapters
 out_of_scope:
   - Product database writes, independent migrations and account ownership

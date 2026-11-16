@@ -10,6 +10,7 @@ Use narrow checks and synthetic code. The current implementation persists practi
 | pnpm web:typecheck | TypeScript contracts and UI/browser tests. |
 | pnpm contracts:check | Generated JSON Schema matches the canonical runtime schemas; TS contracts derive from those schemas. |
 | pnpm web:test:db | Disposable real PostgreSQL: fresh/legacy migration, draft conflicts, immutable snapshots/revisions, report binding/idempotency and unfinished attempts. |
+| pnpm python:check | Locked Ruff/layout/strict Pyright/Tach checks and offline Python tests, including prohibited-import fixtures. |
 | pnpm web:test | Runner protocol limits/bindings and preserved historical migration checks. |
 | pnpm web:test:browser | Disposable PostgreSQL and installed Google Chrome: saved draft/attempt reload, save/result failures, concurrent tabs, unfinished submissions, Host/Origin/contracts and real Pyodide execution, UI states, Stop/timeout/output/reset, mutation/technique, stale messages, network canary, static server restrictions, malformed-request survival and retired-route checks. |
 | pnpm packages:typecheck | Shared packages. |
@@ -21,10 +22,12 @@ The browser config starts distinct loopback application and runner origins, with
 
 No live LLM calls or private learner data are used. Database and browser tests use real disposable PostgreSQL with synthetic data, never an existing database or volume. Historical SQL checks protect retained migration invariants; they do not claim the retired product remains active. Python source/tests now use Ruff, strict Pyright and pytest through pnpm python:check in the locked uv workspace. Host tests cover validation and safe AST rules, never execution of solutions. No Vitest command exists. JSON Schema exports already exist for the versioned practice HTTP contract. The TypeScript eval CLI still returns an empty scaffold result, not challenge quality evidence.
 
-Solution-reveal checks cover cancellation, lost responses, reload, cross-tab assistance snapshots, immutable first-reveal records, rejected origins, and upgrades from 0006/0007. Progressive-hint checks add wire parity, no-retry mock transports, durable level/identity claims, retry exhaustion, late results, assistance ordering and Chrome reload/recovery. Coaching and privacy-safe telemetry remain later slices. See docs/architecture/runner-spike.md for measured limitations.
+Solution-reveal checks cover cancellation, lost responses, reload, cross-tab assistance snapshots, immutable first-reveal records, rejected origins, and upgrades from 0006/0007. Progressive-hint checks add wire parity, no-retry mock transports, durable level/identity claims, retry exhaustion, late results, assistance ordering and Chrome reload/recovery. Coaching coverage is described below. External telemetry remains deferred. See [runner limits](../architecture/runner-spike.md) for the original measurements.
 
 [Code quality conventions](../engineering/code-quality-conventions.md) distinguish automated checks from contextual paragraph review. Run the latter before checks; a formatter pass does not prove that code is grouped by responsibility.
 
 Generation checks add strict Python source/fixture typing, schema parity and mocked-provider retry tests, real PostgreSQL claim/correction/revision/report lifecycle tests, and Chrome generation/recovery flows. GitHub Actions runs local entry points; see [CI](../engineering/continuous-integration.md). Paid quality evaluation is a separate owner-authorized pilot, never a CI step.
 
 Selected-attempt coaching adds affirmative sharing/cancel/retry, exact saved-source projection, hidden/report-text exclusion, two-dispatch concurrency/recovery, immutable feedback/attempt snapshots, 0009 upgrades, wire parity and Google Chrome reload/keyboard/mobile regressions. All automated inputs/providers are synthetic. Manual coaching quality evaluation remains separately authorized and is not implied by CI.
+
+[V1 completion evidence](v1-completion.md) records the fresh-checkout setup, real migration entrypoint, current full offline/Chrome results and remaining limitations. Run browser checks after a production-build check, rather than sharing `.next` output between concurrent build and development servers.

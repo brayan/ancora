@@ -1,6 +1,6 @@
 # Agent Startup Flow
 
-Current scope is local programming practice under [ADR 0011](../adr/0011-focus-on-local-programming-practice.md). Older account/source/RAG guidance below is historical until replaced by the persistence/generation slices. The current eval CLI is an empty synthetic scaffold, not runner evidence.
+Current scope is local programming practice under ADRs 0011–0016. Accounts, sources, cards and RAG are retired. The eval CLI is an empty synthetic scaffold, not runner or model-quality evidence. [V1 completion](../testing/v1-completion.md) owns current verification and limitations.
 
 Ancora uses compact root guidance plus routing metadata. Agents should start narrow and open only the docs needed for the requested boundary.
 
@@ -18,6 +18,7 @@ Do not read every shard by default. The manifest maps repo paths to one shard so
 ## Routing
 
 - `apps/web`, `apps/web/server`, prompt, schema, `packages/ui`, `packages/shared-types`, and `docs/frontend` work starts with `docs/agents/projects/web.yaml`.
+- `apps/api` starts with `docs/agents/projects/api.yaml` for framework-free core, API/provider boundaries and Python checks.
 - `tools/eval-runner` and `evals` work starts with `docs/agents/projects/eval-runner.yaml`.
 - `scripts`, `.github`, `infra`, and governance-doc work starts with `docs/agents/projects/scripts-ci.yaml`.
 

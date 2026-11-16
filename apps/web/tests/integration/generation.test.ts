@@ -10,6 +10,7 @@ import { Pool } from 'pg';
 import {
   generatorInputSchema,
   generatorOutputSchema,
+  hintOutputSchema,
   type GeneratorInput,
   type GeneratorOutput,
 } from '@ancora/schemas';
@@ -448,7 +449,7 @@ test('should interrupt stale generating reservations when opening a generation a
 });
 
 for (const baseline of [6, 7, 8, 9]) {
-  test(`should retain fixed drafts attempts and migration ledger when upgrading from 000${baseline}`, async () => {
+  test(`should retain drafts attempts assistance and ledger when upgrading from 000${baseline}`, async () => {
     const temporary = await mkdtemp(path.join(os.tmpdir(), 'ancora-generation-upgrade-'));
     const name = `ancora_upgrade_${randomUUID().replaceAll('-', '')}`;
     assert.match(name, /^[a-z0-9_]+$/);
@@ -485,19 +486,74 @@ for (const baseline of [6, 7, 8, 9]) {
         'check',
         attemptId
       );
-      // Use the historical table shape; the current repository requires the assistance migration.
-      await upgrade.query(
-        `INSERT INTO practice_attempts (id, revision_id, source, mode, source_digest, cases_digest, runtime_version)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [
-          attemptId,
+
+      const solutionRevealed = baseline >= 8;
+      const hintLevel = baseline >= 9 ? 1 : 0;
+      if (solutionRevealed) {
+        await upgrade.query('INSERT INTO practice_solution_reveals (revision_id) VALUES ($1)', [
           FIXED_REVISION.revisionId,
-          request.source,
-          'check',
-          request.sourceDigest,
-          request.casesDigest,
-          request.runtimeVersion,
-        ]
+        ]);
+      }
+      if (hintLevel > 0) {
+        const output = hintOutputSchema.parse({
+          schemaVersion: 1,
+          hint: { level: 1, content: 'Synthetic saved hint: compare the public examples.' },
+          model: {
+            provider: 'openai',
+            name: 'synthetic-offline',
+            promptVersion: 'programming-hints-v1',
+            schemaVersion: 1,
+          },
+        });
+        await upgrade.query(
+          `INSERT INTO practice_hint_requests
+           (id, revision_id, level, state, dispatches, output, events)
+           VALUES ($1, $2, 1, 'ready', 1, $3::jsonb, $4::jsonb)`,
+          [
+            randomUUID(),
+            FIXED_REVISION.revisionId,
+            JSON.stringify(output),
+            JSON.stringify([{ dispatch: 1, outcome: 'ready', at: new Date().toISOString() }]),
+          ]
+        );
+      }
+      const reveals = solutionRevealed
+        ? (await upgrade.query('SELECT * FROM practice_solution_reveals')).rows
+        : [];
+      const hints =
+        hintLevel > 0 ? (await upgrade.query('SELECT * FROM practice_hint_requests')).rows : [];
+
+      // Use the historical table shape; the current repository requires the assistance migration.
+      const columns = [
+        'id',
+        'revision_id',
+        'source',
+        'mode',
+        'source_digest',
+        'cases_digest',
+        'runtime_version',
+      ];
+      const values: (string | boolean | number)[] = [
+        attemptId,
+        FIXED_REVISION.revisionId,
+        request.source,
+        'check',
+        request.sourceDigest,
+        request.casesDigest,
+        request.runtimeVersion,
+      ];
+      if (solutionRevealed) {
+        columns.push('solution_revealed');
+        values.push(true);
+      }
+      if (hintLevel > 0) {
+        columns.push('hint_level');
+        values.push(hintLevel);
+      }
+      await upgrade.query(
+        `INSERT INTO practice_attempts (${columns.join(', ')})
+         VALUES (${values.map((_, index) => `$${index + 1}`).join(', ')})`,
+        values
       );
       await upgrade.query(
         'UPDATE practice_attempts SET report = $1::jsonb, completed_at = now() WHERE id = $2',
@@ -521,10 +577,19 @@ for (const baseline of [6, 7, 8, 9]) {
       ).rows[0];
       assert.deepEqual(migrated, {
         ...attempt,
-        solution_revealed: false,
-        hint_level: 0,
+        solution_revealed: solutionRevealed,
+        hint_level: hintLevel,
         coaching_available: false,
       });
+      assert.deepEqual(
+        (await upgrade.query('SELECT * FROM practice_solution_reveals')).rows,
+        reveals
+      );
+      assert.deepEqual((await upgrade.query('SELECT * FROM practice_hint_requests')).rows, hints);
+      const savedAttempt = await upgraded.viewAttempt(attemptId);
+      assert.equal(savedAttempt.solutionRevealed, solutionRevealed);
+      assert.equal(savedAttempt.hintLevel, hintLevel);
+      assert.equal(savedAttempt.coachingAvailable, false);
       assert.deepEqual((await old.revision(FIXED_REVISION.revisionId)).content, FIXED_REVISION);
       const upgradedLedger = await upgrade.query<{ hash: string; created_at: string }>(
         'SELECT hash, created_at FROM drizzle.__drizzle_migrations ORDER BY created_at'

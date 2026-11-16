@@ -90,6 +90,7 @@ try {
         stdio: 'inherit',
         env: {
           NODE_ENV: 'test',
+          PYTHONDONTWRITEBYTECODE: '1',
           PATH: process.env.PATH,
           HOME: process.env.HOME,
           UV_CACHE_DIR: process.env.UV_CACHE_DIR,

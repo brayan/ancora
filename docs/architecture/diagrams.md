@@ -1,7 +1,7 @@
 # Runtime Boundaries
 
-Current synthetic spike: Next.js UI on loopback → dedicated loopback iframe broker → disposable Pyodide worker. Results return as bounded data through the broker to the UI. The worker can fetch only the static runner origin; it cannot reach Next.js, Python service, external network or secrets.
+Execution: Next.js UI on loopback → dedicated loopback iframe broker → disposable Pyodide worker. Fixed and generated challenges use the same isolated boundary. Results return as bounded data through the broker to the UI. The worker can fetch only the static runner origin; it cannot reach Next.js, Python service, external network or secrets.
 
-Planned generation: trusted user action → Next.js lifecycle/budget → authenticated local FastAPI/Pydantic AI → OpenAI. Next.js alone persists records in PostgreSQL/Drizzle. Neither runner results nor Python generation responses assign ready status or execute product actions.
+Generation and requested assistance: explicit learner action → Next.js lifecycle/dispatch allowance → trusted-server-token-protected local FastAPI/Pydantic AI → OpenAI. Coaching additionally requires explicit sharing of one saved attempt. Next.js alone persists records in PostgreSQL/Drizzle. Neither runner results nor Python responses assign ready status or execute product actions. This server token does not introduce learner accounts or login.
 
-See ADR 0011 and runner-spike.md for capability limits and evidence meaning.
+See [the system overview](system-overview.md), [coaching boundary](selected-attempt-coaching.md) and [runner limits](runner-spike.md).

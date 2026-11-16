@@ -4,9 +4,9 @@ ADR 0011 replaces the earlier source-grounded flashcard architecture with local 
 
 | Boundary | Owner and status |
 |---|---|
-| apps/web | Next.js App Router/React/TypeScript UI, browser product boundary and durable generation/practice/hint orchestration. |
+| apps/web | Next.js App Router/React/TypeScript UI, browser product boundary and durable practice/generation/assistance orchestration. |
 | apps/web/runner | Dedicated-origin static browser execution broker and disposable Pyodide worker; v1 fixed and v2 generated contracts. |
-| apps/api | FastAPI/Pydantic AI generator and progressive hints; coaching deferred. No DB writes. |
+| apps/api | FastAPI/Pydantic AI generation, progressive hints and selected-attempt coaching. No DB writes. |
 | apps/web/server/db | PostgreSQL/Drizzle persistence owner for immutable revisions, versioned drafts and exact attempt/assistance snapshots. Historical SQL/snapshots retained. |
 | packages/ui, shared-types, schemas, config | Thin shared UI/contracts/configuration; no hidden product workflows. |
 | prompts, evals, tools/eval-runner | First-class versioned synthetic evidence. The existing CLI smoke is only a scaffold. |

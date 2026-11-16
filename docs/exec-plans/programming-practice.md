@@ -2,31 +2,37 @@
 
 ## Goal and authorization
 
-Owner-approved local single-user pivot; selected Next.js/React/TypeScript + FastAPI/Pydantic AI. Current implementation scope: the completed pivot/runner, persistence and generation/CI slices plus merged solution reveal/tracking and the owner-authorized progressive-hints slice. ADR 0011 is authoritative.
+Ancora's local single-user programming-practice loop is implemented under ADRs 0011–0016. PRs #7–#12 delivered the pivot/runner, persistence, generation/CI, solution reveal, progressive hints and selected-attempt coaching. Next.js/React/TypeScript, FastAPI/Pydantic AI and PostgreSQL/Drizzle remain the accepted stack.
 
-## Sequence
+The owner authorized v1 completion from latest `main`: reconcile current documentation, verify setup and migration upgrades on disposable databases, run complete offline and Google Chrome checks, and fix issues found. Live coaching evaluation is explicitly deferred. Earlier generation/hint budgets do not authorize new calls.
 
-1. Record the pivot, ownership, privacy, content mode and lifecycle. Update manifest/shards/canonical docs.
-2. Remove retired routes, UI, server helpers, contracts, auth dependencies and stale current-product tests. Preserve original checkout, historical SQL/snapshots and database volumes. Pause migration/seed commands pending persistence review.
-3. Prove an isolated, dedicated-origin disposable Pyodide worker with a fixed synthetic exercise, bound messages, Stop/timeouts/output caps/reset, no contamination and blocked application/external requests. Record Chrome evidence and memory/latency limitations.
-4. Implemented in the persistence worktree: fixed-exercise editor + durable draft/attempt/revision workflow, reviewed additive migration 0006, guarded ledger upgrades, runtime schemas with derived TS contracts and generated JSON Schema. See docs/architecture/practice-persistence.md.
-5. Implemented: bounded FastAPI/Pydantic AI generation, versioned prompts, explicit correction, recent-exercise context, recovery and GitHub Actions. See [active plan](challenge-generation.md) and ADR 0013. The owner selected gpt-6-luna and USD 1 total live evaluation budget; CI remains offline.
-6. Implemented in PR #10: confirmed solution reveal, durable first-reveal records, attempt assistance snapshots and recent history. See [assistance](../architecture/practice-assistance.md). Sync the merged shared parameter checker with exact upstream provenance.
-7. Implemented in merged PR #11: progressive hints, durable requests, bounded retries and assistance snapshots under ADR 0015. Manual gpt-6-luna quality evaluation has a separate USD 1 total cap; CI stays offline.
-8. Current slice: selected-attempt coaching with exact saved-source sharing confirmation, durable bounded requests, advisory feedback and immutable assistance snapshots under ADR 0016. CI stays offline; manual live evaluation is not authorized by prior budgets.
+## Implemented capabilities
 
-## Runner acceptance
+| Capability | Owning documentation |
+|---|---|
+| Local product scope and retired features | [ADR 0011](../adr/0011-focus-on-local-programming-practice.md) |
+| Dedicated-origin disposable execution | [Runner boundary and original measurements](../architecture/runner-spike.md) |
+| Immutable revisions, saved drafts/attempts, reload/resume | [Persistence and migration history](../architecture/practice-persistence.md) |
+| Generated challenges, reference validation and explicit correction | [Generation lifecycle](../architecture/challenge-generation.md) |
+| Confirmed reveal and assistance snapshots | [Practice assistance](../architecture/practice-assistance.md) |
+| Progressive hints and bounded retries | [Progressive hints](../architecture/progressive-hints.md) |
+| Coaching with explicit saved-code sharing | [Coaching lifecycle](../architecture/selected-attempt-coaching.md) |
+| Shared conventions, Python layers and offline CI | [Python conventions](../engineering/python-conventions.md) and [CI](../engineering/continuous-integration.md) |
 
-Correct/incorrect/exceptional functions; comprehension false-positive/inconclusive handling; empty/boundary/duplicate/order/mutation cases; infinite loop timeout and Stop; output caps; next-run recovery; reference/learner separation; stale/malformed/oversized message rejection; blocked privileged/paid/external requests even through Python-JS interop; startup/reset timing; bounded memory probe and explicit absence of a hard process quota.
+## V1 completion
 
-## Validation
+1. Align product, architecture, operations, eval, roadmap and agent navigation with implemented capabilities. Preserve ADR history and label earlier slice evidence.
+2. Install frozen pnpm/uv workspaces in a fresh worktree. Review retained migrations before exercising the real migration command on a fresh disposable database, including idempotent reapplication.
+3. Run `pnpm repo:test:pr`, `pnpm python:check` and `pnpm web:test:browser`. Verify fresh/known-legacy and 0006–0009 upgrades, immutable records and assistance preservation. Use only synthetic providers/data and disposable PostgreSQL.
+4. Exercise local startup and the practice UI in installed Google Chrome. Check reload/resume, execution recovery, keyboard/focus and desktop/mobile layout; inspect normal-flow console/network failures.
+5. Fix findings within accepted boundaries, add meaningful regressions for behavior changes and rerun affected checks. Record results and remaining limits in [v1 completion evidence](../testing/v1-completion.md).
 
-Narrow naming/lint/type/unit checks, dedicated real-Chrome browser suite, desktop/mobile keyboard/focus/overflow checks, then repo completion lanes. Governance guards only verify routing/language; the eval scaffold is not Python/runner evidence. Use synthetic code and no live LLM calls. See docs/testing/testing-strategy.md and docs/architecture/runner-spike.md.
+## Completion and limits
 
-## Rollback and publication
+The completion pass verified fresh setup, repeated migrations, the production build, full offline/Chrome checks and ordinary local startup. [V1 completion evidence](../testing/v1-completion.md) records the exact scope and local environment. Historical assistance preservation now has populated upgrade fixtures.
 
-The original dirty checkout remains intact. Persistence adds tables without dropping history; never drop/reset an existing database as rollback. Revert the worktree's task-owned changes to recover this branch; do not reset/delete the original checkout. Custom additive migrations are tested on disposable databases; rollback never resets retained data. Draft PR #6 introduces source ingestion; recommend a new pivot PR rather than silently repurposing it. Do not publish/commit or change that PR without a publication request. Review ADR/product first, removal scope second, runner capability/tests third.
+[The testing strategy](../testing/testing-strategy.md) distinguishes governance, software behavior, browser isolation and model quality. Empty eval smoke cannot establish challenge/coaching quality. Assistance remains separate from behavioral/technique verdicts.
 
-## Current handoff
+Preserve original dirty checkouts, retained SQL/snapshots/journal entries and existing volumes. Do not run schema push, destructive diff generation, resets or migrations against an existing database for this task. Python does not own database writes or execute solutions. No new product scope, runtime dependency or migration is planned.
 
-PRs #7–#11 delivered runner isolation, durable practice, generation/CI, explicit solution reveal and progressive hints. This branch adds selected-attempt coaching with migration 0010 and no dependency changes. Only disposable databases are migrated by tests. See [coaching ownership, sharing and lifecycle](../architecture/selected-attempt-coaching.md). Manual coaching quality evaluation remains separate and deferred; no earlier model/budget is reused.
+Publication requires a separate request. Revert only task-owned changes if needed; do not reset another worktree or delete data. Future improvements remain [roadmap proposals](../roadmap/next-improvements.md).

@@ -1,7 +1,9 @@
 # Cost Model
 
-The runner spike makes no LLM calls. Pyodide executes synthetic code locally with self-hosted pinned assets; the browser suite requires no provider key.
+Fixed practice and browser execution do not call an LLM. Challenge generation, hints and explicitly requested coaching may dispatch paid requests when configured. CI uses synthetic providers with no provider credentials or paid calls.
 
-Before generation evaluations, select an OpenAI model and explicit spending/request/token budget. Record observed usage, prompt/model/runtime versions, request counts and privacy-safe trace references. Prices must be verified when used; unknown cost remains unknown.
+Generation permits one initial dispatch and at most one explicit correction. Hint/coaching requests have their own initial-plus-one-explicit-retry allowance. Framework/SDK/transport retries cannot expand durable allowances. Uncertain dispatches consume allowance; reads/reloads and runner messages cannot trigger a paid retry.
 
-One Generation permits initial dispatch plus at most one correction across every retry layer. Uncertain dispatches consume allowance and are never automatically repeated. Runner messages cannot trigger paid work. Optional assistance has a separate explicit user action and budget.
+Live evaluation requires a separately selected model and explicit total budget before calls. Record observed usage, versions and dispatch outcomes using synthetic inputs; verify current prices before calculating costs. Missing usage/cost remains unknown. Earlier generation/hint budgets were separate completed authorizations, not standing credit.
+
+Live coaching evaluation is deferred for v1 completion; no earlier budget is reused. See [eval strategy](../evals/eval-strategy.md) and [coaching limits](../architecture/selected-attempt-coaching.md).

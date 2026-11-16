@@ -1,5 +1,7 @@
 # Browser Runner Spike
 
+This page retains the original spike decision and dated measurements. The same execution boundary now supports persisted/generated practice and assistance; see [the current system](system-overview.md) and [v1 verification](../testing/v1-completion.md).
+
 ## Scope and decision
 
 One synthetic `positive_even` function exercises the boundary before persistence or live generation. Pyodide 314.0.7 is pinned and served locally from the locked npm dependency. No CDN calls or automatic package loading. FastAPI is not scaffolded, and generated Python is never executed in host Python or a server process.
@@ -24,7 +26,7 @@ Cold asset transfer and fresh-runtime startup are measured separately from funct
 
 ## Reproduction
 
-`pnpm install --frozen-lockfile`, installed Google Chrome, then `pnpm web:test:browser`. Playwright starts both loopback origins itself and refuses to reuse other servers. `pnpm dev` is the manual equivalent. Only synthetic screenshots are saved under ignored test-results; tracing/video are off. Existing database volumes are never opened/reset by these commands.
+For the current full suite, follow [offline setup](../../README.md#offline-verification): frozen pnpm/uv installs, installed Google Chrome and the PostgreSQL image, then `pnpm web:test:browser`. The wrapper creates a disposable database and synthetic Python service; Playwright starts both web/runner origins and refuses existing listeners. `pnpm dev` starts the ordinary local stack and requires a separately migrated practice database. Only synthetic screenshots are saved under ignored test-results; tracing/video are off. Tests never open/reset existing database volumes.
 
 ## Verified local result — 2026-11-13
 
