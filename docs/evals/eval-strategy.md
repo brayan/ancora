@@ -1,95 +1,37 @@
-# Eval Strategy
+# Programming Practice Eval Strategy
 
-Current scope is local programming practice under [ADR 0011](../adr/0011-focus-on-local-programming-practice.md). Older account/source/RAG guidance below is historical until replaced by the persistence/generation slices. The current eval CLI is an empty synthetic scaffold, not runner evidence.
+ADRs 0011–0016 define concept-generated Python practice and requested assistance. Challenges have no fabricated Source/Chunk/citation lineage. Retired source/RAG/flashcard features are not current evaluation targets.
 
-## Status Summary
+## Evidence boundaries
 
-| Status | Scope |
+| Evidence | What it establishes |
 |---|---|
-| Implemented | Evals are a first-class repo boundary with `tools/eval-runner`, `evals`, prompts, schemas, and ADR guidance. |
-| In progress | TypeScript eval runner scaffold and portfolio eval strategy documentation. |
-| Planned | Deterministic smoke evals, citation checks, RAG comparison evals, answer grading evals, report-only quality evals, and artifact sanitation checks. |
-| Deferred | Non-synthetic eval datasets, production user data evals, large benchmark suites, and external judge provider routing. |
+| Offline Python/schema/provider tests | Structural consistency, mapping, bounded dispatches, safe errors and framework-free layering. |
+| Disposable PostgreSQL integration | Immutable records, upgrade preservation, concurrency, recovery and assistance ordering. |
+| Actual Chrome/Pyodide tests | Supported execution behavior, cancellation/reset, message/capability boundaries and UI flows. |
+| `pnpm eval:smoke` | Deterministic metadata from an empty scaffold; no exercise-quality score or execution coverage. |
+| Separately authorized live review | Clarity, semantics, difficulty, progression and solution disclosure for the reviewed samples. |
 
-## Eval Principles
+Reference/test agreement is internal consistency, not independent semantic correctness. Browser reports are untrusted self-study evidence, not hostile-code attestation. Automated provider tests use typed fakes or mocked transports; no paid call belongs in CI.
 
-- Eval inputs must be synthetic or explicitly approved sample material.
-- Reports should use source IDs, chunk IDs, prompt versions, scores, and trace references instead of raw private source text.
-- Deterministic checks should gate regressions before subjective quality scores do.
-- Report-only evals can inform decisions before they become blocking checks.
-- Every prompt or retrieval change should identify which evals need to move with it.
+## Versioned synthetic material
 
-## Deterministic Smoke Evals
+[Programming-practice evals](../../evals/programming-practice/README.md) own generation, hint and coaching inputs/rubrics. [Prompts](../../prompts) own versioned instructions; [schemas](../../packages/schemas/README.md) own wire artifacts. Authored synthetic exercises are test inputs, never the production challenge bank.
 
-| Status | Expected Checks |
-|---|---|
-| Planned | Source chunk IDs are preserved through retrieval and generation. |
-| Planned | Required citations exist for grounded answers and generated cards. |
-| Planned | Retrieval excludes chunks from other accounts. |
-| Planned | Known synthetic questions retrieve expected synthetic chunks. |
-| Planned | Structured outputs pass schema validation. |
-| Planned | Reports omit raw private source text and secrets. |
+- Generation: statement/contract agreement, finite inputs, empty/boundary/duplicate/order/mutation cases, varied function names/types, candidate rejection and explicit correction.
+- Hints: public-only context, progression, faithfulness and bounded disclosure; exclude learner/reference source and hidden cases.
+- Coaching: one explicitly shared synthetic saved attempt, public context and bounded aggregate evidence; advisory output cannot alter code/tests/verdicts. Check semantic accuracy, useful next steps and spoiler/source repetition separately from output shape.
 
-Smoke evals should be small enough to run locally and in CI.
+Host tests may inspect solution ASTs but never execute solutions. Execution belongs only to the isolated browser runner.
 
-## Report-Only Quality Evals
+## Live evaluation and acceptance
 
-Quality evals can be report-only until the scoring rubric is stable. They should capture:
+Generation and hint pilots had separate approved models/budgets and sample acceptance, recorded in the [generation plan](../exec-plans/challenge-generation.md) and [hint evidence](../architecture/progressive-hints.md). Reviewed samples do not prove all future outputs correct.
 
-- Grounding strength.
-- Citation usefulness.
-- Answer correctness against synthetic references.
-- Flashcard clarity and difficulty.
-- Hallucination or unsupported claims.
-- Refusal behavior when source evidence is insufficient.
-- Cost and latency per workflow.
+Live coaching evaluation is explicitly deferred in v1 completion. A later run needs a new exact model ID, maximum total budget and owner review of complete feedback. Do not reuse earlier budgets, infer quality from offline tests or treat model scores as human acceptance. CI stays offline regardless of future manual evaluations.
 
-## Citation Checks
+## Artifact privacy
 
-Citation checks should answer concrete questions:
+Use synthetic or explicitly approved inputs. Keep private material, real submitted source, credentials, raw provider payloads and prompt/completion traces out of fixtures, commits, screenshots and reports. Record bounded IDs, digests, versions, counts and measured usage/durations when available; missing measurements remain unknown. Private review outputs belong only in an explicitly authorized location outside Git.
 
-- Does every grounded answer cite at least one source chunk?
-- Do cited chunk IDs belong to the requesting account?
-- Does the answer avoid claims not supported by retrieved chunks?
-- Are citations attached to generated card versions, not only transient responses?
-- Does the UI have enough citation metadata to explain source provenance without exposing unnecessary private text?
-
-## RAG Comparison Evals
-
-RAG comparison evals should compare changes in retrieval behavior before replacing the simple baseline.
-
-| Comparison | Status |
-|---|---|
-| Direct pgvector retrieval vs tuned query construction | Planned |
-| Top-k settings and score thresholds | Planned |
-| Chunk size and overlap strategies | Planned |
-| Reranking or LangChain.js abstractions | Deferred until baseline evidence exists |
-| Dedicated vector database | Deferred until pgvector limits are demonstrated |
-
-## Answer Grading Evals
-
-Answer grading evals should stay tied to learner outcomes:
-
-- Correctness against synthetic source facts.
-- Completeness for the learner's question.
-- Citation support.
-- Clarity and study usefulness.
-- Appropriate uncertainty when evidence is missing.
-- Safe handling of prompt-injection attempts in source text.
-
-Model-graded evals should be labeled as report-only until rubric reliability is reviewed.
-
-## Artifact Sanitation
-
-Every eval artifact should be safe to commit. Sanitation checks should reject:
-
-- Real private source text.
-- Secrets or API keys.
-- Raw provider payloads that include private content.
-- Trace exports with unredacted prompts or completions.
-- Screenshots containing private material.
-- Non-synthetic datasets unless explicitly approved and documented.
-
-## Eval Handoff Expectations
-
-Future implementation prompts that change retrieval, prompts, generation, grading, or workflow orchestration should update this strategy or explain why it does not apply. Handoffs should report eval commands run, missing commands, and whether failures are product regressions or expected report-only findings.
+Prompt/schema/provider changes must identify affected cases/checks. [V1 completion evidence](../testing/v1-completion.md) records current software validation and limits.

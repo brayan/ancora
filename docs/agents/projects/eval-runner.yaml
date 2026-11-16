@@ -1,5 +1,5 @@
 name: eval-runner
-status: planned
+status: scaffold
 primary_paths:
   - tools/eval-runner
 related_paths:
@@ -7,6 +7,7 @@ related_paths:
   - prompts
 read_first:
   - CONTEXT.md
+  - docs/evals/eval-strategy.md
   - docs/adr/0004-use-openai-as-default-llm-provider.md
   - docs/adr/0007-place-eval-runner-under-services.md
   - docs/adr/0011-focus-on-local-programming-practice.md

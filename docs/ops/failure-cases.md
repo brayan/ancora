@@ -11,6 +11,11 @@
 | Stale job/revision/digest | Reject without changing current results. |
 | Runner network/privileged request | Block through execution-origin policy; never dispatch application actions. |
 | Browser OOM | Hard process quota unavailable; document risk and manual reload recovery. |
-| Future provider timeout | Durable interrupted/unknown state, no silent paid retry. |
+| Provider timeout or lost response | Durable interrupted/unknown state, no silent paid retry; explicit correction/retry uses remaining allowance. |
+| Draft save failure or concurrent-tab conflict | Preserve editor/recovery copies; require an explicit conflict choice. |
+| Generation validation interrupted | Reopen the saved candidate and resume validation; never silently regenerate it. |
+| Hint/coaching unavailable | Keep saved assistance readable; do not dispatch on reads or reload. |
+| Coaching sharing cancelled | Send no source/provider request; preserve the selected attempt and editor. |
+| Unknown/incomplete migration ledger | Refuse migration and require historical review; never reset or infer missing steps. |
 
-See ADR 0011, runner-spike.md and the browser tests. Inputs/screenshots are synthetic.
+See [runner limits](../architecture/runner-spike.md), [persistence](../architecture/practice-persistence.md), [coaching](../architecture/selected-attempt-coaching.md) and [v1 verification](../testing/v1-completion.md). Inputs/screenshots are synthetic.

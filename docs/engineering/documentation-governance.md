@@ -28,7 +28,7 @@ Long-form product, architecture, engineering, frontend, testing, eval, operation
 
 ## Privacy Rules
 
-Private source material must not appear in docs, screenshots, fixtures, eval datasets, commits, or copied logs. Use synthetic examples, source IDs, chunk IDs, card IDs, deck IDs, prompt versions, and trace references.
+Private learning material and submitted code must not appear in docs, screenshots, fixtures, eval datasets, commits, or copied logs. Use synthetic examples and challenge/revision/attempt IDs, digests, prompt/schema/runtime versions and privacy-safe trace references. Do not invent Source/Chunk lineage for concept-generated challenges.
 
 ## Documentation-Only Scope
 

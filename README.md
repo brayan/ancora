@@ -2,19 +2,20 @@
 
 Local Python programming practice. Next.js App Router, React and TypeScript provide a workspace backed by PostgreSQL/Drizzle. FastAPI/Pydantic AI generate complete challenges; a separate static origin runs Python in disposable Pyodide workers.
 
-## Current slice
+## Local v1
 
 Choose a concept and difficulty, generate a challenge, validate its reference in the isolated runner, and explicitly open the ready revision. Drafts, immutable challenge revisions and exact attempts survive reloads. Failed generation preserves the current editor; pending validation can resume, and one correction is an explicit action. Confirmed solution reveal preserves your draft, records the first reveal and marks later attempts as assisted. Requested progressive hints are saved per revision and mark subsequent attempts; they send public challenge context and earlier hints, never your code. Selected-attempt coaching shares only the saved code you explicitly confirm, public context and an aggregate result; saved feedback leaves your draft and verdict intact. The fixed synthetic exercise remains available without a model. No login or accounts are required.
 
 ## Local startup
 
-Requirements: Node 22+, pnpm 10+, uv 0.11.18, Python 3.13, Docker and installed Google Chrome for browser checks.
+Requirements: Node 22+, pnpm 10.8.0, uv 0.11.18, Python 3.13, Docker and ripgrep (`rg`). Browser checks also require installed Google Chrome. CI uses Node 22 and Python 3.13; dependency versions come from the committed locks.
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm python:sync
 pnpm docker:up
-DATABASE_URL=postgresql://ancora:ancora@127.0.0.1:5433/ancora_practice pnpm db:migrate
+export DATABASE_URL=postgresql://ancora:ancora@127.0.0.1:5433/ancora_practice
+pnpm db:migrate
 pnpm dev
 ```
 
@@ -26,16 +27,18 @@ The Python backend lives in [apps/api](apps/api/README.md), with import package 
 
 For generation, export a random `PRACTICE_SERVICE_TOKEN` of at least 32 characters to the trusted web/Python servers, plus `PRACTICE_MODEL=gpt-6-luna`, `OPENAI_API_KEY` and `PRACTICE_GENERATION_ENABLED=1` for Python. Example files list the configuration; Python does not automatically load dotenv files. `pnpm dev` passes provider configuration only to Python and removes credentials from the static runner environment. Without generation configuration, the fixed exercise still works. Enable hint requests independently with `PRACTICE_HINTS_ENABLED=1` in Python. Generating or requesting hints is an explicit paid model action; CI uses a synthetic provider and needs no OpenAI key.
 
+## Offline verification
+
+After the frozen installs above, make the test image available and run the three independent CI lanes:
+
 ```sh
-pnpm code:check
-pnpm contracts:check
-pnpm web:typecheck
-pnpm web:test
-pnpm web:test:db
-pnpm web:test:browser
+docker pull pgvector/pgvector:pg16
 pnpm repo:test:pr
 pnpm python:check
+pnpm web:test:browser
 ```
+
+The repository lane includes conventions, contracts, types, unit tests and disposable database checks. The Python lane includes Ruff, shared layout guards, strict Pyright, Tach and offline pytest. Browser checks use installed Google Chrome and synthetic providers for generation, hints and coaching. The eval CLI smoke is an empty scaffold; it is not model-quality evidence. See [v1 completion evidence](docs/testing/v1-completion.md) for the verified setup, upgrade paths and limitations.
 
 Database/browser test wrappers create disposable PostgreSQL containers with tmpfs and random loopback ports. They never use a supplied DATABASE_URL or an existing volume. Have the project PostgreSQL image available locally first. Browser checks start their own web/runner/synthetic-generation servers and refuse occupied ports; stop a manual preview first. No live provider calls or real learner data belong in CI or test captures.
 
@@ -47,6 +50,7 @@ Database/browser test wrappers create disposable PostgreSQL containers with tmpf
 - [Generation lifecycle](docs/architecture/challenge-generation.md)
 - [Solution reveal and assistance](docs/architecture/practice-assistance.md)
 - [Progressive hints](docs/architecture/progressive-hints.md)
+- [Selected-attempt coaching](docs/architecture/selected-attempt-coaching.md)
 - [Python conventions](docs/engineering/python-conventions.md)
 - [Continuous integration](docs/engineering/continuous-integration.md)
 - [Persistence contract and migration review](docs/architecture/practice-persistence.md)
@@ -55,6 +59,7 @@ Database/browser test wrappers create disposable PostgreSQL containers with tmpf
 - [Runner boundary and limitations](docs/architecture/runner-spike.md)
 - [Code quality and structure rules](docs/engineering/code-quality-conventions.md)
 - [Testing strategy](docs/testing/testing-strategy.md)
+- [Next improvements](docs/roadmap/next-improvements.md)
 
 The runner has no credentials or privileged product helpers. Its results are untrusted self-study evidence; reference/test agreement is only internal consistency. Hard browser-process memory quotas and hostile-code attestation remain unavailable.
 

@@ -1,6 +1,6 @@
-version: 0.8
+version: 0.9
 project: ancora
-status: selected-attempt-coaching
+status: local-v1-verified
 description: Local single-user Python programming practice with generated challenges.
 startup:
   root_guidance: AGENTS.md
@@ -30,6 +30,7 @@ canonical_docs:
   nextjs_naming_convention: docs/frontend/nextjs-naming-convention.md
   test_impact_policy: docs/testing/change-based-test-coverage-policy.md
   testing_strategy: docs/testing/testing-strategy.md
+  v1_completion: docs/testing/v1-completion.md
   eval_strategy: docs/evals/eval-strategy.md
   implementation_plan: docs/exec-plans/programming-practice.md
 accepted_stack:
@@ -37,7 +38,7 @@ accepted_stack:
   product: apps/web owns product orchestration and durable records
   generation: Bounded FastAPI/Pydantic AI service in apps/api; no DB writes
   persistence: PostgreSQL and Drizzle; additive 0006–0010 with ledger preflight
-  provider: OpenAI; gpt-6-luna with separate USD 1 generation and hint evaluation caps in their plans
+  provider: OpenAI; explicit model configuration and separate manual-evaluation authorization
   identity: Local single-user; no login or accounts
   runner: Disposable Pyodide worker on separate loopback static origin
 privacy_boundary: Submitted code and private material must not leak to logs, traces, screenshots, fixtures or eval artifacts.

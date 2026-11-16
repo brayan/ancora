@@ -48,6 +48,7 @@ const generation = spawn(
         'HOME',
         'UV_CACHE_DIR',
         'UV_PYTHON_INSTALL_DIR',
+        'PYTHONDONTWRITEBYTECODE',
         'OPENAI_API_KEY',
         'PRACTICE_SERVICE_TOKEN',
         'PRACTICE_MODEL',
