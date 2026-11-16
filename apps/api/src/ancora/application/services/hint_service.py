@@ -35,12 +35,13 @@ class HintService:
 
         result = await self._provider.generate(command)
         validate_hint(result.hint, command.level)
-        if (
+        has_invalid_hint_result = (
             result.hint.content.strip()
             in [text.strip() for text in command.previous_hints]
             or result.model.name != self._provider.model
             or result.model.provider != "openai"
             or result.model.prompt_version != "programming-hints-v1"
-        ):
+        )
+        if has_invalid_hint_result:
             raise HintInvalid
         return result

@@ -15,12 +15,13 @@ class ApiErrorResponse(BaseModel):
         "provider_interrupted",
         "hint_invalid",
         "hints_unavailable",
+        "coaching_invalid",
+        "coaching_unavailable",
     ]
 
 
 class DraftInvalidResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-
     error: Literal["draft_invalid"]
     issues: Annotated[
         list[Annotated[str, Field(min_length=1, max_length=100)]],

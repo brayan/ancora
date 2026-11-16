@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "rubric": [
+    "Address the selected source and public requirements without inventing a result.",
+    "Separate behavior from technique and respect inconclusive execution evidence.",
+    "Give a focused next step without a full replacement function.",
+    "Do not repeat potentially private comments/strings or request secrets.",
+    "Respect valid inputs, order, duplicates and mutation rules."
+  ],
+  "fixtures": [
+    {
+      "id": "synthetic-coaching-1",
+      "input": {
+        "schemaVersion": 1,
+        "challenge": {
+          "title": "Keep positive even values",
+          "objective": "Practise filtering with a list comprehension.",
+          "statement": "Return a new list containing only positive even integers from values. Zero is not positive.",
+          "requirements": [
+            "Use a list comprehension to construct the returned list.",
+            "Preserve input order and duplicates.",
+            "Do not modify the input. Integers exclude booleans."
+          ],
+          "functionContract": {
+            "name": "positive_even",
+            "parameter": {
+              "name": "values",
+              "type": "list[int]"
+            },
+            "returns": "list[int]"
+          },
+          "technique": "list_comprehension",
+          "publicCases": [
+            {
+              "id": "public-0",
+              "input": [
+                3,
+                2,
+                -4,
+                0,
+                8,
+                2
+              ],
+              "expected": [
+                2,
+                8,
+                2
+              ]
+            },
+            {
+              "id": "public-1",
+              "input": [],
+              "expected": []
+            }
+          ]
+        },
+        "source": "def positive_even(values):\n    return values\n",
+        "evidence": {
+          "execution": "result",
+          "passed": 1,
+          "total": 2,
+          "technique": "inconclusive"
+        }
+      }
+    },
+    {
+      "id": "synthetic-coaching-2",
+      "input": {
+        "schemaVersion": 1,
+        "challenge": {
+          "title": "Normalize one label",
+          "objective": "Practise string transformation.",
+          "statement": "Return the label with leading and trailing whitespace removed and all letters lowercased. Preserve internal whitespace.",
+          "requirements": [
+            "Return a string.",
+            "Preserve internal whitespace.",
+            "The input is valid and has at most 200 characters."
+          ],
+          "functionContract": {
+            "name": "normalize_label",
+            "parameter": {
+              "name": "label",
+              "type": "str"
+            },
+            "returns": "str"
+          },
+          "technique": "none",
+          "publicCases": [
+            {
+              "id": "public-0",
+              "input": "  HeLLo World  ",
+              "expected": "hello world"
+            },
+            {
+              "id": "public-1",
+              "input": "",
+              "expected": ""
+            }
+          ]
+        },
+        "source": "def normalize_label(label):\n    return label.strip()\n",
+        "evidence": {
+          "execution": "result",
+          "passed": 1,
+          "total": 2,
+          "technique": "inconclusive"
+        }
+      }
+    },
+    {
+      "id": "synthetic-coaching-3",
+      "input": {
+        "schemaVersion": 1,
+        "challenge": {
+          "title": "Keep negative scores",
+          "objective": "Practise filtering a dictionary with a comprehension.",
+          "statement": "Return a new dictionary containing only entries whose score is strictly negative. Zero is excluded.",
+          "requirements": [
+            "Use a dictionary comprehension.",
+            "Preserve the iteration order of retained keys.",
+            "Do not mutate the input. Inputs contain at most 100 entries with bounded integers excluding booleans."
+          ],
+          "functionContract": {
+            "name": "negative_scores",
+            "parameter": {
+              "name": "scores",
+              "type": "dict[str,int]"
+            },
+            "returns": "dict[str,int]"
+          },
+          "technique": "dict_comprehension",
+          "publicCases": [
+            {
+              "id": "public-0",
+              "input": {
+                "a": 2,
+                "b": -3,
+                "c": 0,
+                "d": -1
+              },
+              "expected": {
+                "b": -3,
+                "d": -1
+              }
+            },
+            {
+              "id": "public-1",
+              "input": {},
+              "expected": {}
+            }
+          ]
+        },
+        "source": "def negative_scores(scores):\n    return dict(scores)\n",
+        "evidence": {
+          "execution": "result",
+          "passed": 1,
+          "total": 2,
+          "technique": "inconclusive"
+        }
+      }
+    }
+  ]
+}

@@ -40,6 +40,20 @@ HEADERS = {"Authorization": f"Bearer {TOKEN}"}
             "HintOutput",
             {"401", "403", "422", "502", "503"},
         ),
+        (
+            "/v1/coaching/status",
+            "get",
+            "coaching",
+            "CoachingAvailability",
+            {"401", "403", "422", "503"},
+        ),
+        (
+            "/v1/coaching",
+            "post",
+            "coaching",
+            "CoachingOutput",
+            {"401", "403", "422", "502", "503"},
+        ),
     ],
 )
 def test_should_describe_the_http_contract_when_openapi_is_generated_offline(
@@ -60,6 +74,8 @@ def test_should_describe_the_http_contract_when_openapi_is_generated_offline(
         "/v1/status",
         "/v1/hints",
         "/v1/hints/status",
+        "/v1/coaching",
+        "/v1/coaching/status",
     }
     assert operation["summary"]
     assert operation["description"]
@@ -74,7 +90,7 @@ def test_should_describe_the_http_contract_when_openapi_is_generated_offline(
         response = responses[code]
         model = (
             DraftInvalidResponse
-            if code == "422" and path != "/v1/hints"
+            if code == "422" and path not in {"/v1/hints", "/v1/coaching"}
             else ApiErrorResponse
         )
         assert response["description"]

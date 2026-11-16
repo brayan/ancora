@@ -327,6 +327,9 @@
                 "minimum": 0,
                 "maximum": 3
               },
+              "coachingAvailable": {
+                "type": "boolean"
+              },
               "createdAt": {
                 "type": "string",
                 "format": "date-time",
@@ -342,6 +345,7 @@
               "mode",
               "solutionRevealed",
               "hintLevel",
+              "coachingAvailable",
               "createdAt",
               "completed"
             ],
@@ -381,6 +385,9 @@
                   "minimum": 0,
                   "maximum": 3
                 },
+                "coachingAvailable": {
+                  "type": "boolean"
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time",
@@ -408,6 +415,7 @@
                 "mode",
                 "solutionRevealed",
                 "hintLevel",
+                "coachingAvailable",
                 "createdAt",
                 "report"
               ],

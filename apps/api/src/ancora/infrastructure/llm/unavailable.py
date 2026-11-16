@@ -1,3 +1,8 @@
+from ancora.application.coaching import (
+    CoachingCommand,
+    CoachingResult,
+    CoachingUnavailable,
+)
 from ancora.application.errors import GenerationUnavailable
 from ancora.application.hints import HintCommand, HintResult, HintsUnavailable
 from ancora.application.models import GenerationCommand, GenerationResult
@@ -23,3 +28,14 @@ class UnavailableHintProvider:
         command: HintCommand,
     ) -> HintResult:
         raise HintsUnavailable
+
+
+class UnavailableCoachingProvider:
+    available: bool = False
+    model: str | None = None
+
+    async def generate(
+        self,
+        command: CoachingCommand,
+    ) -> CoachingResult:
+        raise CoachingUnavailable

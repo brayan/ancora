@@ -22,6 +22,7 @@ for (const key of [
   'PRACTICE_MODEL',
   'PRACTICE_GENERATION_ENABLED',
   'PRACTICE_HINTS_ENABLED',
+  'PRACTICE_COACHING_ENABLED',
 ]) {
   delete webEnvironment[key];
 }
@@ -52,6 +53,7 @@ const generation = spawn(
         'PRACTICE_MODEL',
         'PRACTICE_GENERATION_ENABLED',
         'PRACTICE_HINTS_ENABLED',
+        'PRACTICE_COACHING_ENABLED',
       ].flatMap((key) => (process.env[key] === undefined ? [] : [[key, process.env[key]]]))
     ),
   }

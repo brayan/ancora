@@ -24,10 +24,12 @@ def normalize_hint_schema(value: object) -> object:
     if "anyOf" in mapping:
         branches: list[object] = []
         for branch in cast(list[object], mapping["anyOf"]):
-            if isinstance(branch, dict) and set(cast(dict[str, object], branch)) == {
-                "anyOf"
-            }:
-                branches.extend(cast(list[object], branch["anyOf"]))
+            is_nested_union = isinstance(branch, dict) and set(
+                cast(dict[str, object], branch)
+            ) == {"anyOf"}
+            if is_nested_union:
+                nested_union = cast(dict[str, object], branch)
+                branches.extend(cast(list[object], nested_union["anyOf"]))
             else:
                 branches.append(cast(object, branch))
         mapping["anyOf"] = branches

@@ -19,6 +19,7 @@ related_paths:
   - pnpm-workspace.yaml
   - pyproject.toml
   - uv.lock
+  - tach.toml
   - .python-version
   - tsconfig.base.json
   - .gitignore

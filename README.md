@@ -4,7 +4,7 @@ Local Python programming practice. Next.js App Router, React and TypeScript prov
 
 ## Current slice
 
-Choose a concept and difficulty, generate a challenge, validate its reference in the isolated runner, and explicitly open the ready revision. Drafts, immutable challenge revisions and exact attempts survive reloads. Failed generation preserves the current editor; pending validation can resume, and one correction is an explicit action. Confirmed solution reveal preserves your draft, records the first reveal and marks later attempts as assisted. Requested progressive hints are saved per revision and mark subsequent attempts; they send public challenge context and earlier hints, never your code. The fixed synthetic exercise remains available without a model. No login or accounts are required.
+Choose a concept and difficulty, generate a challenge, validate its reference in the isolated runner, and explicitly open the ready revision. Drafts, immutable challenge revisions and exact attempts survive reloads. Failed generation preserves the current editor; pending validation can resume, and one correction is an explicit action. Confirmed solution reveal preserves your draft, records the first reveal and marks later attempts as assisted. Requested progressive hints are saved per revision and mark subsequent attempts; they send public challenge context and earlier hints, never your code. Selected-attempt coaching shares only the saved code you explicitly confirm, public context and an aggregate result; saved feedback leaves your draft and verdict intact. The fixed synthetic exercise remains available without a model. No login or accounts are required.
 
 ## Local startup
 
@@ -57,3 +57,5 @@ Database/browser test wrappers create disposable PostgreSQL containers with tmpf
 - [Testing strategy](docs/testing/testing-strategy.md)
 
 The runner has no credentials or privileged product helpers. Its results are untrusted self-study evidence; reference/test agreement is only internal consistency. Hard browser-process memory quotas and hostile-code attestation remain unavailable.
+
+Selected-attempt coaching is independently enabled with `PRACTICE_COACHING_ENABLED=1` in Python. See [sharing, lifecycle and migration 0010](docs/architecture/selected-attempt-coaching.md). CI stays offline; live coaching quality evaluation needs its own model/budget approval.

@@ -85,13 +85,14 @@ def technique_result(
         return "failed"
 
     body = function.body
-    if (
+    returns_comprehension_directly = (
         len(body) == 1
         and isinstance(body[0], ast.Return)
         and isinstance(body[0].value, comprehension)
-    ):
+    )
+    if returns_comprehension_directly:
         return "passed"
-    if (
+    returns_assigned_comprehension = (
         len(body) == 2
         and isinstance(body[0], ast.Assign)
         and len(body[0].targets) == 1
@@ -100,7 +101,8 @@ def technique_result(
         and isinstance(body[1], ast.Return)
         and isinstance(body[1].value, ast.Name)
         and body[1].value.id == body[0].targets[0].id
-    ):
+    )
+    if returns_assigned_comprehension:
         return "passed"
     return "inconclusive"
 

@@ -16,6 +16,7 @@ import { GenerationPanel } from '@/features/programming-practice/components/Gene
 import { PracticeResults } from '@/features/programming-practice/components/PracticeResults';
 import { ReferenceSolution } from '@/features/programming-practice/components/ReferenceSolution';
 import { HintsPanel } from '@/features/programming-practice/components/HintsPanel';
+import { CoachingPanel } from '@/features/programming-practice/components/CoachingPanel';
 import { AttemptHistory } from '@/features/programming-practice/components/AttemptHistory';
 
 type Display = { report: RunnerResponse | null; label: string; source: string | undefined };
@@ -28,13 +29,20 @@ export function PracticeScreen() {
   const [generating, setGenerating] = useState(false);
   const [assisting, setAssisting] = useState(false);
   const [hinting, setHinting] = useState(false);
+  const [coaching, setCoaching] = useState(false);
   const [display, setDisplay] = useState<Display | null>(null);
   const [error, setError] = useState('');
   const submission = useRef<{ id: string; source: string; mode: 'examples' | 'check' } | null>(
     null
   );
   const busy =
-    preparing || runner.busy || generating || assisting || hinting || practice.reportSaving;
+    preparing ||
+    runner.busy ||
+    generating ||
+    assisting ||
+    hinting ||
+    coaching ||
+    practice.reportSaving;
   const available = !['connecting', 'unavailable'].includes(runner.state.status);
   const validSource =
     practice.source.trim().length > 0 && practice.source.length <= MAX_SOURCE_LENGTH;
@@ -171,6 +179,7 @@ export function PracticeScreen() {
               preparing ||
               assisting ||
               hinting ||
+              coaching ||
               runner.busy ||
               practice.reportSaving ||
               !!practice.pendingReport
@@ -382,6 +391,12 @@ export function PracticeScreen() {
               Your last submission has no saved result. Run again to create another attempt.
             </p>
           )}
+          <CoachingPanel
+            key={`coaching:${practice.session.challenge.revisionId}`}
+            attempts={practice.session.attempts}
+            blocked={busy}
+            onBusyChange={setCoaching}
+          />
           <AttemptHistory
             attempts={practice.session.attempts}
             disabled={busy}

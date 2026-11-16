@@ -15,6 +15,9 @@ import type {
   HintOutput,
   HintView,
   HintError,
+  CoachingOutput,
+  CoachingView,
+  CoachingError,
 } from '@ancora/schemas';
 import type { ChallengeView } from '@ancora/shared-types';
 import type { GenericRunnerCase } from '@/runner/protocol.mjs';
@@ -83,6 +86,7 @@ export const practiceAttempts = pgTable('practice_attempts', {
   runtimeVersion: text('runtime_version').notNull(),
   solutionRevealed: boolean('solution_revealed').notNull().default(false),
   hintLevel: integer('hint_level').notNull().default(0),
+  coachingAvailable: boolean('coaching_available').notNull().default(false),
   report: jsonb('report').$type<StoredReport>(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   completedAt: timestamp('completed_at', { withTimezone: true }),
@@ -150,4 +154,29 @@ export const practiceHintRequests = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [uniqueIndex('practice_hint_revision_level_unique').on(table.revisionId, table.level)]
+);
+
+export const practiceCoachingRequests = pgTable(
+  'practice_coaching_requests',
+  {
+    id: text('id').primaryKey(),
+    attemptId: text('attempt_id')
+      .notNull()
+      .references(() => practiceAttempts.id),
+    revisionId: text('revision_id')
+      .notNull()
+      .references(() => practiceRevisions.id),
+    sourceDigest: text('source_digest').notNull(),
+    consentVersion: text('consent_version').$type<'code-sharing-v1'>().notNull(),
+    state: text('state').$type<CoachingView['state']>().notNull(),
+    dispatches: integer('dispatches').notNull(),
+    output: jsonb('output').$type<CoachingOutput>(),
+    error: text('error').$type<CoachingError>(),
+    events: jsonb('events')
+      .$type<{ dispatch: number; outcome: string; at: string; error?: CoachingError }[]>()
+      .notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex('practice_coaching_attempt_unique').on(table.attemptId)]
 );

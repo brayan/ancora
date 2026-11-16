@@ -27,11 +27,12 @@ def normalize(
         definitions = cast(dict[str, object], root["$defs"])
         name = cast(str, mapping["$ref"]).removeprefix("#/$defs/")
         return normalize(definitions[name], root)
-    if (
+    is_integer_constant = (
         "const" in mapping
         and type(mapping["const"]) is int
         and mapping.get("type") == "number"
-    ):
+    )
+    if is_integer_constant:
         mapping = {**mapping, "type": "integer"}
     return {
         key: sorted(cast(list[str], element))

@@ -66,14 +66,16 @@ def _validate_reference(draft: ChallengeDraft) -> None:
         ast.Nonlocal,
     )
     for node in ast.walk(function):
-        if isinstance(node, forbidden) or (
+        has_forbidden_structure = isinstance(node, forbidden) or (
             isinstance(node, ast.FunctionDef) and node is not function
-        ):
+        )
+        if has_forbidden_structure:
             raise DraftInvalid("reference_structure_invalid")
     required = {"list_comprehension": ast.ListComp, "dict_comprehension": ast.DictComp}
-    if draft.technique != "none" and not any(
+    is_required_technique_missing = draft.technique != "none" and not any(
         isinstance(node, required[draft.technique]) for node in ast.walk(function)
-    ):
+    )
+    if is_required_technique_missing:
         raise DraftInvalid("reference_technique_invalid")
 
 

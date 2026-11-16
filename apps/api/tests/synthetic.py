@@ -178,11 +178,12 @@ class SyntheticChallengeProvider:
     ) -> GenerationResult:
         self.calls += 1
         draft = draft_for(generation_input(command.request.concept))
-        if (
+        should_fail_initial_reference = (
             command.request.preferences == "synthetic-invalid-reference"
             and command.request.concept == "strings"
             and command.previous is None
-        ):
+        )
+        if should_fail_initial_reference:
             draft = draft.model_copy(
                 update={
                     "reference_source": 'def retain_letters(value: str) -> str:\n    return ""\n',

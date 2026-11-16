@@ -10,8 +10,10 @@ read_first:
   - docs/engineering/python-conventions.md
   - docs/architecture/challenge-generation.md
   - docs/architecture/progressive-hints.md
+  - docs/architecture/selected-attempt-coaching.md
+  - docs/adr/0016-persist-selected-attempt-coaching.md
   - docs/adr/0015-persist-bounded-progressive-hints.md
-role: Bounded FastAPI/Pydantic AI challenge generation and progressive hints; coaching remains deferred.
+role: Bounded FastAPI/Pydantic AI challenge generation and progressive hints and selected-attempt coaching.
 allowed_work:
   - Framework-free domain/application services and application-owned provider interfaces
   - API capability routers and independent API/infrastructure Pydantic mappings
@@ -23,5 +25,5 @@ out_of_scope:
   - Execution of reference or learner Python
   - Live evaluation before model and spending budget selection
 validation:
-  expected_commands: [pnpm python:lint, pnpm python:format:check, pnpm python:typecheck, pnpm python:test, pnpm contracts:check]
+  expected_commands: [pnpm python:lint, pnpm python:format:check, pnpm python:typecheck, pnpm python:architecture, pnpm python:test, pnpm contracts:check]
   rule: Host tests never execute generated or submitted solutions. Live calls require the selected model and remaining explicit budget.

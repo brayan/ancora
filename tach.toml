@@ -1,0 +1,107 @@
+# First-party boundaries from ADR 0014; third-party core purity is checked by pytest.
+source_roots = ["apps/api/src"]
+exact = true
+root_module = "forbid"
+forbid_circular_dependencies = true
+ignore_type_checking_imports = false
+
+[[modules]]
+path = "ancora"
+depends_on = []
+
+[[modules]]
+path = "ancora.domain"
+depends_on = []
+
+[[modules]]
+path = "ancora.domain.challenges"
+depends_on = []
+
+[[modules]]
+path = "ancora.domain.hints"
+depends_on = ["ancora.domain.challenges"]
+
+[[modules]]
+path = "ancora.domain.coaching"
+depends_on = ["ancora.domain.challenges"]
+
+[[modules]]
+path = "ancora.application"
+depends_on = ["ancora.domain.challenges", "ancora.domain.hints", "ancora.domain.coaching"]
+
+[[modules]]
+path = "ancora.application.interfaces"
+depends_on = ["ancora.application"]
+
+[[modules]]
+path = "ancora.application.services"
+depends_on = [
+    "ancora.application",
+    "ancora.application.interfaces",
+    "ancora.domain.challenges",
+    "ancora.domain.hints",
+    "ancora.domain.coaching",
+]
+
+[[modules]]
+path = "ancora.api"
+depends_on = [
+    "ancora.application",
+    "ancora.application.interfaces",
+    "ancora.application.services",
+    "ancora.domain.challenges",
+    "ancora.domain.hints",
+    "ancora.domain.coaching",
+    "ancora.settings",
+]
+
+[[modules]]
+path = "ancora.infrastructure"
+depends_on = [
+    "ancora.application",
+    "ancora.domain.challenges",
+    "ancora.domain.hints",
+    "ancora.domain.coaching",
+]
+
+[[modules]]
+path = "ancora.settings"
+depends_on = []
+
+[[modules]]
+path = "ancora.bootstrap"
+depends_on = [
+    "ancora.api",
+    "ancora.application.interfaces",
+    "ancora.application.services",
+    "ancora.infrastructure",
+    "ancora.settings",
+]
+
+# Uvicorn loads bootstrap via an import string, not a static Python import.
+[[modules]]
+path = "ancora.main"
+depends_on = []
+
+# Shared challenge models are public; validation internals have narrower consumers.
+[[interfaces]]
+from = ["ancora.domain.challenges"]
+expose = ["models(\\..*)?"]
+visibility = [
+    "ancora.domain.hints",
+    "ancora.domain.coaching",
+    "ancora.application",
+    "ancora.application.services",
+    "ancora.api",
+    "ancora.infrastructure",
+]
+
+[[interfaces]]
+from = ["ancora.domain.challenges"]
+expose = ["errors(\\..*)?", "values(\\..*)?"]
+visibility = ["ancora.application.services", "ancora.api", "ancora.infrastructure"]
+
+[[interfaces]]
+from = ["ancora.domain.challenges"]
+expose = ["rules(\\..*)?"]
+visibility = ["ancora.application.services"]
