@@ -47,6 +47,7 @@
     "python:format:check": "scripts/ci/run-python-checks.sh format",
     "python:typecheck": "scripts/ci/run-python-checks.sh typecheck",
     "python:test": "scripts/ci/run-python-checks.sh test",
+    "python:architecture": "scripts/ci/run-python-checks.sh architecture",
     "python:check": "scripts/ci/run-python-checks.sh all"
   },
   "devDependencies": {

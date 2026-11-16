@@ -20,11 +20,14 @@ Safe errors: `draft_invalid` (422, optional bounded issue codes), `provider_inte
 Focused offline checks:
 
 ```
+pnpm python:architecture
 uv run --frozen --all-packages ruff check apps/api
 uv run --frozen --all-packages ruff format --check apps/api
 uv run --frozen --all-packages pyright apps/api/src apps/api/tests
 uv run --frozen --all-packages pytest apps/api/tests
 ```
+
+The root Tach graph enforces ADR 0014's layers and public interfaces. It also runs in `pnpm python:check` and the existing offline Python CI job. Architecture tests verify deliberately forbidden imports in temporary copies, while separate checks retain the framework-free core guarantee. See [Python conventions](../../docs/engineering/python-conventions.md#architecture-guard) before changing the graph.
 
 For disposable browser integration only, run `uv run --frozen --all-packages python apps/api/tests/serve_synthetic.py` with both `ANCORA_SYNTHETIC_DATABASE=1` and `ANCORA_SYNTHETIC_PROVIDER=1` and a valid service token. This explicit test module injects a typed synthetic generator; it is outside the production package. No provider credentials are needed. Do not use its authored exercises as production content. No database dependencies or code-execution helpers exist here.
 

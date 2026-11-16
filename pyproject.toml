@@ -11,6 +11,7 @@ dev = [
     "pytest==9.2.0",
     "pytest-asyncio==1.5.0",
     "ruff==0.17.5",
+    "tach==0.35.3",
 ]
 
 [tool.uv]
@@ -53,6 +54,6 @@ skip-magic-trailing-comma = false
 [tool.pytest.ini_options]
 testpaths = ["apps/api/tests", "apps/web/tests/python", "scripts/quality/python/tests"]
 pythonpath = ["apps/api/src", "apps/web/runner", "scripts/quality/python"]
-addopts = "--strict-config --strict-markers"
+addopts = "--strict-config --strict-markers -p no:tach"
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"

@@ -54,6 +54,7 @@ command_surface:
     - pnpm python:lint
     - pnpm python:format:check
     - pnpm python:typecheck
+    - pnpm python:architecture
     - pnpm python:test
     - pnpm python:check
     - pnpm web:test:db
@@ -85,7 +86,7 @@ project_shards:
     routes: [tools/eval-runner/**, evals/**]
   - name: scripts-ci
     file: docs/agents/projects/scripts-ci.yaml
-    routes: [scripts/**, docker/**, infra/**, config/**, packages/config/**, docs/**, package.json, Makefile, pnpm-workspace.yaml, pyproject.toml, uv.lock, .python-version, .github/**]
+    routes: [scripts/**, docker/**, infra/**, config/**, packages/config/**, docs/**, package.json, Makefile, pnpm-workspace.yaml, pyproject.toml, uv.lock, tach.toml, .python-version, .github/**]
 adr_index:
   - docs/adr/0011-focus-on-local-programming-practice.md
   - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md

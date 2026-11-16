@@ -25,5 +25,5 @@ out_of_scope:
   - Execution of reference or learner Python
   - Live evaluation before model and spending budget selection
 validation:
-  expected_commands: [pnpm python:lint, pnpm python:format:check, pnpm python:typecheck, pnpm python:test, pnpm contracts:check]
+  expected_commands: [pnpm python:lint, pnpm python:format:check, pnpm python:typecheck, pnpm python:architecture, pnpm python:test, pnpm contracts:check]
   rule: Host tests never execute generated or submitted solutions. Live calls require the selected model and remaining explicit budget.
