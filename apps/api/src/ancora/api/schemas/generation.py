@@ -5,18 +5,9 @@ from typing import Annotated, Literal
 from pydantic import AfterValidator, BaseModel, BeforeValidator, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
-from ancora.domain.challenges.models import (
-    Concept,
-    Difficulty,
-    PythonType,
-    Technique,
-)
+from ancora.challenges.domain.models import Concept, Difficulty, PythonType, Technique
 
-
-def _strict_version(value: object) -> object:
-    if type(value) not in (int, float):
-        raise ValueError("schema version must be numeric")
-    return value
+PythonName = Annotated[str, Field(pattern=r"^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$")]
 
 
 def wire_text_limit(maximum: int) -> AfterValidator:
@@ -29,15 +20,48 @@ def wire_text_limit(maximum: int) -> AfterValidator:
     return AfterValidator(validate)
 
 
+Requirement = Annotated[str, Field(max_length=500, min_length=1), wire_text_limit(500)]
+
+
+def _strict_version(value: object) -> object:
+    if type(value) not in (int, float):
+        raise ValueError("schema version must be numeric")
+    return value
+
+
 Version = Annotated[Literal[1], BeforeValidator(_strict_version)]
-PythonName = Annotated[str, Field(pattern=r"^(?!__)[A-Za-z_][A-Za-z0-9_]{0,39}$")]
-Requirement = Annotated[str, Field(min_length=1, max_length=500), wire_text_limit(500)]
 
 
 class WireModel(BaseModel):
     model_config = ConfigDict(
-        extra="forbid", strict=True, alias_generator=to_camel, regex_engine="python-re"
+        alias_generator=to_camel, extra="forbid", regex_engine="python-re", strict=True
     )
+
+
+class GeneratedCase(WireModel):
+    expected_json: Annotated[
+        str, Field(max_length=6000, min_length=1), wire_text_limit(6000)
+    ]
+    id: Annotated[str, Field(pattern=r"^[A-Za-z0-9_-]{1,40}$")]
+    input_json: Annotated[
+        str, Field(max_length=6000, min_length=1), wire_text_limit(6000)
+    ]
+
+
+class GenerationRequest(WireModel):
+    concept: Concept
+    difficulty: Difficulty
+    goal: Annotated[str, Field(max_length=300, min_length=1), wire_text_limit(300)]
+    language: Literal["python"]
+    preferences: Annotated[str, Field(max_length=300), wire_text_limit(300)]
+    target_minutes: Annotated[int, Field(ge=5, le=30)]
+
+
+class ModelProvenance(WireModel):
+    name: Annotated[str, Field(max_length=100, min_length=1), wire_text_limit(100)]
+    prompt_version: Literal["programming-practice-v1"]
+    provider: Literal["openai"]
+    schema_version: Version
 
 
 class Parameter(WireModel):
@@ -51,67 +75,41 @@ class FunctionContract(WireModel):
     returns: PythonType
 
 
-class GenerationRequest(WireModel):
-    language: Literal["python"]
-    concept: Concept
-    difficulty: Difficulty
-    goal: Annotated[str, Field(min_length=1, max_length=300), wire_text_limit(300)]
-    target_minutes: Annotated[int, Field(ge=5, le=30)]
-    preferences: Annotated[str, Field(max_length=300), wire_text_limit(300)]
-
-
-class GeneratedCase(WireModel):
-    id: Annotated[str, Field(pattern=r"^[A-Za-z0-9_-]{1,40}$")]
-    input_json: Annotated[
-        str, Field(min_length=1, max_length=6000), wire_text_limit(6000)
-    ]
-    expected_json: Annotated[
-        str, Field(min_length=1, max_length=6000), wire_text_limit(6000)
-    ]
-
-
 class ChallengeDraft(WireModel):
-    schema_version: Version
-    title: Annotated[str, Field(min_length=1, max_length=200), wire_text_limit(200)]
+    check_cases: Annotated[list[GeneratedCase], Field(max_length=8, min_length=3)]
     concept: Concept
+    constraints: Annotated[list[Requirement], Field(max_length=10, min_length=1)]
     difficulty: Difficulty
-    objective: Annotated[str, Field(min_length=1, max_length=500), wire_text_limit(500)]
-    statement: Annotated[
-        str, Field(min_length=1, max_length=4000), wire_text_limit(4000)
-    ]
     function_contract: FunctionContract
-    requirements: Annotated[list[Requirement], Field(min_length=1, max_length=12)]
-    constraints: Annotated[list[Requirement], Field(min_length=1, max_length=10)]
-    technique: Technique
-    public_cases: Annotated[list[GeneratedCase], Field(min_length=2, max_length=4)]
-    check_cases: Annotated[list[GeneratedCase], Field(min_length=3, max_length=8)]
+    objective: Annotated[str, Field(max_length=500, min_length=1), wire_text_limit(500)]
+    public_cases: Annotated[list[GeneratedCase], Field(max_length=4, min_length=2)]
     reference_source: Annotated[
-        str, Field(min_length=1, max_length=12000), wire_text_limit(12000)
+        str, Field(max_length=12000, min_length=1), wire_text_limit(12000)
     ]
+    requirements: Annotated[list[Requirement], Field(max_length=12, min_length=1)]
+    schema_version: Version
+    statement: Annotated[
+        str, Field(max_length=4000, min_length=1), wire_text_limit(4000)
+    ]
+    technique: Technique
+    title: Annotated[str, Field(max_length=200, min_length=1), wire_text_limit(200)]
 
 
 class GeneratorInput(WireModel):
-    schema_version: Version
-    request: GenerationRequest
-    previous: ChallengeDraft | None
     feedback: Annotated[
         list[Annotated[str, Field(max_length=100), wire_text_limit(100)]],
         Field(max_length=10),
     ]
+    previous: ChallengeDraft | None
     recent_exercises: Annotated[
         list[Annotated[str, Field(max_length=200), wire_text_limit(200)]],
         Field(max_length=5),
     ]
-
-
-class ModelProvenance(WireModel):
-    provider: Literal["openai"]
-    name: Annotated[str, Field(min_length=1, max_length=100), wire_text_limit(100)]
-    prompt_version: Literal["programming-practice-v1"]
+    request: GenerationRequest
     schema_version: Version
 
 
 class GeneratorOutput(WireModel):
-    schema_version: Version
     draft: ChallengeDraft
     model: ModelProvenance
+    schema_version: Version

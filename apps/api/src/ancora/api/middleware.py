@@ -6,7 +6,7 @@ from starlette.datastructures import Headers
 from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-from ancora.settings import Settings
+from ancora.config.settings import Settings
 
 
 class TrustedServerBoundary:

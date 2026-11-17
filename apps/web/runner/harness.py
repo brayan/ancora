@@ -11,30 +11,6 @@ Technique = Literal["none", "list_comprehension", "dict_comprehension"]
 TechniqueResult = Literal["passed", "failed", "inconclusive", "not_required"]
 
 
-class ParameterContract(TypedDict):
-    name: str
-    type: PythonType
-
-
-class FunctionContract(TypedDict):
-    name: str
-    parameter: ParameterContract
-    returns: PythonType
-
-
-class RunnerCase(TypedDict):
-    id: str
-    input: object
-    expected: object
-
-
-class CaseResult(TypedDict):
-    id: str
-    passed: bool
-    actual: object
-    mutated: bool
-
-
 def declared_function(
     tree: ast.Module,
     name: str,
@@ -45,6 +21,24 @@ def declared_function(
         if isinstance(node, ast.FunctionDef) and node.name == name
     ]
     return functions[0] if len(functions) == 1 else None
+
+
+class CaseResult(TypedDict):
+    actual: object
+    id: str
+    mutated: bool
+    passed: bool
+
+
+class ParameterContract(TypedDict):
+    name: str
+    type: PythonType
+
+
+class FunctionContract(TypedDict):
+    name: str
+    parameter: ParameterContract
+    returns: PythonType
 
 
 def contract_matches(
@@ -157,40 +151,60 @@ def same_case_value(
     return actual == expected
 
 
-def evaluate(
-    source: str,
-    cases: list[RunnerCase],
-    required: Technique,
-    contract: FunctionContract | None = None,
-) -> str:
-    outcomes: list[CaseResult] = []
-    technique: TechniqueResult = "inconclusive"
-    function_name = contract["name"] if contract else "positive_even"
-    try:
+class RunnerCase(TypedDict):
+    expected: object
+    id: str
+    input: object
+
+
+class RunnerEvaluation:
+    """Keep case evidence while the browser adapter owns execution and exceptions."""
+
+    def __init__(
+        self,
+        cases: list[RunnerCase],
+        required: Technique,
+        contract: FunctionContract | None = None,
+    ) -> None:
+        self.cases = cases
+        self.required: Technique = required
+        self.contract = contract
+        self.function_name = contract["name"] if contract else "positive_even"
+        self.outcomes: list[CaseResult] = []
+        self.technique: TechniqueResult = "inconclusive"
+
+    def prepare(
+        self,
+        source: str,
+    ) -> dict[str, object]:
         tree = ast.parse(source)
-        technique = technique_result(tree, required, function_name)
-        if contract is not None and not contract_matches(tree, contract):
+        self.technique = technique_result(tree, self.required, self.function_name)
+        if self.contract is not None and not contract_matches(tree, self.contract):
             raise ValueError("Define exactly the declared function and parameter.")
 
-        namespace: dict[str, object] = {}
-        # This entry point is invoked only in the disposable, network-restricted browser worker.
-        exec(compile(tree, "<solution>", "exec"), namespace)  # noqa: S102
-        candidate = namespace.get(function_name)
+        # Pyodide executes only after preflight, in this fresh solution namespace.
+        return {}
+
+    def check(
+        self,
+        namespace: dict[str, object],
+    ) -> None:
+        candidate = namespace.get(self.function_name)
         if not callable(candidate):
-            raise TypeError(f"Define {function_name} with its declared parameter.")
+            raise TypeError(f"Define {self.function_name} with its declared parameter.")
         # The runtime call boundary follows the callable check; result data stays untrusted.
         function = cast(Callable[[object], object], candidate)
 
-        for case in cases:
+        for case in self.cases:
             values = copy.deepcopy(case["input"])
             actual = function(values)
             mutated = not same_case_value(values, case["input"])
             supported = supported_value(
                 actual,
-                contract["returns"] if contract else "list[int]",
-                100 if contract else 1000,
+                self.contract["returns"] if self.contract else "list[int]",
+                100 if self.contract else 1000,
             )
-            outcomes.append(
+            self.outcomes.append(
                 {
                     "id": case["id"],
                     "passed": supported
@@ -201,13 +215,18 @@ def evaluate(
                 }
             )
 
-        return json.dumps({"cases": outcomes, "technique": technique, "error": None})
-    # Learner SystemExit/KeyboardInterrupt must become bounded reports too.
-    except BaseException as error:  # noqa: BLE001
+    def report(
+        self,
+        error: BaseException | None = None,
+    ) -> str:
         return json.dumps(
             {
-                "cases": outcomes,
-                "technique": technique,
-                "error": f"{type(error).__name__}: {str(error)[:900]}",
+                "cases": self.outcomes,
+                "technique": self.technique,
+                "error": (
+                    f"{type(error).__name__}: {str(error)[:900]}"
+                    if error is not None
+                    else None
+                ),
             }
         )

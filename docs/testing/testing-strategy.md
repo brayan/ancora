@@ -5,12 +5,12 @@ Use narrow checks and synthetic code. The current implementation persists practi
 | Command | Evidence |
 |---|---|
 | pnpm code:check | Shared formatting, braces, test naming and web naming/import/architecture/size policies. |
-| pnpm quality:test | Positive/negative convention fixtures, including malformed structure, imports and stale size exceptions. |
+| pnpm quality:test | Positive/negative convention fixtures and Python wrapper commands/scopes/failure propagation. |
 | pnpm web:lint | Web naming, imports, architecture, size and ESLint for app/static delivery. |
 | pnpm web:typecheck | TypeScript contracts and UI/browser tests. |
 | pnpm contracts:check | Generated JSON Schema matches the canonical runtime schemas; TS contracts derive from those schemas. |
 | pnpm web:test:db | Disposable real PostgreSQL: fresh/legacy migration, draft conflicts, immutable snapshots/revisions, report binding/idempotency and unfinished attempts. |
-| pnpm python:check | Locked Ruff/layout/strict Pyright/Tach checks and offline Python tests, including prohibited-import fixtures. |
+| pnpm python:check | Locked Ruff/layout/ordering/suppression/strict Pyright checks, exact Tach graph/shared domain guard, installed-artifact checks and offline behavior/import regressions. |
 | pnpm web:test | Runner protocol limits/bindings and preserved historical migration checks. |
 | pnpm web:test:browser | Disposable PostgreSQL and installed Google Chrome: saved draft/attempt reload, save/result failures, concurrent tabs, unfinished submissions, Host/Origin/contracts and real Pyodide execution, UI states, Stop/timeout/output/reset, mutation/technique, stale messages, network canary, static server restrictions, malformed-request survival and retired-route checks. |
 | pnpm packages:typecheck | Shared packages. |
@@ -21,6 +21,10 @@ Use narrow checks and synthetic code. The current implementation persists practi
 The browser config starts distinct loopback application and runner origins, without reusing existing servers. Install dependencies with `pnpm install --frozen-lockfile` and `pnpm python:sync`; Google Chrome must be installed. Chrome screenshots in ignored test-results contain only synthetic exercises. Traces/videos are off so future private code is not captured by default.
 
 No live LLM calls or private learner data are used. Database and browser tests use real disposable PostgreSQL with synthetic data, never an existing database or volume. Historical SQL checks protect retained migration invariants; they do not claim the retired product remains active. Python source/tests now use Ruff, strict Pyright and pytest through pnpm python:check in the locked uv workspace. Host tests cover validation and safe AST rules, never execution of solutions. No Vitest command exists. JSON Schema exports already exist for the versioned practice HTTP contract. The TypeScript eval CLI still returns an empty scaffold result, not challenge quality evidence.
+
+Shared Python checker implementation/fixtures live in engineering-playbook. Ancora verifies the installed wheel/version, wrapper orchestration and actual import boundaries without duplicating those fixtures. The external-domain guard covers direct/from/`TYPE_CHECKING` imports; local tests retain application purity and whole-core imports without site packages. Chrome covers Python parsing/compilation/module/case errors, custom base exceptions, partial results, bounded messages, formatting failure and subsequent-run recovery through the browser adapter.
+
+[Python standards alignment evidence](python-standards-alignment.md) records the reviewed package adoption, behavior-preserving ordering and browser boundary refactor, with downstream offline/Chrome results. Earlier dated evidence retains its original fixture counts.
 
 Solution-reveal checks cover cancellation, lost responses, reload, cross-tab assistance snapshots, immutable first-reveal records, rejected origins, and upgrades from 0006/0007. Progressive-hint checks add wire parity, no-retry mock transports, durable level/identity claims, retry exhaustion, late results, assistance ordering and Chrome reload/recovery. Coaching coverage is described below. External telemetry remains deferred. See [runner limits](../architecture/runner-spike.md) for the original measurements.
 

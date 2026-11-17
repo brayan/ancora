@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from ancora.api.dependencies import HintGenerator, HintProviderDependency
+from ancora.api.dependencies.hints import HintGenerator, HintProviderDependency
 from ancora.api.mappers.hints import command_from_request, response_from_result
 from ancora.api.responses import TRUSTED_SERVER_RESPONSES
 from ancora.api.schemas.errors import ApiErrorResponse
@@ -11,9 +11,9 @@ router = APIRouter(tags=["hints"])
 
 @router.get(
     "/hints/status",
-    summary="Read hint availability",
     response_model=HintAvailability,
     responses=TRUSTED_SERVER_RESPONSES,
+    summary="Read hint availability",
 )
 async def status(provider: HintProviderDependency) -> HintAvailability:
     """Read hint configuration without a provider call or product writes.
@@ -26,9 +26,8 @@ async def status(provider: HintProviderDependency) -> HintAvailability:
 
 @router.post(
     "/hints",
-    summary="Generate one progressive hint",
-    response_model=HintOutput,
     response_description="A bounded hint and provider provenance; no verdict or solution.",
+    response_model=HintOutput,
     responses={
         **TRUSTED_SERVER_RESPONSES,
         422: {
@@ -51,6 +50,7 @@ async def status(provider: HintProviderDependency) -> HintAvailability:
             },
         },
     },
+    summary="Generate one progressive hint",
 )
 async def generate(
     payload: HintInput,

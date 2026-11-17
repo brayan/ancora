@@ -226,6 +226,93 @@ test('should distinguish behavior from technique when functions are wrong or use
   expect(error.type === 'result' && error.error).toContain('ValueError');
 });
 
+for (const scenario of [
+  {
+    phase: 'parsing',
+    source: 'def positive_even(values):\n    return [\n',
+    error: 'SyntaxError:',
+    completed: 0,
+  },
+  {
+    phase: 'compilation',
+    source: `return []\n${REFERENCE_CODE}`,
+    error: 'SyntaxError:',
+    completed: 0,
+  },
+  {
+    phase: 'module execution',
+    source: `raise SystemExit('Synthetic exit')\n${REFERENCE_CODE}`,
+    error: 'SystemExit: Synthetic exit',
+    completed: 0,
+  },
+  {
+    phase: 'case checking',
+    source:
+      "def positive_even(values):\n    if not values:\n        raise KeyboardInterrupt('Synthetic interrupt')\n    return [x for x in values if x > 0 and x % 2 == 0]\n",
+    error: 'KeyboardInterrupt: Synthetic interrupt',
+    completed: 1,
+  },
+  {
+    phase: 'custom learner exception',
+    source:
+      "def positive_even(values):\n    class SyntheticAbort(BaseException):\n        pass\n    raise SyntheticAbort('Synthetic abort')\n",
+    error: 'SyntheticAbort: Synthetic abort',
+    completed: 0,
+  },
+]) {
+  test(`should return bounded evidence and recover when ${scenario.phase} raises`, async ({
+    page,
+  }) => {
+    await ready(page);
+
+    const report = await execute(page, scenario.source);
+
+    expect(report.type).toBe('result');
+    if (report.type !== 'result') {
+      throw new Error('Expected a learner error report');
+    }
+    expect(report.error).toContain(scenario.error);
+    expect(report.error).not.toContain('Traceback');
+    expect(report.error).not.toContain('def positive_even');
+    expect(report.cases).toHaveLength(scenario.completed);
+    expect(report.cases.every((item) => item.passed)).toBe(true);
+    expect(successful(await execute(page, REFERENCE_CODE)).cases.every((item) => item.passed)).toBe(
+      true
+    );
+  });
+}
+
+test('should cap learner error text when the browser adapter formats a Python exception', async ({
+  page,
+}) => {
+  await ready(page);
+
+  const report = await execute(
+    page,
+    "def positive_even(values):\n    raise ValueError('x' * 2000)\n"
+  );
+
+  expect(report.type === 'result' && report.error).toBe(`ValueError: ${'x'.repeat(900)}`);
+  expect(successful(await execute(page, REFERENCE_CODE)).cases.every((item) => item.passed)).toBe(
+    true
+  );
+});
+
+test('should fail safely and recover when a learner exception cannot be formatted', async ({
+  page,
+}) => {
+  await ready(page);
+  const source =
+    'def positive_even(values):\n    class SyntheticFailure(Exception):\n        def __str__(self):\n            raise RuntimeError("Synthetic formatting failure")\n    raise SyntheticFailure()\n';
+
+  const report = await execute(page, source);
+
+  expect(report.type === 'failure' && report.code).toBe('execution_error');
+  expect(successful(await execute(page, REFERENCE_CODE)).cases.every((item) => item.passed)).toBe(
+    true
+  );
+});
+
 test('should stop loops and cap output when execution exceeds limits then recover', async ({
   page,
 }) => {

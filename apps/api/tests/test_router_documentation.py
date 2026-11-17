@@ -1,7 +1,7 @@
 import pytest
 from ancora.api.schemas.errors import ApiErrorResponse, DraftInvalidResponse
 from ancora.bootstrap import create_app
-from ancora.settings import Settings
+from ancora.config.settings import Settings
 from fastapi.testclient import TestClient
 from synthetic import SyntheticChallengeProvider
 
@@ -114,6 +114,21 @@ def test_should_keep_documentation_routes_disabled_when_router_metadata_is_added
     assert provider.calls == 0
 
 
+def test_should_match_documented_body_limit_error_when_a_status_request_is_oversized() -> (
+    None
+):
+    provider = SyntheticChallengeProvider()
+    with TestClient(create_app(Settings(service_token=TOKEN), provider)) as client:
+        response = client.request(
+            "GET", "/v1/status", content="x" * 200001, headers=HEADERS
+        )
+
+    assert response.status_code == 422
+    error = DraftInvalidResponse.model_validate(response.json())
+    assert error.issues == ["request_too_large"]
+    assert provider.calls == 0
+
+
 def test_should_return_configured_availability_without_dispatch_when_status_is_read() -> (
     None
 ):
@@ -131,18 +146,3 @@ def test_should_return_false_availability_when_generation_is_disabled() -> None:
 
     assert response.status_code == 200
     assert response.json() == {"available": False, "model": None}
-
-
-def test_should_match_documented_body_limit_error_when_a_status_request_is_oversized() -> (
-    None
-):
-    provider = SyntheticChallengeProvider()
-    with TestClient(create_app(Settings(service_token=TOKEN), provider)) as client:
-        response = client.request(
-            "GET", "/v1/status", headers=HEADERS, content="x" * 200001
-        )
-
-    assert response.status_code == 422
-    error = DraftInvalidResponse.model_validate(response.json())
-    assert error.issues == ["request_too_large"]
-    assert provider.calls == 0

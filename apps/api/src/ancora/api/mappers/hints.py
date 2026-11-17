@@ -1,31 +1,34 @@
 from ancora.api.schemas import hints as schemas
-from ancora.application.hints import HintCommand, HintResult
-from ancora.domain.challenges.models import ExampleCase, FunctionContract, Parameter
-from ancora.domain.hints.models import HintChallenge
+from ancora.challenges.domain.models import ExampleCase, FunctionContract, Parameter
+from ancora.hints.application.models import HintCommand, HintResult
+from ancora.hints.domain.models import HintChallenge
 
 
 def command_from_request(payload: schemas.HintInput) -> HintCommand:
     challenge = payload.challenge
     contract = challenge.function_contract
+    function_contract = FunctionContract(
+        name=contract.name,
+        parameter=Parameter(contract.parameter.name, contract.parameter.type),
+        returns=contract.returns,
+    )
+    requirements = tuple(challenge.requirements)
+    public_cases = tuple(
+        ExampleCase(case.id, case.input, case.expected)
+        for case in challenge.public_cases
+    )
+    public_challenge = HintChallenge(
+        function_contract=function_contract,
+        objective=challenge.objective,
+        public_cases=public_cases,
+        requirements=requirements,
+        statement=challenge.statement,
+        technique=challenge.technique,
+        title=challenge.title,
+    )
+    previous_hints = tuple(payload.previous_hints)
     return HintCommand(
-        challenge=HintChallenge(
-            title=challenge.title,
-            objective=challenge.objective,
-            statement=challenge.statement,
-            function_contract=FunctionContract(
-                name=contract.name,
-                parameter=Parameter(contract.parameter.name, contract.parameter.type),
-                returns=contract.returns,
-            ),
-            requirements=tuple(challenge.requirements),
-            technique=challenge.technique,
-            public_cases=tuple(
-                ExampleCase(case.id, case.input, case.expected)
-                for case in challenge.public_cases
-            ),
-        ),
-        level=payload.level,
-        previous_hints=tuple(payload.previous_hints),
+        challenge=public_challenge, level=payload.level, previous_hints=previous_hints
     )
 
 

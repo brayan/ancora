@@ -7,14 +7,14 @@ from dataclasses import replace
 from ancora.api.mappers.generation import draft_to_domain
 from ancora.api.schemas.generation import ChallengeDraft, GeneratorInput
 from ancora.api.schemas.hints import HintInput
-from ancora.application.hints import HintCommand, HintProvenance, HintResult
-from ancora.application.models import (
+from ancora.challenges.application.models import (
     GenerationCommand,
     GenerationResult,
     ModelProvenance,
 )
-from ancora.domain.challenges.models import PythonType
-from ancora.domain.hints.models import Hint
+from ancora.challenges.domain.models import PythonType
+from ancora.hints.application.models import HintCommand, HintProvenance, HintResult
+from ancora.hints.domain.models import Hint
 
 HINT_TEXTS = (
     "Identify the relationship between the input and expected output in each public example.",
@@ -48,30 +48,6 @@ def hint_input(level: int = 1) -> HintInput:
             "previousHints": list(HINT_TEXTS[: level - 1]),
         }
     )
-
-
-class SyntheticHintProvider:
-    available: bool = True
-    model: str = "synthetic-offline"
-
-    def __init__(
-        self,
-        delay_seconds: float = 0.0,
-    ) -> None:
-        self.calls: list[HintCommand] = []
-        self.delay_seconds = delay_seconds
-
-    async def generate(
-        self,
-        command: HintCommand,
-    ) -> HintResult:
-        self.calls.append(command)
-        if self.delay_seconds:
-            await asyncio.sleep(self.delay_seconds)
-        return HintResult(
-            Hint(command.level, HINT_TEXTS[command.level - 1]),
-            HintProvenance("openai", self.model, "programming-hints-v1"),
-        )
 
 
 def draft_for(generation_input: GeneratorInput) -> ChallengeDraft:
@@ -194,4 +170,28 @@ class SyntheticChallengeProvider:
                 draft_to_domain(draft), difficulty=command.request.difficulty
             ),
             model=ModelProvenance("openai", self.model, "programming-practice-v1"),
+        )
+
+
+class SyntheticHintProvider:
+    available: bool = True
+    model: str = "synthetic-offline"
+
+    def __init__(
+        self,
+        delay_seconds: float = 0.0,
+    ) -> None:
+        self.calls: list[HintCommand] = []
+        self.delay_seconds = delay_seconds
+
+    async def generate(
+        self,
+        command: HintCommand,
+    ) -> HintResult:
+        self.calls.append(command)
+        if self.delay_seconds:
+            await asyncio.sleep(self.delay_seconds)
+        return HintResult(
+            Hint(command.level, HINT_TEXTS[command.level - 1]),
+            HintProvenance("openai", self.model, "programming-hints-v1"),
         )

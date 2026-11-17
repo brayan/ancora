@@ -1,4 +1,4 @@
-# First-party boundaries from ADR 0014; third-party core purity is checked by pytest.
+# ADR 0017: exact capability boundaries; external domain imports are checked separately.
 source_roots = ["apps/api/src"]
 exact = true
 root_module = "forbid"
@@ -10,98 +10,96 @@ path = "ancora"
 depends_on = []
 
 [[modules]]
-path = "ancora.domain"
+path = "ancora.config"
 depends_on = []
 
 [[modules]]
-path = "ancora.domain.challenges"
+path = "ancora.shared.application"
 depends_on = []
 
 [[modules]]
-path = "ancora.domain.hints"
-depends_on = ["ancora.domain.challenges"]
+path = "ancora.challenges.domain"
+depends_on = []
 
 [[modules]]
-path = "ancora.domain.coaching"
-depends_on = ["ancora.domain.challenges"]
+path = "ancora.challenges.application"
+depends_on = ["ancora.challenges.domain"]
 
 [[modules]]
-path = "ancora.application"
-depends_on = ["ancora.domain.challenges", "ancora.domain.hints", "ancora.domain.coaching"]
+path = "ancora.challenges.application.interfaces"
+depends_on = ["ancora.challenges.application"]
 
 [[modules]]
-path = "ancora.application.interfaces"
-depends_on = ["ancora.application"]
+path = "ancora.challenges.application.services"
+depends_on = ["ancora.challenges.application", "ancora.challenges.application.interfaces", "ancora.challenges.domain"]
 
 [[modules]]
-path = "ancora.application.services"
-depends_on = [
-    "ancora.application",
-    "ancora.application.interfaces",
-    "ancora.domain.challenges",
-    "ancora.domain.hints",
-    "ancora.domain.coaching",
-]
+path = "ancora.challenges.infrastructure"
+depends_on = ["ancora.challenges.application", "ancora.challenges.domain", "ancora.shared.application"]
+
+[[modules]]
+path = "ancora.hints.domain"
+depends_on = ["ancora.challenges.domain"]
+
+[[modules]]
+path = "ancora.hints.application"
+depends_on = ["ancora.hints.domain"]
+
+[[modules]]
+path = "ancora.hints.application.interfaces"
+depends_on = ["ancora.hints.application"]
+
+[[modules]]
+path = "ancora.hints.application.services"
+depends_on = ["ancora.hints.application", "ancora.hints.application.interfaces", "ancora.hints.domain", "ancora.challenges.domain"]
+
+[[modules]]
+path = "ancora.hints.infrastructure"
+depends_on = ["ancora.hints.application", "ancora.hints.domain", "ancora.shared.application"]
+
+[[modules]]
+path = "ancora.coaching.domain"
+depends_on = ["ancora.challenges.domain"]
+
+[[modules]]
+path = "ancora.coaching.application"
+depends_on = ["ancora.coaching.domain"]
+
+[[modules]]
+path = "ancora.coaching.application.interfaces"
+depends_on = ["ancora.coaching.application"]
+
+[[modules]]
+path = "ancora.coaching.application.services"
+depends_on = ["ancora.coaching.application", "ancora.coaching.application.interfaces", "ancora.coaching.domain", "ancora.challenges.domain"]
+
+[[modules]]
+path = "ancora.coaching.infrastructure"
+depends_on = ["ancora.coaching.application", "ancora.coaching.domain", "ancora.shared.application"]
 
 [[modules]]
 path = "ancora.api"
-depends_on = [
-    "ancora.application",
-    "ancora.application.interfaces",
-    "ancora.application.services",
-    "ancora.domain.challenges",
-    "ancora.domain.hints",
-    "ancora.domain.coaching",
-    "ancora.settings",
-]
-
-[[modules]]
-path = "ancora.infrastructure"
-depends_on = [
-    "ancora.application",
-    "ancora.domain.challenges",
-    "ancora.domain.hints",
-    "ancora.domain.coaching",
-]
-
-[[modules]]
-path = "ancora.settings"
-depends_on = []
+depends_on = ["ancora.config", "ancora.shared.application", "ancora.challenges.application", "ancora.challenges.application.interfaces", "ancora.challenges.application.services", "ancora.challenges.domain", "ancora.hints.application", "ancora.hints.application.interfaces", "ancora.hints.application.services", "ancora.hints.domain", "ancora.coaching.application", "ancora.coaching.application.interfaces", "ancora.coaching.application.services", "ancora.coaching.domain"]
 
 [[modules]]
 path = "ancora.bootstrap"
-depends_on = [
-    "ancora.api",
-    "ancora.application.interfaces",
-    "ancora.application.services",
-    "ancora.infrastructure",
-    "ancora.settings",
-]
+depends_on = ["ancora.api", "ancora.config", "ancora.challenges.application.interfaces", "ancora.challenges.application.services", "ancora.challenges.infrastructure", "ancora.hints.application.interfaces", "ancora.hints.application.services", "ancora.hints.infrastructure", "ancora.coaching.application.interfaces", "ancora.coaching.application.services", "ancora.coaching.infrastructure"]
 
-# Uvicorn loads bootstrap via an import string, not a static Python import.
 [[modules]]
 path = "ancora.main"
 depends_on = []
 
-# Shared challenge models are public; validation internals have narrower consumers.
 [[interfaces]]
-from = ["ancora.domain.challenges"]
+from = ["ancora.challenges.domain"]
 expose = ["models(\\..*)?"]
-visibility = [
-    "ancora.domain.hints",
-    "ancora.domain.coaching",
-    "ancora.application",
-    "ancora.application.services",
-    "ancora.api",
-    "ancora.infrastructure",
-]
+visibility = ["ancora.hints.domain", "ancora.coaching.domain", "ancora.challenges.application", "ancora.challenges.application.services", "ancora.hints.application.services", "ancora.coaching.application.services", "ancora.api", "ancora.challenges.infrastructure"]
 
 [[interfaces]]
-from = ["ancora.domain.challenges"]
+from = ["ancora.challenges.domain"]
 expose = ["errors(\\..*)?", "values(\\..*)?"]
-visibility = ["ancora.application.services", "ancora.api", "ancora.infrastructure"]
+visibility = ["ancora.challenges.application.services", "ancora.hints.application.services", "ancora.coaching.application.services", "ancora.api", "ancora.challenges.infrastructure"]
 
 [[interfaces]]
-from = ["ancora.domain.challenges"]
+from = ["ancora.challenges.domain"]
 expose = ["rules(\\..*)?"]
-visibility = ["ancora.application.services"]
+visibility = ["ancora.challenges.application.services"]

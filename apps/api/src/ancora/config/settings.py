@@ -1,0 +1,58 @@
+"""Explicit server-only configuration. No selected model or provider by default."""
+
+import os
+from dataclasses import dataclass
+from typing import Self
+
+
+@dataclass(frozen=True)
+class Settings:
+    service_token: str = ""
+    enabled: bool = False
+    model: str | None = None
+    api_key: str | None = None
+    hints_enabled: bool = False
+    coaching_enabled: bool = False
+
+    @property
+    def authenticated(self) -> bool:
+        return len(self.service_token) >= 32
+
+    @property
+    def available(self) -> bool:
+        return self.enabled and self.provider_configured
+
+    @property
+    def hints_available(self) -> bool:
+        return self.hints_enabled and self.provider_configured
+
+    @property
+    def coaching_available(self) -> bool:
+        return self.coaching_enabled and self.provider_configured
+
+    @property
+    def provider_configured(self) -> bool:
+        return (
+            self.authenticated
+            and self.api_key is not None
+            and bool(self.api_key.strip())
+            and self.model is not None
+            and 1 <= len(self.model.strip()) <= 100
+        )
+
+    @classmethod
+    def from_environment(cls) -> Self:
+        service_token = os.environ.get("PRACTICE_SERVICE_TOKEN", "")
+        enabled = os.environ.get("PRACTICE_GENERATION_ENABLED") == "1"
+        model = os.environ.get("PRACTICE_MODEL")
+        api_key = os.environ.get("OPENAI_API_KEY")
+        hints_enabled = os.environ.get("PRACTICE_HINTS_ENABLED") == "1"
+        coaching_enabled = os.environ.get("PRACTICE_COACHING_ENABLED") == "1"
+        return cls(
+            api_key=api_key,
+            coaching_enabled=coaching_enabled,
+            enabled=enabled,
+            hints_enabled=hints_enabled,
+            model=model,
+            service_token=service_token,
+        )

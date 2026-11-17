@@ -6,9 +6,11 @@
 |---|---|---|
 | Repository checks | `pnpm repo:test:pr` | Context, code conventions, contracts, TypeScript, unit tests, disposable PostgreSQL integration and offline eval smoke. |
 | Google Chrome integration | `pnpm web:test:browser` | Real Chrome, separate web/runner origins, synthetic service provider and disposable PostgreSQL. |
-| Python quality and tests | `pnpm python:sync` then `pnpm python:check` | Frozen workspace, Ruff lint/format, all three shared layout checkers, strict Pyright, Tach architecture checks and offline pytest. |
+| Python quality and tests | `pnpm python:sync` then `pnpm python:check` | Frozen workspace, Ruff lint/format, installed layout/ordering/suppression checks, strict Pyright, exact Tach graph, shared domain-import guard and offline pytest. |
 
 Node jobs install the `packageManager` version from `package.json` and run `pnpm install --frozen-lockfile`; Python jobs use uv `0.11.18`, Python `3.13` and `uv.lock`. Browser checks also install the frozen Python workspace for the synthetic service. Updating either dependency manifest requires its lockfile update. See [Python conventions](python-conventions.md) for maintained paths and strict typing policy.
+
+The shared Python policy is a committed, hash-locked wheel with [immutable provenance](../../config/quality/python/README.md). CI installs it with the workspace; it does not download checker source or depend on a playbook checkout. Ancora tests its installed artifact and wrapper contract, including failure propagation, while shared checker fixtures remain upstream. Dependency installation may use package registries; check execution and providers stay offline.
 
 Repository guard lanes require ripgrep (`rg`) locally. The repository job installs it explicitly from Ubuntu packages before invoking the lane; it does not rely on the hosted image including this tool.
 

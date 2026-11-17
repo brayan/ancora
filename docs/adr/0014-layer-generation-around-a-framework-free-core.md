@@ -2,6 +2,8 @@
 
 Status: Accepted
 
+Package placement is superseded by [ADR 0017](0017-organize-python-api-by-capability.md). The plain core, application services/interfaces and separate API/provider mappings remain accepted; the tree below records the original layout.
+
 Date: 2026-11-14
 
 ## Context
@@ -59,4 +61,4 @@ Pure domain rules and application orchestration can be tested without frameworks
 
 Separate boundary schemas/mappers contain deliberate duplication because HTTP and provider integrations have independent ownership. Parity tests make divergence explicit; do not replace this with a shared Pydantic business model.
 
-The shared playbook's architecture-guard policy is enforced by the root `tach.toml` and `pnpm python:architecture`, included in the aggregate Python CI command. Exact first-party module dependencies, explicit public interfaces, cycle rejection and checked `TYPE_CHECKING` imports preserve these boundaries. API and infrastructure cannot depend on one another; bootstrap remains their composition root. Static core-purity tests and the site-packages-disabled import test complement Tach's first-party graph. See [Python conventions](../engineering/python-conventions.md#architecture-guard) for the concrete graph, locked tooling and negative regression cases.
+The shared playbook's architecture-guard policy is enforced by the root `tach.toml` and `pnpm python:architecture`, included in the aggregate Python CI command. Exact first-party module dependencies, explicit public interfaces, cycle rejection and checked `TYPE_CHECKING` imports preserve these boundaries. API and infrastructure cannot depend on one another; bootstrap remains their composition root. Static core-purity tests and the site-packages-disabled import test complement Tach's first-party graph. See [Python conventions](../engineering/python-conventions.md#import-enforcement) for the current graph, locked tooling and negative regression cases.

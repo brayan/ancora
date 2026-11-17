@@ -8,11 +8,22 @@ from ancora.api.mappers.generation import (
     draft_to_domain,
     response_from_result,
 )
-from ancora.application.models import GenerationResult, ModelProvenance
-from ancora.domain.challenges.errors import DraftInvalid
-from ancora.infrastructure.llm import mappers as provider_mappers
-from ancora.infrastructure.llm import schemas as provider_schemas
+from ancora.challenges.application.models import GenerationResult, ModelProvenance
+from ancora.challenges.domain.errors import DraftInvalid
+from ancora.challenges.infrastructure.ai import mappers as provider_mappers
+from ancora.challenges.infrastructure.ai import schemas as provider_schemas
 from synthetic import draft_for, generation_input
+
+
+def test_should_bound_runner_envelope_when_native_cases_are_encoded_for_http() -> None:
+    draft = draft_to_domain(draft_for(generation_input("strings")))
+    cases = tuple(
+        replace(case, expected="😀" * 800, input="😀" * 800)
+        for case in draft.public_cases + draft.check_cases
+    )
+    draft = replace(draft, check_cases=cases[2:], public_cases=cases[:2])
+    with pytest.raises(DraftInvalid, match="runner_payload_too_large"):
+        draft_from_domain(draft)
 
 
 @pytest.mark.parametrize(
@@ -40,22 +51,6 @@ def test_should_preserve_challenge_meaning_when_crossing_both_boundaries(
     assert domain_draft.requirements == tuple(draft.requirements)
 
 
-def test_should_preserve_unicode_and_dictionary_order_when_cases_are_serialized() -> (
-    None
-):
-    draft = draft_for(generation_input("dictionaries"))
-    first = draft.public_cases[1].model_copy(
-        update={"input_json": '{"z":2,"á":1}', "expected_json": '{"z":2,"á":1}'}
-    )
-    draft = draft.model_copy(update={"public_cases": [draft.public_cases[0], first]})
-    domain_draft = draft_to_domain(draft)
-    wire_draft = draft_from_domain(domain_draft)
-
-    assert list(json.loads(wire_draft.public_cases[1].input_json)) == ["z", "á"]
-    assert list(json.loads(wire_draft.public_cases[1].expected_json)) == ["z", "á"]
-    assert draft_to_domain(wire_draft) == domain_draft
-
-
 def test_should_preserve_correction_context_when_preparing_provider_request() -> None:
     payload = generation_input()
     payload = payload.model_copy(
@@ -79,6 +74,22 @@ def test_should_preserve_correction_context_when_preparing_provider_request() ->
     assert provider_request.recent_exercises == payload.recent_exercises
 
 
+def test_should_preserve_unicode_and_dictionary_order_when_cases_are_serialized() -> (
+    None
+):
+    draft = draft_for(generation_input("dictionaries"))
+    first = draft.public_cases[1].model_copy(
+        update={"input_json": '{"z":2,"á":1}', "expected_json": '{"z":2,"á":1}'}
+    )
+    draft = draft.model_copy(update={"public_cases": [draft.public_cases[0], first]})
+    domain_draft = draft_to_domain(draft)
+    wire_draft = draft_from_domain(domain_draft)
+
+    assert list(json.loads(wire_draft.public_cases[1].input_json)) == ["z", "á"]
+    assert list(json.loads(wire_draft.public_cases[1].expected_json)) == ["z", "á"]
+    assert draft_to_domain(wire_draft) == domain_draft
+
+
 def test_should_validate_boundary_output_when_application_returns_bad_metadata() -> (
     None
 ):
@@ -91,14 +102,3 @@ def test_should_validate_boundary_output_when_application_returns_bad_metadata()
     result = GenerationResult(draft, replace(provenance, name=""))
     with pytest.raises(ValidationError):
         response_from_result(result)
-
-
-def test_should_bound_runner_envelope_when_native_cases_are_encoded_for_http() -> None:
-    draft = draft_to_domain(draft_for(generation_input("strings")))
-    cases = tuple(
-        replace(case, input="😀" * 800, expected="😀" * 800)
-        for case in draft.public_cases + draft.check_cases
-    )
-    draft = replace(draft, public_cases=cases[:2], check_cases=cases[2:])
-    with pytest.raises(DraftInvalid, match="runner_payload_too_large"):
-        draft_from_domain(draft)

@@ -7,27 +7,27 @@ from contextlib import AsyncExitStack, asynccontextmanager
 from fastapi import FastAPI
 
 from ancora.api.app import create_api
-from ancora.application.interfaces.challenge_generation_provider import (
+from ancora.challenges.application.interfaces.challenge_generation_provider import (
     ChallengeGenerationProvider,
 )
-from ancora.application.interfaces.coaching_provider import CoachingProvider
-from ancora.application.interfaces.hint_provider import HintProvider
-from ancora.application.services.challenge_generation_service import (
+from ancora.challenges.application.services.challenge_generation_service import (
     ChallengeGenerationService,
 )
-from ancora.application.services.coaching_service import CoachingService
-from ancora.application.services.hint_service import HintService
-from ancora.infrastructure.llm.openai_challenge_provider import (
+from ancora.challenges.infrastructure.ai.openai_challenge_provider import (
     OpenAIChallengeProvider,
 )
-from ancora.infrastructure.llm.openai_coaching_provider import OpenAICoachingProvider
-from ancora.infrastructure.llm.openai_hint_provider import OpenAIHintProvider
-from ancora.infrastructure.llm.unavailable import (
-    UnavailableChallengeProvider,
-    UnavailableCoachingProvider,
-    UnavailableHintProvider,
+from ancora.challenges.infrastructure.ai.unavailable import UnavailableChallengeProvider
+from ancora.coaching.application.interfaces.coaching_provider import CoachingProvider
+from ancora.coaching.application.services.coaching_service import CoachingService
+from ancora.coaching.infrastructure.ai.openai_coaching_provider import (
+    OpenAICoachingProvider,
 )
-from ancora.settings import Settings
+from ancora.coaching.infrastructure.ai.unavailable import UnavailableCoachingProvider
+from ancora.config.settings import Settings
+from ancora.hints.application.interfaces.hint_provider import HintProvider
+from ancora.hints.application.services.hint_service import HintService
+from ancora.hints.infrastructure.ai.openai_hint_provider import OpenAIHintProvider
+from ancora.hints.infrastructure.ai.unavailable import UnavailableHintProvider
 
 
 def create_app(

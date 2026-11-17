@@ -6,8 +6,15 @@ from ancora.api.schemas.generation import Version, WireModel, wire_text_limit
 from ancora.api.schemas.hints import HintChallenge
 
 Content = Annotated[
-    str, Field(min_length=1, max_length=900, pattern=r"\S"), wire_text_limit(900)
+    str, Field(max_length=900, min_length=1, pattern=r"\S"), wire_text_limit(900)
 ]
+
+
+class CoachingAvailability(WireModel):
+    available: bool
+    model: (
+        Annotated[str, Field(max_length=100, min_length=1), wire_text_limit(100)] | None
+    )
 
 
 class CoachingEvidence(WireModel):
@@ -21,42 +28,35 @@ class CoachingEvidence(WireModel):
         "invalid_message",
     ]
     passed: Annotated[int, Field(ge=0, le=12)]
-    total: Annotated[int, Field(ge=0, le=12)]
     technique: Literal["passed", "failed", "inconclusive", "not_required"]
-
-
-class CoachingInput(WireModel):
-    schema_version: Version
-    challenge: HintChallenge
-    source: Annotated[
-        str,
-        Field(min_length=1, max_length=12000, pattern=r"\S"),
-        wire_text_limit(12000),
-    ]
-    evidence: CoachingEvidence
+    total: Annotated[int, Field(ge=0, le=12)]
 
 
 class CoachingFeedback(WireModel):
-    summary: Content
-    observations: Annotated[list[Content], Field(min_length=1, max_length=4)]
     next_step: Content
+    observations: Annotated[list[Content], Field(max_length=4, min_length=1)]
+    summary: Content
+
+
+class CoachingInput(WireModel):
+    challenge: HintChallenge
+    evidence: CoachingEvidence
+    schema_version: Version
+    source: Annotated[
+        str,
+        Field(max_length=12000, min_length=1, pattern=r"\S"),
+        wire_text_limit(12000),
+    ]
 
 
 class CoachingModel(WireModel):
-    provider: Literal["openai"]
-    name: Annotated[str, Field(min_length=1, max_length=100), wire_text_limit(100)]
+    name: Annotated[str, Field(max_length=100, min_length=1), wire_text_limit(100)]
     prompt_version: Literal["programming-coaching-v1"]
+    provider: Literal["openai"]
     schema_version: Version
 
 
 class CoachingOutput(WireModel):
-    schema_version: Version
     feedback: CoachingFeedback
     model: CoachingModel
-
-
-class CoachingAvailability(WireModel):
-    available: bool
-    model: (
-        Annotated[str, Field(min_length=1, max_length=100), wire_text_limit(100)] | None
-    )
+    schema_version: Version

@@ -1,17 +1,17 @@
 from unittest.mock import patch
 
 from ancora.bootstrap import create_app
-from ancora.settings import Settings
+from ancora.config.settings import Settings
 from fastapi.testclient import TestClient
 from synthetic import SyntheticChallengeProvider
 
 TOKEN = "synthetic-server-token-32-characters"
 HEADERS = {"Authorization": f"Bearer {TOKEN}"}
 SETTINGS = Settings(
-    service_token=TOKEN,
+    api_key="synthetic-key",
     enabled=True,
     model="synthetic-offline",
-    api_key="synthetic-key",
+    service_token=TOKEN,
 )
 
 

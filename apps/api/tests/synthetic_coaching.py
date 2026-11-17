@@ -3,20 +3,20 @@
 import asyncio
 
 from ancora.api.schemas.coaching import CoachingInput
-from ancora.application.coaching import (
+from ancora.coaching.application.models import (
     CoachingCommand,
     CoachingProvenance,
     CoachingResult,
 )
-from ancora.domain.coaching.models import CoachingFeedback
+from ancora.coaching.domain.models import CoachingFeedback
 from synthetic import hint_input
 
-SYNTHETIC_SOURCE = "def positive_even(values):\n    return values\n"
 FEEDBACK = CoachingFeedback(
     "The selected attempt returns every input element.",
     ("The public contract asks for positive even numbers and a new list.",),
     "Compare the returned list with the first public example and consider a filtering comprehension.",
 )
+SYNTHETIC_SOURCE = "def positive_even(values):\n    return values\n"
 
 
 def coaching_input() -> CoachingInput:

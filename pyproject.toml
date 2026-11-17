@@ -11,6 +11,7 @@ dev = [
     "pytest==9.2.0",
     "pytest-asyncio==1.5.0",
     "ruff==0.17.5",
+    "sailtech-python-checks[architecture]==0.10.3",
     "tach==0.35.3",
 ]
 
@@ -21,15 +22,17 @@ required-version = "==0.11.18"
 [tool.uv.workspace]
 members = ["apps/api"]
 
+[tool.uv.sources]
+sailtech-python-checks = { path = "config/quality/python/sailtech_python_checks-0.10.3-py3-none-any.whl" }
+
 [tool.pyright]
 include = [
     "apps/api/src",
     "apps/api/tests",
     "apps/web/runner/harness.py",
     "apps/web/tests/python",
-    "scripts/quality/python",
 ]
-extraPaths = ["apps/api/src", "apps/web/runner", "scripts/quality/python"]
+extraPaths = ["apps/api/src", "apps/web/runner"]
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.13"
@@ -43,17 +46,28 @@ useLibraryCodeForTypes = true
 
 [tool.ruff]
 target-version = "py313"
-include = ["apps/api/**/*.py", "apps/web/runner/harness.py", "apps/web/tests/python/**/*.py", "scripts/quality/python/**/*.py"]
+include = ["apps/api/**/*.py", "apps/web/runner/harness.py", "apps/web/tests/python/**/*.py"]
 
 [tool.ruff.lint]
-extend-select = ["ANN", "B", "I", "UP", "SIM"]
+extend-select = [
+    "ANN", "B", "I", "UP", "SIM",
+    "N801", "N802", "N803", "N804", "N805", "N806", "N815", "N816",
+    "ARG001", "ARG002", "ARG003",
+    "PLR0911", "PLR0912", "PLR0913", "PLR0915", "RUF100",
+]
+
+[tool.ruff.lint.pylint]
+max-args = 8
+max-branches = 12
+max-returns = 8
+max-statements = 50
 
 [tool.ruff.format]
 skip-magic-trailing-comma = false
 
 [tool.pytest.ini_options]
-testpaths = ["apps/api/tests", "apps/web/tests/python", "scripts/quality/python/tests"]
-pythonpath = ["apps/api/src", "apps/web/runner", "scripts/quality/python"]
+testpaths = ["apps/api/tests", "apps/web/tests/python"]
+pythonpath = ["apps/api/src", "apps/web/runner"]
 addopts = "--strict-config --strict-markers -p no:tach"
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"
