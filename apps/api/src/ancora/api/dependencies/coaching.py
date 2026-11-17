@@ -17,6 +17,4 @@ def get_coaching_provider(request: Request) -> CoachingProvider:
 
 
 CoachingGenerator = Annotated[CoachingService, Depends(get_coaching_service)]
-
-
 CoachingProviderDependency = Annotated[CoachingProvider, Depends(get_coaching_provider)]

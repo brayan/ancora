@@ -56,7 +56,7 @@ dev = [
     { name = "pytest", specifier = "==9.2.0" },
     { name = "pytest-asyncio", specifier = "==1.5.0" },
     { name = "ruff", specifier = "==0.17.5" },
-    { name = "sailtech-python-checks", extras = ["architecture"], path = "config/quality/python/sailtech_python_checks-0.9.5-py3-none-any.whl" },
+    { name = "sailtech-python-checks", extras = ["architecture"], path = "config/quality/python/sailtech_python_checks-0.10.0-py3-none-any.whl" },
     { name = "tach", specifier = "==0.35.3" },
 ]
 
@@ -851,10 +851,10 @@ wheels = [
 
 [[package]]
 name = "sailtech-python-checks"
-version = "0.9.5"
-source = { path = "config/quality/python/sailtech_python_checks-0.9.5-py3-none-any.whl" }
+version = "0.10.0"
+source = { path = "config/quality/python/sailtech_python_checks-0.10.0-py3-none-any.whl" }
 wheels = [
-    { filename = "sailtech_python_checks-0.9.5-py3-none-any.whl", hash = "sha256:06c7cdb573f588d42714ea6e0ed899c910912c9519125fa9f0cb7000305be187" },
+    { filename = "sailtech_python_checks-0.10.0-py3-none-any.whl", hash = "sha256:288b291f2a597120f340d0f0dfc19f510825aa3c8bfb82a9175bdcb1da04a4d3" },
 ]
 
 [package.optional-dependencies]

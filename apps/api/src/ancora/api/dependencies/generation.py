@@ -23,8 +23,6 @@ def get_generation_provider(request: Request) -> ChallengeGenerationProvider:
 GenerationProvider = Annotated[
     ChallengeGenerationProvider, Depends(get_generation_provider)
 ]
-
-
 GenerationService = Annotated[
     ChallengeGenerationService, Depends(get_generation_service)
 ]

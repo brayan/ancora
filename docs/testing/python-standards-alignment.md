@@ -2,11 +2,11 @@
 
 Verified locally on 2026-11-17 in a new worktree from main `dd4d5d842e30239c3262f0e4c59af6fd3ae88d39`, branch `chore/python-standards-alignment`. Environment: macOS, Node `26.0.0`, pnpm `10.8.0`, uv `0.11.18`, Python `3.13.13`, Google Chrome `157.0.8103.79` and Playwright `1.65.0`.
 
-The [final combined results](#capability-layout-and-final-combined-verification) below supersede the earlier phase's counts after the capability layout refactor.
+The [combined results](#capability-layout-and-final-combined-verification) supersede the earlier phase's counts after the capability layout refactor. The [alias-policy follow-up](#shared-type-alias-policy--2026-11-17) records the subsequent shared-package upgrade.
 
 ## Scope and review
 
-The root workspace installs the reviewed `sailtech-python-checks` wheel `0.9.5`, including its compatible Tach extra. [Artifact provenance](../../config/quality/python/README.md) records immutable source and SHA-256. Copied checker implementations/fixtures were removed; all existing enabled layout rules remain enforced alongside ordering, suppression rejection and the shared domain-import guard. Ruff adds shared naming, unused-argument and size rules without disabling existing checks. Pyright remains strict.
+The root workspace installs `sailtech-python-checks` with its compatible Tach extra, initially `0.9.5` and now `0.10.0` after the alias-policy follow-up. [Artifact provenance](../../config/quality/python/README.md) records immutable source and SHA-256. Copied checker implementations/fixtures were removed; all existing enabled layout rules remain enforced alongside ordering, suppression rejection and the shared domain-import guard. Ruff adds shared naming, unused-argument and size rules without disabling existing checks. Pyright remains strict.
 
 Source/tests follow dependency-aware ordering while retaining positional signatures/dataclass fields. Effectful keyword arguments are computed in their original order. An AST comparison identified function-body changes beyond keyword ordering for focused review: mapper argument preparation, provider setup, environment reads, intentional argument discards and the runner refactor. Contract/schema checks passed without regenerating artifacts. Domain/application remain framework-free; the exact first-party graph is unchanged.
 
@@ -57,3 +57,19 @@ Source comparison confirmed 90 business-function bodies unchanged after normaliz
 The first combined Chrome run stopped at coaching keyboard confirmation (5 passed, 1 failed). Its dialog stayed open before a request was sent. Inspection found that the test focused the Share button before the component's scheduled panel-focus callback could finish; an isolated unchanged rerun passed. The test now waits for intended panel focus and uses Tab/Enter, preserving the product interaction instead of adding sleeps, increasing timeouts or enabling retries. The final full suite passed with that correction; no product UI behavior changed.
 
 Review order: ADR 0017 and `tach.toml`; nested architecture regressions; capability moves/mappings/bootstrap; browser runner adapter/harness and keyboard regression; packaged policy artifact/wrapper/provenance. The standards, runner suppression removal and capability layout remain in one owner-requested PR. Alphabetical keyword-only constructor migration remains a separate proposal.
+
+## Shared type alias policy — 2026-11-17
+
+The locked development package is now `sailtech-python-checks` **0.10.0**, built from engineering-playbook commit [`db85bd54d0a4cfb12755835305315a7d53530152`](https://github.com/brayan/engineering-playbook/commit/db85bd54d0a4cfb12755835305315a7d53530152), published on `feat/python-type-alias-ordering`. Independent worktree/archive builds were byte-identical; provenance and `uv.lock` pin SHA-256 `288b291f2a597120f340d0f0dfc19f510825aa3c8bfb82a9175bdcb1da04a4d3`.
+
+The existing ordering command adds `PYORD011` for dependency-safe module alias groups and `PYORD012` for cohesive alias spacing. It reuses the original definition-time dependency graph and respects statement barriers and bindings. Groups stay intact after required getters/classes; standalone section comments permit a single blank separator. The package checks source without executing it or rewriting declarations.
+
+Shared-package validation passed Ruff/formatting, strict Pyright, all layout/ordering commands and **324 pytest cases plus 132 subtests**, including 30 new placement/spacing regressions. Those fixtures remain upstream. Ancora's existing installed-artifact tests verify the new hash, installed module bytes, five CLI versions and wrapper wiring.
+
+A preview found three spacing violations in the generation, hint and coaching dependency modules, with no placement violations. Removing only the blank gaps keeps their prerequisite getters in place; AST comparisons confirmed all three modules unchanged. No runtime dependencies, positional APIs, prompts, schemas or migrations changed.
+
+- `pnpm python:sync`: frozen installation of the new local artifact passed.
+- `UV_OFFLINE=1 pnpm python:check`: passed all packaged checks, Ruff/formatting, strict Pyright, exact Tach/domain guards and **214 pytest cases**.
+- `pnpm repo:test:pr`: passed context/conventions/contracts/types, 8 config cases, 20 quality/runner cases, 33 web unit cases, 48 disposable-PostgreSQL cases and 1 eval-scaffold case.
+
+The preceding **60/60 Chrome result** remains runtime evidence for the earlier combined refactor; Chrome was not rerun for this development-policy and AST-identical whitespace follow-up. CI uses the same installed checker and remains offline. No provider calls ran.

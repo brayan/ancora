@@ -1,19 +1,19 @@
 # Shared Python policy artifact
 
-Ancora installs `sailtech-python-checks[architecture]==0.9.5` as a root uv development dependency. The committed wheel replaces the former copied scripts and fixtures under `scripts/quality/python`. It is not an application runtime dependency.
+Ancora installs `sailtech-python-checks[architecture]==0.10.0` as a root uv development dependency. The committed wheel replaces the former copied scripts and fixtures under `scripts/quality/python`. It is not an application runtime dependency.
 
 The machine-readable [provenance](provenance.json) records:
 
-- Source: [engineering-playbook at `6a41791644d300aa3075e935b81529f5942ccb96`](https://github.com/brayan/engineering-playbook/tree/6a41791644d300aa3075e935b81529f5942ccb96/scripts/python-conventions).
-- Upstream review: [PR #27](https://github.com/brayan/engineering-playbook/pull/27), which records the package's Ruff, strict Pyright, 294 tests and 132 subtests. These are upstream results, not Ancora test counts.
-- Wheel: `sailtech_python_checks-0.9.5-py3-none-any.whl`.
-- SHA-256: `06c7cdb573f588d42714ea6e0ed899c910912c9519125fa9f0cb7000305be187`.
+- Source: [engineering-playbook at `db85bd54d0a4cfb12755835305315a7d53530152`](https://github.com/brayan/engineering-playbook/tree/db85bd54d0a4cfb12755835305315a7d53530152/scripts/python-conventions).
+- Upstream validation: Ruff/formatting, strict Pyright, all installed layout/order checks, 324 tests and 132 subtests passed for the source commit. These are shared-package results, not Ancora test counts. Source is published on [feat/python-type-alias-ordering](https://github.com/brayan/engineering-playbook/tree/feat/python-type-alias-ordering).
+- Wheel: `sailtech_python_checks-0.10.0-py3-none-any.whl`.
+- SHA-256: `288b291f2a597120f340d0f0dfc19f510825aa3c8bfb82a9175bdcb1da04a4d3`.
 
-Two isolated builds from the immutable source archive with Hatchling `1.33.0` produced byte-identical wheels. The artifact hash is also locked in `uv.lock`. Ancora's offline artifact test verifies installed module bytes against this wheel; CLI tests check all five command versions. Shared implementation/behavior fixtures remain upstream.
+Independent builds from the clean committed worktree and its immutable source archive with Hatchling `1.33.0` produced byte-identical wheels. The artifact hash is also locked in `uv.lock`. Ancora's offline artifact test verifies installed module bytes against this wheel; CLI tests check all five command versions. Shared implementation/behavior fixtures remain upstream.
 
 ## Consumption
 
-`pnpm python:sync` installs the locked local wheel. `scripts/ci/run-python-checks.sh` calls the installed parameter, condition, class-spacing and ordering commands over `apps/api`, `apps/web/runner/harness.py` and `apps/web/tests/python`. Architecture checks run both `tach check --exact` and the shared domain guard over `apps/api/src`. The `architecture` extra uses the existing locked Tach `0.35.3` backend.
+`pnpm python:sync` installs the locked local wheel. `scripts/ci/run-python-checks.sh` calls the installed parameter, condition, class-spacing and ordering commands over `apps/api`, `apps/web/runner/harness.py` and `apps/web/tests/python`. Architecture checks run both `tach check --exact` and the shared domain guard over `apps/api/src`. The `architecture` extra uses the existing locked Tach `0.35.3` backend. Ordering also enforces `PYORD011` dependency-safe module alias groups and `PYORD012` cohesive spacing. Ancora’s dependency aliases stay after the getters they require, without unnecessary blank lines.
 
 All commands are read-only and offline after dependency installation. They parse scanned source without importing/executing it. Exit 0 means compliant, 1 means violations and 2 means invalid input/backend failure. CI uses the same wrapper; it never builds or downloads checker source, reads a sibling checkout or invokes providers. Ancora's runner contract tests substitute `uv` to verify exact commands, scopes, root-directory handling and failure propagation.
 

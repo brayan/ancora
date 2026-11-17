@@ -17,6 +17,4 @@ def get_hint_provider(request: Request) -> HintProvider:
 
 
 HintGenerator = Annotated[HintService, Depends(get_hint_service)]
-
-
 HintProviderDependency = Annotated[HintProvider, Depends(get_hint_provider)]

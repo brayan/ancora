@@ -11,7 +11,7 @@ dev = [
     "pytest==9.2.0",
     "pytest-asyncio==1.5.0",
     "ruff==0.17.5",
-    "sailtech-python-checks[architecture]==0.9.5",
+    "sailtech-python-checks[architecture]==0.10.0",
     "tach==0.35.3",
 ]
 
@@ -23,7 +23,7 @@ required-version = "==0.11.18"
 members = ["apps/api"]
 
 [tool.uv.sources]
-sailtech-python-checks = { path = "config/quality/python/sailtech_python_checks-0.9.5-py3-none-any.whl" }
+sailtech-python-checks = { path = "config/quality/python/sailtech_python_checks-0.10.0-py3-none-any.whl" }
 
 [tool.pyright]
 include = [
