@@ -1,71 +1,60 @@
 # Python conventions
 
-Ancora adapts the engineering playbook's [Python typing standard](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/python-typing-standard.md), [service conventions](https://github.com/brayan/engineering-playbook/blob/main/docs/backend/python-service-conventions.md), [test naming](https://github.com/brayan/engineering-playbook/blob/main/docs/testing/test-naming-convention.md) and [contextual paragraph spacing](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/code-paragraph-spacing.md). The tooling baseline comes from Sailtech's `apps/platform/ops-agent/pyproject.toml` at `e2a6ce0`, adapted to Ancora's execution boundary and workspace.
+Ancora adopts the engineering playbook’s [code conventions](https://github.com/brayan/engineering-playbook/blob/6a41791644d300aa3075e935b81529f5942ccb96/docs/engineering/python-code-conventions.md), [typing standard](https://github.com/brayan/engineering-playbook/blob/6a41791644d300aa3075e935b81529f5942ccb96/docs/engineering/python-typing-standard.md) and [project tooling](https://github.com/brayan/engineering-playbook/blob/6a41791644d300aa3075e935b81529f5942ccb96/docs/engineering/python-project-tooling.md). Those documents own shared rules; this page owns local integration. Shared [contextual paragraph spacing](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/code-paragraph-spacing.md) and [test naming](https://github.com/brayan/engineering-playbook/blob/main/docs/testing/test-naming-convention.md) apply alongside automated checks.
 
-## Runtime and dependency ownership
+## Workspace and policy artifact
 
-The root uv workspace supports Python `>=3.13,<3.15`; `.python-version`, CI, Ruff's `py313` target and Pyright's `3.13` target select the minimum version. The browser's pinned Pyodide runtime is separate and must remain compatible with the harness. Install uv `0.11.18`, then run `pnpm python:sync` from the repository root. `uv.lock` locks the whole workspace. Root `pyproject.toml` owns the pinned quality/test tools; `apps/api/pyproject.toml` owns its runtime dependencies. Review manifest changes, run `uv lock` intentionally, and commit the resulting lockfile together. Frozen commands never update it.
+Use uv `0.11.18` and Python `3.13`; the workspace supports `>=3.13,<3.15`. `.python-version`, CI, Ruff and Pyright target the minimum version. The browser’s pinned Pyodide runtime is separate. Root `pyproject.toml` owns development tools; `apps/api/pyproject.toml` owns runtime dependencies. Review changes, run `uv lock` intentionally and commit the manifest/lock together. Frozen commands never update them.
 
-FastAPI delivers bounded generation, hint and coaching APIs, Pydantic validates untrusted HTTP/model output, and Pydantic AI stays behind a typed provider adapter. Keep HTTP thin, deterministic validation independently testable, and create packages only when they own real behavior. Python never owns product database writes. Provider configuration is explicit; SDK/framework retries cannot expand durable dispatch allowances.
+The development dependency `sailtech-python-checks[architecture]==0.9.5` installs a committed wheel from `config/quality/python`; `uv.lock` records its hash. [Provenance and upgrade instructions](../../config/quality/python/README.md) identify the immutable reviewed source and reproducible artifact. Normal validation needs no sibling checkout or checker-source download. The shared package owns implementation/fixtures; Ancora tests the installed artifact, CLI wiring, fail-closed orchestration and actual import graph.
 
-## Package structure and dependency direction
+## Maintained code
 
-Follow [ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md). The service package has root `api/`, `application/`, `domain/` and `infrastructure/` boundaries. Split API routers by capability and Pydantic schemas by boundary/domain; do not restore a global `contracts.py`. `bootstrap.py` wires concrete adapters and their lifecycle; `main.py` starts the process. FastAPI `Depends` stays in the API.
+Ruff, strict Pyright and the four installed layout/ordering commands cover service source/tests, `apps/web/runner/harness.py` and `apps/web/tests/python`. Ruff retains its defaults and adds typing, imports, bugbear, modernization, simplification, naming, unused-argument and function-size checks, plus stale-suppression detection. Exact selectors/budgets live in `pyproject.toml`.
 
-Domain models and application commands/results are plain dataclasses. Neither layer imports Pydantic, FastAPI, vendor SDKs or transport DTOs. Application services coordinate operations with meaningful orchestration; application-owned `interfaces/` use typed `Protocol` dependencies and plain core models. Name provider interfaces separately from the services that consume them. Deterministic domain rules can remain functions. Avoid forwarding-only use-case classes and repositories for non-persistence operations.
+Declare parameter/return annotations, parameterize collections and narrow unknown data at validation boundaries. Prefer `object`, typed models and small `Protocol` interfaces over `Any`. Keep dynamic SDK behavior inside typed adapters or stubs. Static annotations do not replace runtime validation.
 
-API and infrastructure Pydantic models validate untrusted data, then map explicitly to/from core values. Wire versions and JSON case encoding stay at those boundaries. The HTTP and LLM schemas each have parity tests against the canonical versioned artifact.
+The packaged commands enforce:
 
-### Architecture guard
+- Definitions with two or more parameters use one per line and a trailing comma, including `self`/`cls`.
+- Multiline `if`/`elif` conditions become meaningful named predicates, preserving short-circuit behavior. See [condition integration](python-condition-layout.md).
+- Class declaration spacing and separators between declaration kinds follow shared lexical rules.
+- Dependency-aware declaration/class order, public functions before helpers, alphabetical tests, keyword-only parameters, explicit call keywords, enum members and supported static dictionary constant keys.
+- No suppression comments, ordering baselines or per-file ordering opt-outs. Fix or restructure the source.
 
-The playbook's [Python project tooling](https://github.com/brayan/engineering-playbook/blob/c993c5bc2da0210604c8f2d82939c1ed109f9d23/docs/engineering/python-project-tooling.md) defines the shared baseline. Ancora pins Tach `0.35.3` as a root development tool. The repository-root [tach.toml](../../tach.toml) governs `apps/api/src`; the browser harness and standalone shared checkers have no service layers and remain under their existing checks.
+Preserve positional APIs and dataclass constructor field sequences. Dependencies precede consumers. Precompute effectful arguments in their original evaluation order before sorting call keywords. Review framework validators, dictionary iteration and enum values before moving declarations. The checker reports violations without executing or rewriting source; passing it does not prove behavioral equivalence. Formatting does not replace contextual paragraph review.
 
-| Module | Allowed first-party dependencies |
-|---|---|
-| Domain challenges | None. |
-| Domain hints/coaching | Shared challenge models only. |
-| Application commands/results/errors | Domain models. |
-| Application interfaces | Plain application commands/results. |
-| Application services | Application commands/interfaces and domain models/rules. |
-| API | Application commands/interfaces/services, domain values/errors and settings. |
-| Infrastructure | Application commands/results/errors and domain values/errors; no API or application services. |
-| Settings | None. |
-| Bootstrap | API, application interfaces/services, infrastructure and settings. |
+Constructors follow the same parameter rule: `__init__(self, model, api_key, *, transport=...)` preserves positional `model, api_key`; parameters after `*` are alphabetical. There is no blanket alphabetical rule for every constructor parameter. Making owned constructors keyword-only would require an explicit API/call-site migration; it is not implied by a passing ordering check. Dataclass positional field sequences and framework-required signatures also retain their contracts.
 
-The package initializers have no outward dependencies. `main.py` starts Uvicorn with the `ancora.bootstrap:create_app` import string, which Tach does not model as a static edge. The graph records observed static dependencies; structural provider implementations do not need to import their `Protocol`. Challenge models are a public cross-feature interface; only application services may import challenge orchestration rules. The configuration owns the exact module/interface lists.
+## Service architecture
 
-`pnpm python:architecture` runs `tach check --exact` from the frozen workspace. It also runs inside `python:check`, including the existing Python GitHub Actions job. Exact edges reject unused declarations, cycles are forbidden, ungoverned root modules are rejected and `TYPE_CHECKING` imports count as dependencies. API and infrastructure are sibling adapters; only bootstrap wires them together. Do not run `tach sync` in CI or add dependencies to silence failures. Review intentional graph changes alongside their code and ADR.
+[ADR 0017](../adr/0017-organize-python-api-by-capability.md) owns the Lumera-aligned feature-first layout: root `api/` and `config/`, with `challenges/`, `hints/` and `coaching/` each containing domain/application and `infrastructure/ai`. `shared/application` contains only the common provider-interruption error. Challenge contracts/value validation remain public feature-owned dependencies; acceptance rules and concrete adapters remain private. Create only packages with real content.
 
-Tach's first-party graph does not prove framework independence. Pytest separately rejects non-standard-library/non-core imports (including under `TYPE_CHECKING`), preserves absolute imports and imports the whole core with site packages disabled. Architecture fixtures copy the actual source/configuration to temporary directories and prove compliant imports pass while forbidden directions, private cross-feature access, root modules, unused edges and cycles fail. They parse code without executing solutions or starting the service. Tach's optional pytest impact-selection plugin is disabled with `-p no:tach`; the full offline suite remains the default. See [Tach configuration](https://docs.gauge.sh/usage/configuration/).
+[ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md) still owns plain core models and separate transport/provider mappings. Domain/application models are dataclasses; neither layer imports Pydantic, FastAPI, SDKs or transport DTOs. Application services coordinate meaningful operations through application-owned `interfaces`, retaining Ancora's agreed name. Deterministic rules may remain functions; avoid forwarding-only use-case classes and repositories for non-persistence operations.
 
-The backend folder is `apps/api`, its import package is `ancora`, and its distribution is `ancora-api`. Keep workspace, startup, test and agent-routing paths aligned when moving it. Each HTTP operation declares a summary, router tag, response model and error-response metadata, with a concise docstring explaining meaningful behavior and side effects. Document provider dispatch separately from readiness and configuration availability separately from health checks. Schema/model fields carry structural details; comments explain non-obvious constraints. OpenAPI metadata is testable in-process while documentation HTTP routes remain disabled. See [the backend contract](../../apps/api/README.md).
+API/provider Pydantic schemas validate their own untrusted boundaries and map explicitly to plain core values. Split routers and dependency accessors by capability, keep `Depends` in the root API, and document HTTP summaries, tags, response/error models and meaningful side effects. Wire/schema parity remains tested against canonical artifacts. `config/settings.py` parses environment configuration; `bootstrap.py` wires adapters/lifecycles; `main.py` starts Uvicorn. The import package is `ancora`, distribution `ancora-api`, under `apps/api`.
 
-## Maintained code and strict checks
+Next.js remains the sole durable-record/migration owner. Python never writes the product database or executes reference/learner solutions. Provider configuration is explicit and framework retries cannot expand dispatch allowances. [ADR 0016](../adr/0016-persist-selected-attempt-coaching.md) also requires affirmative sharing of saved code.
 
-Root Ruff and Pyright configuration covers service source/tests, `apps/web/runner/harness.py`, AST-only host tests under `apps/web/tests/python` and the shared checker/fixtures under `scripts/quality/python`. Ruff retains its defaults and adds `ANN`, `B`, `I`, `UP` and `SIM`. Pyright checks all these paths in strict mode, including typed fixtures and fakes. No maintained path is excluded or globally weakened for a dynamic dependency.
+### Import enforcement
 
-Declare parameter and return annotations, parameterize collections, and narrow unknown values at validation boundaries. Prefer `object`, typed models and small `Protocol` interfaces over propagating `Any`. Unavoidable exceptions need an exact-line, rule-specific Ruff or Pyright suppression and a reason; Pyright rejects stale ignores and ignores generic `type: ignore` comments. Keep untyped SDK behavior inside its adapter. Runtime validation must enforce exact types and bounds rather than relying on static annotations or coercion.
+`pnpm python:architecture` runs `tach check --exact`, then `sailtech-check-domain-imports --source-root apps/api/src`. Root [tach.toml](../../tach.toml) owns first-party modules, exact dependencies and public interfaces. Only bootstrap wires the API/infrastructure siblings. Root modules, unused edges, cycles, forbidden directions and private cross-feature imports fail; `TYPE_CHECKING` counts. `main.py` uses the `ancora.bootstrap:create_app` import string; Tach models static imports. Structural provider implementations need not import their `Protocol`. Never run `tach sync` in CI or add edges just to silence a failure.
 
-Use `test_should_<outcome>_when_<condition>` for pytest functions and meaningful setup/execution/assertion paragraphs. Typed fakes keep provider tests deterministic and offline. Host pytest may parse and inspect synthetic Python ASTs; it must never execute learner submissions or generated solutions. Actual challenge execution belongs only to the isolated browser runner. Do not put private code/material in fixtures, logs, snapshots or evals.
+The shared domain command discovers all three nested domain directories and uses compatible locked Tach to reject third-party imports, including under `TYPE_CHECKING`, regardless of exclusions. Syntax/backend failures fail closed. Ancora separately discovers every nested application package, restricts imports to standard-library/core modules, requires absolute layer imports and imports the entire core without site packages. A discovery regression prevents folder moves from making these checks vacuous. Temporary-project regressions cover each domain, cross-feature application/adapter imports and private challenge rules. Pytest disables Tach’s optional impact-selection plugin (`-p no:tach`) to retain the full offline suite.
 
-Follow the playbook's [Python parameter layout](https://github.com/brayan/engineering-playbook/blob/b6d8ae17a005fb64f3440605dbdc8d2912fef46e/docs/engineering/python-parameter-layout.md): definitions with two or more declared parameters put each on a new line, with the closing parenthesis on a separate line and a trailing comma. Count `self`/`cls`, keyword-only and variadic parameters. Calls and lambdas are outside this rule. The committed shared checker under `scripts/quality/python` runs in `python:lint`, so `python:check` and the existing Python GitHub Actions job reject violations. Ruff preserves the layout through magic trailing commas. See the [local provenance and update instructions](../../scripts/quality/python/README.md).
-
-## Commands
-
-Follow the shared [Python Class Declaration Spacing](https://github.com/brayan/engineering-playbook/blob/b6d8ae17a005fb64f3440605dbdc8d2912fef46e/docs/engineering/python-class-declaration-spacing.md) standard. Ancora explicitly enables its checker through `python:lint` over the same maintained Python scopes as the other layout rules. The shared standard owns multiline/section-comment exceptions; local commands and provenance stay here.
-
-Follow the playbook’s [Python Condition Layout](https://github.com/brayan/engineering-playbook/blob/b6d8ae17a005fb64f3440605dbdc8d2912fef46e/docs/engineering/python-condition-layout.md): extract multiline `if`/`elif` conditions into named predicates while preserving evaluation order. The shared rule/checker owns its scope and exclusions. See [Ancora’s lint/CI integration](python-condition-layout.md) and [copied-source provenance](../../scripts/quality/python/README.md); no local rule fork remains.
+## Commands and evidence
 
 | Command | Scope |
 |---|---|
-| `pnpm python:sync` | Frozen uv workspace install, including development tools. |
-| `pnpm python:lint` | Ruff and deterministic parameter, condition and class declaration spacing checks over maintained Python. |
-| `pnpm python:format:check` | Read-only Ruff formatting check over the same paths. |
-| `pnpm python:typecheck` | Strict Pyright over maintained source and tests. |
-| `pnpm python:test` | Offline pytest: service behavior, architecture regressions, safe harness AST checks and all shared layout fixtures. |
-| `pnpm python:architecture` | Read-only Tach import graph and public-interface checks over the service source. |
-| `pnpm python:check` | Lint, formatting, strict types, architecture, then pytest. |
+| `pnpm python:sync` | Frozen workspace install, including the reviewed policy wheel. |
+| `pnpm python:lint` | Ruff, parameters, conditions, class spacing and ordering/suppression checks. |
+| `pnpm python:format:check` | Read-only Ruff formatting. |
+| `pnpm python:typecheck` | Strict Pyright over maintained source/tests. |
+| `pnpm python:architecture` | Exact first-party graph/public interfaces and shared external-domain guard. |
+| `pnpm python:test` | Offline behavior, contracts, architecture, artifact and safe harness AST tests. |
+| `pnpm python:check` | Lint, formatting, types, architecture, then pytest. |
+| `pnpm quality:test` | Ancora-owned tool orchestration and convention regressions. |
 
-These use the same locked environment locally and in [CI](continuous-integration.md). Perform contextual self-review before running checks; formatter success does not prove paragraph quality. Service/host tests cannot establish isolation or generation quality. Real Chrome checks establish browser behavior; paid quality evaluation is separate and requires an explicit model and remaining budget.
+[CI](continuous-integration.md) uses these same entry points. Validation invokes no providers and needs no provider credentials. Live evaluation requires a separately selected model and budget. Use synthetic material; private code must not enter fixtures, logs, screenshots or evals.
 
-Selected-attempt coaching applies the same plain-core/provider boundary; source arrives only through explicit Next.js sharing and is never executed by host tests or the service. See [ADR 0016](../adr/0016-persist-selected-attempt-coaching.md).
+Host tests may parse synthetic ASTs and inspect safe value rules. Actual source execution and learner exception handling belong to the browser’s Pyodide adapter, with a fresh solution namespace and bounded reports. See [runner boundaries/limits](../architecture/runner-spike.md); host checks do not establish browser isolation or model quality.

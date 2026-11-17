@@ -6,10 +6,10 @@ import uvicorn
 def main() -> None:
     uvicorn.run(
         "ancora.bootstrap:create_app",
+        access_log=False,
         factory=True,
         host="127.0.0.1",
         port=8001,
-        access_log=False,
     )
 
 

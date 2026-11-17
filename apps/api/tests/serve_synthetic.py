@@ -4,7 +4,7 @@ import os
 
 import uvicorn
 from ancora.bootstrap import create_app
-from ancora.settings import Settings
+from ancora.config.settings import Settings
 from synthetic import SyntheticChallengeProvider, SyntheticHintProvider
 from synthetic_coaching import SyntheticCoachingProvider
 
@@ -30,9 +30,9 @@ def main() -> None:
             SyntheticHintProvider(delay_seconds=2.0),
             SyntheticCoachingProvider(delay_seconds=2.0),
         ),
+        access_log=False,
         host="127.0.0.1",
         port=8001,
-        access_log=False,
     )
 
 

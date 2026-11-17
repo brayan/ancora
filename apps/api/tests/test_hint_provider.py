@@ -4,11 +4,52 @@ from typing import cast
 import httpx2
 import pytest
 from ancora.api.mappers.hints import command_from_request
-from ancora.application.errors import ProviderInterrupted
-from ancora.domain.hints.models import HintInvalid
-from ancora.infrastructure.llm.openai_hint_provider import OpenAIHintProvider
+from ancora.hints.domain.models import HintInvalid
+from ancora.hints.infrastructure.ai.openai_hint_provider import OpenAIHintProvider
+from ancora.shared.application.errors import ProviderInterrupted
 from synthetic import HINT_TEXTS, hint_input
 from test_provider import provider_response
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "kind", ["refusal", "incomplete", "invalid", "429", "500", "network"]
+)
+async def test_should_never_retry_when_hint_transport_or_structured_output_fails(
+    kind: str,
+) -> None:
+    calls = 0
+
+    def respond(request: httpx2.Request) -> httpx2.Response:
+        nonlocal calls
+        calls += 1
+        if kind == "network":
+            raise httpx2.ConnectError("synthetic-private-error", request=request)
+        if kind in ("429", "500"):
+            return httpx2.Response(
+                int(kind),
+                json={
+                    "error": {"message": "synthetic-private-error", "type": "synthetic"}
+                },
+            )
+        return httpx2.Response(
+            200,
+            json=provider_response(
+                "{}", incomplete=kind == "incomplete", refusal=kind == "refusal"
+            ),
+        )
+
+    provider = OpenAIHintProvider(
+        "gpt-6-luna", "synthetic-key", transport=httpx2.MockTransport(respond)
+    )
+    try:
+        with pytest.raises(
+            ProviderInterrupted if kind in ("429", "500", "network") else HintInvalid
+        ):
+            await provider.generate(command_from_request(hint_input()))
+    finally:
+        await provider.close()
+    assert calls == 1
 
 
 @pytest.mark.asyncio
@@ -43,44 +84,3 @@ async def test_should_send_only_public_context_when_dispatching_a_structured_hin
     assert not hasattr(command.challenge, "reference_source")
     assert not hasattr(command.challenge, "check_cases")
     assert command.previous_hints == (HINT_TEXTS[0],)
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "kind", ["refusal", "incomplete", "invalid", "429", "500", "network"]
-)
-async def test_should_never_retry_when_hint_transport_or_structured_output_fails(
-    kind: str,
-) -> None:
-    calls = 0
-
-    def respond(request: httpx2.Request) -> httpx2.Response:
-        nonlocal calls
-        calls += 1
-        if kind == "network":
-            raise httpx2.ConnectError("synthetic-private-error", request=request)
-        if kind in ("429", "500"):
-            return httpx2.Response(
-                int(kind),
-                json={
-                    "error": {"message": "synthetic-private-error", "type": "synthetic"}
-                },
-            )
-        return httpx2.Response(
-            200,
-            json=provider_response(
-                "{}", refusal=kind == "refusal", incomplete=kind == "incomplete"
-            ),
-        )
-
-    provider = OpenAIHintProvider(
-        "gpt-6-luna", "synthetic-key", transport=httpx2.MockTransport(respond)
-    )
-    try:
-        with pytest.raises(
-            ProviderInterrupted if kind in ("429", "500", "network") else HintInvalid
-        ):
-            await provider.generate(command_from_request(hint_input()))
-    finally:
-        await provider.close()
-    assert calls == 1

@@ -15,17 +15,18 @@ fi
 case "$mode" in
   lint)
     uv run --frozen --all-packages ruff check .
-    uv run --frozen --all-packages python scripts/quality/python/check_parameter_layout.py \
-      apps/api apps/web/runner/harness.py apps/web/tests/python scripts/quality/python
-    uv run --frozen --all-packages python scripts/quality/python/check_condition_layout.py \
-      apps/api apps/web/runner/harness.py apps/web/tests/python scripts/quality/python
-    uv run --frozen --all-packages python scripts/quality/python/check_class_declaration_spacing.py \
-      apps/api apps/web/runner/harness.py apps/web/tests/python scripts/quality/python
+    uv run --frozen --all-packages sailtech-check-parameters apps/api apps/web/runner/harness.py apps/web/tests/python
+    uv run --frozen --all-packages sailtech-check-conditions apps/api apps/web/runner/harness.py apps/web/tests/python
+    uv run --frozen --all-packages sailtech-check-class-spacing apps/api apps/web/runner/harness.py apps/web/tests/python
+    uv run --frozen --all-packages sailtech-check-ordering apps/api apps/web/runner/harness.py apps/web/tests/python
     ;;
   format) uv run --frozen --all-packages ruff format --check . ;;
   typecheck) uv run --frozen --all-packages pyright ;;
   test) uv run --frozen --all-packages python -m pytest ;;
-  architecture) uv run --frozen --all-packages tach check --exact ;;
+  architecture)
+    uv run --frozen --all-packages tach check --exact
+    uv run --frozen --all-packages sailtech-check-domain-imports --source-root apps/api/src
+    ;;
   all)
     "$0" lint
     "$0" format

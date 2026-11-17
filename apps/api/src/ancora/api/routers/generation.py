@@ -1,10 +1,7 @@
 from fastapi import APIRouter
 
-from ancora.api.dependencies import GenerationService
-from ancora.api.mappers.generation import (
-    command_from_request,
-    response_from_result,
-)
+from ancora.api.dependencies.generation import GenerationService
+from ancora.api.mappers.generation import command_from_request, response_from_result
 from ancora.api.responses import TRUSTED_SERVER_RESPONSES
 from ancora.api.schemas.errors import ApiErrorResponse, DraftInvalidResponse
 from ancora.api.schemas.generation import GeneratorInput, GeneratorOutput
@@ -14,9 +11,8 @@ router = APIRouter(tags=["generation"])
 
 @router.post(
     "/generate",
-    response_model=GeneratorOutput,
-    summary="Generate a challenge draft",
     response_description="Structurally validated draft and provider provenance.",
+    response_model=GeneratorOutput,
     responses={
         **TRUSTED_SERVER_RESPONSES,
         503: {
@@ -40,6 +36,7 @@ router = APIRouter(tags=["generation"])
             },
         },
     },
+    summary="Generate a challenge draft",
 )
 async def generate(
     payload: GeneratorInput,

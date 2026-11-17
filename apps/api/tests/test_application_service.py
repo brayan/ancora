@@ -1,23 +1,18 @@
 from dataclasses import replace
 
 import pytest
-from ancora.api.mappers.generation import (
-    command_from_request,
-    draft_to_domain,
-)
-from ancora.application.errors import (
-    GenerationUnavailable,
-    ProviderInterrupted,
-)
-from ancora.application.models import (
+from ancora.api.mappers.generation import command_from_request, draft_to_domain
+from ancora.challenges.application.errors import GenerationUnavailable
+from ancora.challenges.application.models import (
     GenerationCommand,
     GenerationResult,
     ModelProvenance,
 )
-from ancora.application.services.challenge_generation_service import (
+from ancora.challenges.application.services.challenge_generation_service import (
     ChallengeGenerationService,
 )
-from ancora.domain.challenges.errors import DraftInvalid
+from ancora.challenges.domain.errors import DraftInvalid
+from ancora.shared.application.errors import ProviderInterrupted
 from synthetic import draft_for, generation_input
 
 
@@ -51,27 +46,36 @@ def provider_for_request() -> tuple[RecordingProvider, GenerationCommand]:
 
 
 @pytest.mark.asyncio
-async def test_should_return_validated_result_when_provider_returns_matching_challenge() -> (
+async def test_should_forward_correction_context_once_when_previous_draft_is_supplied() -> (
     None
 ):
     provider, command = provider_for_request()
-    service = ChallengeGenerationService(provider)
-    result = await service.generate(command)
+    correction = replace(
+        command,
+        feedback=("reference_failed",),
+        previous=provider.result.draft,
+        recent_exercises=("Synthetic earlier exercise",),
+    )
 
-    assert result is provider.result
-    assert provider.commands == [command]
+    await ChallengeGenerationService(provider).generate(correction)
+    assert provider.commands == [correction]
 
 
 @pytest.mark.asyncio
-async def test_should_reject_mismatched_challenge_when_provider_returns_other_concept() -> (
+async def test_should_preserve_interruption_when_provider_outcome_is_uncertain() -> (
     None
 ):
-    provider, command = provider_for_request()
-    provider.result = replace(
-        provider.result, draft=replace(provider.result.draft, concept="strings")
-    )
+    class InterruptedProvider(RecordingProvider):
+        async def generate(
+            self,
+            command: GenerationCommand,
+        ) -> GenerationResult:
+            self.commands.append(command)
+            raise ProviderInterrupted
 
-    with pytest.raises(DraftInvalid, match="request_mismatch"):
+    original, command = provider_for_request()
+    provider = InterruptedProvider(original.result)
+    with pytest.raises(ProviderInterrupted):
         await ChallengeGenerationService(provider).generate(command)
     assert provider.commands == [command]
 
@@ -95,44 +99,35 @@ async def test_should_reject_invalid_reference_when_provider_returns_contract_mi
 
 
 @pytest.mark.asyncio
+async def test_should_reject_mismatched_challenge_when_provider_returns_other_concept() -> (
+    None
+):
+    provider, command = provider_for_request()
+    provider.result = replace(
+        provider.result, draft=replace(provider.result.draft, concept="strings")
+    )
+
+    with pytest.raises(DraftInvalid, match="request_mismatch"):
+        await ChallengeGenerationService(provider).generate(command)
+    assert provider.commands == [command]
+
+
+@pytest.mark.asyncio
+async def test_should_return_validated_result_when_provider_returns_matching_challenge() -> (
+    None
+):
+    provider, command = provider_for_request()
+    service = ChallengeGenerationService(provider)
+    result = await service.generate(command)
+
+    assert result is provider.result
+    assert provider.commands == [command]
+
+
+@pytest.mark.asyncio
 async def test_should_skip_dispatch_when_provider_is_unavailable() -> None:
     provider, command = provider_for_request()
     provider.available = False
     with pytest.raises(GenerationUnavailable):
         await ChallengeGenerationService(provider).generate(command)
     assert provider.commands == []
-
-
-@pytest.mark.asyncio
-async def test_should_preserve_interruption_when_provider_outcome_is_uncertain() -> (
-    None
-):
-    class InterruptedProvider(RecordingProvider):
-        async def generate(
-            self,
-            command: GenerationCommand,
-        ) -> GenerationResult:
-            self.commands.append(command)
-            raise ProviderInterrupted
-
-    original, command = provider_for_request()
-    provider = InterruptedProvider(original.result)
-    with pytest.raises(ProviderInterrupted):
-        await ChallengeGenerationService(provider).generate(command)
-    assert provider.commands == [command]
-
-
-@pytest.mark.asyncio
-async def test_should_forward_correction_context_once_when_previous_draft_is_supplied() -> (
-    None
-):
-    provider, command = provider_for_request()
-    correction = replace(
-        command,
-        previous=provider.result.draft,
-        feedback=("reference_failed",),
-        recent_exercises=("Synthetic earlier exercise",),
-    )
-
-    await ChallengeGenerationService(provider).generate(correction)
-    assert provider.commands == [correction]

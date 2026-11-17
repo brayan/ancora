@@ -1,0 +1,2 @@
+class ProviderInterrupted(Exception):
+    pass

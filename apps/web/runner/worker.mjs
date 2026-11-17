@@ -64,19 +64,47 @@ self.onmessage = async ({ data: request }) => {
     pyodide.setStdin({ error: true });
 
     pyodide.runPython(harness);
-    const evaluate = pyodide.globals.get('evaluate');
+    const RunnerEvaluation = pyodide.globals.get('RunnerEvaluation');
+    const pythonSys = pyodide.pyimport('sys');
     loaded = true;
     self.postMessage({ ...binding, type: 'loaded' });
     const executionStarted = performance.now();
     const cases = pyodide.toPy(request.cases);
-
     const contract = request.protocolVersion === 2 ? pyodide.toPy(request.functionContract) : null;
+    let evaluation;
+    let namespace;
+
     try {
-      const report = JSON.parse(
-        contract
-          ? evaluate(request.source, cases, request.technique, contract)
-          : evaluate(request.source, cases, request.technique)
-      );
+      evaluation = contract
+        ? RunnerEvaluation(cases, request.technique, contract)
+        : RunnerEvaluation(cases, request.technique);
+      let report;
+      try {
+        namespace = evaluation.prepare(request.source);
+        // Source execution belongs to the disposable browser adapter after Python preflight.
+        const value = pyodide.runPython(request.source, {
+          dedent: false,
+          filename: '<solution>',
+          globals: namespace,
+        });
+        if (value instanceof pyodide.ffi.PyProxy) {
+          value.destroy();
+        }
+
+        evaluation.check(namespace);
+        report = JSON.parse(evaluation.report());
+      } catch (error) {
+        if (!(error instanceof pyodide.ffi.PythonError)) {
+          throw error;
+        }
+        // PythonError.message includes traceback/source. Format only the Python exception.
+        const exception = pythonSys.last_exc;
+        try {
+          report = JSON.parse(evaluation.report(exception));
+        } finally {
+          exception.destroy();
+        }
+      }
       if (!outputLimited) {
         self.postMessage({
           ...binding,
@@ -88,9 +116,12 @@ self.onmessage = async ({ data: request }) => {
         });
       }
     } finally {
+      namespace?.destroy();
+      evaluation?.destroy();
+      pythonSys.destroy();
       contract?.destroy();
       cases.destroy();
-      evaluate.destroy();
+      RunnerEvaluation.destroy();
     }
   } catch {
     self.postMessage({

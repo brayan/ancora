@@ -1,36 +1,39 @@
 from ancora.api.schemas import coaching as schemas
-from ancora.application.coaching import CoachingCommand, CoachingResult
-from ancora.domain.challenges.models import ExampleCase, FunctionContract, Parameter
-from ancora.domain.coaching.models import CoachingChallenge, CoachingEvidence
+from ancora.challenges.domain.models import ExampleCase, FunctionContract, Parameter
+from ancora.coaching.application.models import CoachingCommand, CoachingResult
+from ancora.coaching.domain.models import CoachingChallenge, CoachingEvidence
 
 
 def command_from_request(payload: schemas.CoachingInput) -> CoachingCommand:
     challenge = payload.challenge
     contract = challenge.function_contract
+    function_contract = FunctionContract(
+        name=contract.name,
+        parameter=Parameter(contract.parameter.name, contract.parameter.type),
+        returns=contract.returns,
+    )
+    requirements = tuple(challenge.requirements)
+    public_cases = tuple(
+        ExampleCase(case.id, case.input, case.expected)
+        for case in challenge.public_cases
+    )
+    public_challenge = CoachingChallenge(
+        function_contract=function_contract,
+        objective=challenge.objective,
+        public_cases=public_cases,
+        requirements=requirements,
+        statement=challenge.statement,
+        technique=challenge.technique,
+        title=challenge.title,
+    )
+    evidence = CoachingEvidence(
+        payload.evidence.execution,
+        payload.evidence.passed,
+        payload.evidence.total,
+        payload.evidence.technique,
+    )
     return CoachingCommand(
-        challenge=CoachingChallenge(
-            title=challenge.title,
-            objective=challenge.objective,
-            statement=challenge.statement,
-            function_contract=FunctionContract(
-                name=contract.name,
-                parameter=Parameter(contract.parameter.name, contract.parameter.type),
-                returns=contract.returns,
-            ),
-            requirements=tuple(challenge.requirements),
-            technique=challenge.technique,
-            public_cases=tuple(
-                ExampleCase(case.id, case.input, case.expected)
-                for case in challenge.public_cases
-            ),
-        ),
-        source=payload.source,
-        evidence=CoachingEvidence(
-            payload.evidence.execution,
-            payload.evidence.passed,
-            payload.evidence.total,
-            payload.evidence.technique,
-        ),
+        challenge=public_challenge, evidence=evidence, source=payload.source
     )
 
 

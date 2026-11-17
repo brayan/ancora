@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import cast
 
 from ancora.api.schemas.hints import HintDraft, HintInput, HintOutput
-from ancora.infrastructure.llm.hint_schemas import HintDraft as ProviderHintDraft
+from ancora.hints.infrastructure.ai.schemas import HintDraft as ProviderHintDraft
 from pydantic import BaseModel
 from test_contract_drift import normalize
 

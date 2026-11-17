@@ -1,0 +1,10 @@
+{
+  "package": "sailtech-python-checks",
+  "version": "0.9.5",
+  "source_repository": "https://github.com/brayan/engineering-playbook",
+  "source_revision": "6a41791644d300aa3075e935b81529f5942ccb96",
+  "source_directory": "scripts/python-conventions",
+  "wheel": "sailtech_python_checks-0.9.5-py3-none-any.whl",
+  "sha256": "06c7cdb573f588d42714ea6e0ed899c910912c9519125fa9f0cb7000305be187",
+  "upstream_review": "https://github.com/brayan/engineering-playbook/pull/27"
+}

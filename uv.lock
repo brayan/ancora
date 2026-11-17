@@ -43,6 +43,7 @@ dev = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "ruff" },
+    { name = "sailtech-python-checks", extra = ["architecture"] },
     { name = "tach" },
 ]
 
@@ -55,6 +56,7 @@ dev = [
     { name = "pytest", specifier = "==9.2.0" },
     { name = "pytest-asyncio", specifier = "==1.5.0" },
     { name = "ruff", specifier = "==0.17.5" },
+    { name = "sailtech-python-checks", extras = ["architecture"], path = "config/quality/python/sailtech_python_checks-0.9.5-py3-none-any.whl" },
     { name = "tach", specifier = "==0.35.3" },
 ]
 
@@ -846,6 +848,23 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/8c/e4db9ae1e0ee233c04df007ab6d0d42f799ae9abd95d352b6092ee7bc4bf/ruff-0.17.5-py3-none-win_amd64.whl", hash = "sha256:aa415d57c244299279901d776607fee3df7831c2a7435433fbfacde8632c6550", size = 10275454, upload-time = "2026-11-12T17:54:49.401Z" },
     { url = "https://files.pythonhosted.org/packages/e6/65/a1648bc1550e7683bf7bf1e2ce2485c9f8535cbca6cca9ec7b73cc12fb8e/ruff-0.17.5-py3-none-win_arm64.whl", hash = "sha256:64a6fd668a336df959c522991de33e9e3c8be463afc0c9ac8f029f9d19ef756e", size = 9849020, upload-time = "2026-11-12T17:54:52.055Z" },
 ]
+
+[[package]]
+name = "sailtech-python-checks"
+version = "0.9.5"
+source = { path = "config/quality/python/sailtech_python_checks-0.9.5-py3-none-any.whl" }
+wheels = [
+    { filename = "sailtech_python_checks-0.9.5-py3-none-any.whl", hash = "sha256:06c7cdb573f588d42714ea6e0ed899c910912c9519125fa9f0cb7000305be187" },
+]
+
+[package.optional-dependencies]
+architecture = [
+    { name = "tach" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "tach", marker = "extra == 'architecture'", specifier = ">=0.35.3,<0.36" }]
+provides-extras = ["architecture"]
 
 [[package]]
 name = "smmap"

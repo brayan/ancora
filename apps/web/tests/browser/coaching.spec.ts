@@ -75,7 +75,9 @@ test('should share only the selected saved attempt after confirmation when the e
     name: 'Share this saved code with OpenAI',
     exact: true,
   });
-  await share.focus();
+  await expect(page.locator('.coachingConsent')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(share).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(
     page.getByRole('heading', { name: 'Feedback for this saved attempt' })

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from ancora.api.dependencies import GenerationProvider
+from ancora.api.dependencies.generation import GenerationProvider
 from ancora.api.responses import TRUSTED_SERVER_RESPONSES
 from ancora.api.schemas.status import GenerationStatus
 
@@ -9,10 +9,10 @@ router = APIRouter(tags=["status"])
 
 @router.get(
     "/status",
-    response_model=GenerationStatus,
-    summary="Read generation availability",
     response_description="Configured generation availability and the selected model.",
+    response_model=GenerationStatus,
     responses=TRUSTED_SERVER_RESPONSES,
+    summary="Read generation availability",
 )
 async def status(provider: GenerationProvider) -> GenerationStatus:
     """Read configuration availability without contacting the provider.

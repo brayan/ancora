@@ -10,7 +10,7 @@ from ancora.api.schemas.generation import (
     GeneratorInput,
     GeneratorOutput,
 )
-from ancora.infrastructure.llm import schemas as provider_schemas
+from ancora.challenges.infrastructure.ai import schemas as provider_schemas
 from pydantic import BaseModel
 
 

@@ -1,6 +1,9 @@
 from fastapi import APIRouter
 
-from ancora.api.dependencies import CoachingGenerator, CoachingProviderDependency
+from ancora.api.dependencies.coaching import (
+    CoachingGenerator,
+    CoachingProviderDependency,
+)
 from ancora.api.mappers.coaching import command_from_request, response_from_result
 from ancora.api.responses import TRUSTED_SERVER_RESPONSES
 from ancora.api.schemas.coaching import (
@@ -15,9 +18,9 @@ router = APIRouter(tags=["coaching"])
 
 @router.get(
     "/coaching/status",
-    summary="Read coaching availability",
     response_model=CoachingAvailability,
     responses=TRUSTED_SERVER_RESPONSES,
+    summary="Read coaching availability",
 )
 async def status(provider: CoachingProviderDependency) -> CoachingAvailability:
     """Read coaching configuration without a provider call or product writes.
@@ -30,9 +33,8 @@ async def status(provider: CoachingProviderDependency) -> CoachingAvailability:
 
 @router.post(
     "/coaching",
-    summary="Generate selected-attempt coaching",
-    response_model=CoachingOutput,
     response_description="Advisory feedback and provenance; no replacement verdict or solution.",
+    response_model=CoachingOutput,
     responses={
         **TRUSTED_SERVER_RESPONSES,
         422: {
@@ -55,6 +57,7 @@ async def status(provider: CoachingProviderDependency) -> CoachingAvailability:
             },
         },
     },
+    summary="Generate selected-attempt coaching",
 )
 async def generate(
     payload: CoachingInput,

@@ -1,0 +1,2 @@
+class CoachingUnavailable(Exception):
+    pass

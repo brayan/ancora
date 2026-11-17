@@ -19,6 +19,8 @@ canonical_docs:
   challenge_generation: docs/architecture/challenge-generation.md
   python_conventions: docs/engineering/python-conventions.md
   python_condition_layout: docs/engineering/python-condition-layout.md
+  python_policy_artifact: config/quality/python/README.md
+  python_alignment_evidence: docs/testing/python-standards-alignment.md
   continuous_integration: docs/engineering/continuous-integration.md
   runner_spike: docs/architecture/runner-spike.md
   architecture_decisions: docs/adr
@@ -95,4 +97,5 @@ adr_index:
   - docs/adr/0014-layer-generation-around-a-framework-free-core.md
   - docs/adr/0015-persist-bounded-progressive-hints.md
   - docs/adr/0016-persist-selected-attempt-coaching.md
+  - docs/adr/0017-organize-python-api-by-capability.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

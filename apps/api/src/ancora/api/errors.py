@@ -5,15 +5,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from ancora.application.coaching import CoachingUnavailable
-from ancora.application.errors import (
-    GenerationUnavailable,
-    ProviderInterrupted,
-)
-from ancora.application.hints import HintsUnavailable
-from ancora.domain.challenges.errors import DraftInvalid
-from ancora.domain.coaching.models import CoachingInvalid
-from ancora.domain.hints.models import HintInvalid
+from ancora.challenges.application.errors import GenerationUnavailable
+from ancora.challenges.domain.errors import DraftInvalid
+from ancora.coaching.application.errors import CoachingUnavailable
+from ancora.coaching.domain.models import CoachingInvalid
+from ancora.hints.application.errors import HintsUnavailable
+from ancora.hints.domain.models import HintInvalid
+from ancora.shared.application.errors import ProviderInterrupted
 
 
 def register_error_handlers(app: FastAPI) -> None:

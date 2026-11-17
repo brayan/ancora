@@ -7,13 +7,15 @@ read_first:
   - docs/product/programming-practice.md
   - docs/adr/0013-bounded-generation-and-automated-checks.md
   - docs/adr/0014-layer-generation-around-a-framework-free-core.md
+  - docs/adr/0017-organize-python-api-by-capability.md
   - docs/engineering/python-conventions.md
+  - config/quality/python/README.md
   - docs/architecture/challenge-generation.md
   - docs/architecture/progressive-hints.md
   - docs/architecture/selected-attempt-coaching.md
   - docs/adr/0016-persist-selected-attempt-coaching.md
   - docs/adr/0015-persist-bounded-progressive-hints.md
-role: Bounded FastAPI/Pydantic AI challenge generation and progressive hints and selected-attempt coaching.
+role: Feature-first FastAPI/Pydantic AI challenge generation, progressive hints and selected-attempt coaching; root API/config with per-capability plain cores and AI infrastructure.
 allowed_work:
   - Framework-free domain/application services and application-owned provider interfaces
   - API capability routers and independent API/infrastructure Pydantic mappings

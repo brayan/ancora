@@ -1,0 +1,2 @@
+class GenerationUnavailable(Exception):
+    pass

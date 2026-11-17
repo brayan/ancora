@@ -31,6 +31,7 @@ read_first:
   - docs/engineering/git-conventions.md
   - docs/engineering/code-quality-conventions.md
   - docs/engineering/python-conventions.md
+  - config/quality/python/README.md
   - docs/engineering/continuous-integration.md
   - docs/architecture/practice-persistence.md
   - CONTEXT.md

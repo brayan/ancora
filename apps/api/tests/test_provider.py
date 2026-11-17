@@ -3,23 +3,20 @@ from typing import cast
 
 import httpx2
 import pytest
-from ancora.api.mappers.generation import (
-    command_from_request,
-    draft_to_domain,
-)
-from ancora.application.errors import ProviderInterrupted
-from ancora.domain.challenges.errors import DraftInvalid
-from ancora.infrastructure.llm.openai_challenge_provider import (
+from ancora.api.mappers.generation import command_from_request, draft_to_domain
+from ancora.challenges.domain.errors import DraftInvalid
+from ancora.challenges.infrastructure.ai.openai_challenge_provider import (
     OpenAIChallengeProvider,
 )
+from ancora.shared.application.errors import ProviderInterrupted
 from synthetic import draft_for, generation_input
 
 
 def provider_response(
     text: str,
     *,
-    refusal: bool = False,
     incomplete: bool = False,
+    refusal: bool = False,
 ) -> dict[str, object]:
     content: dict[str, object] = (
         {"type": "refusal", "refusal": "synthetic refusal"}
@@ -116,8 +113,8 @@ async def test_should_never_retry_when_provider_rejects_or_interrupts(
             200,
             json=provider_response(
                 "{}",
-                refusal=response_kind == "refusal",
                 incomplete=response_kind == "incomplete",
+                refusal=response_kind == "refusal",
             ),
         )
 

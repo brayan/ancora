@@ -2,7 +2,9 @@
 
 The backend lives in `apps/api`, imports as `ancora`, and is installed as the `ancora-api` distribution. FastAPI owns bounded challenge generation, progressive hints and selected-attempt coaching. Next.js owns durable lifecycle, dispatch allowances and all database writes. Reference and learner Python execute only in the isolated browser runner; this service only parses reference AST and JSON cases.
 
-The package separates `api/` routers/schemas/mappers, `application/services/` orchestration and `application/interfaces/` provider dependencies, framework-free `domain/` challenge/hint/coaching models/rules, and `infrastructure/llm/` adapters/schemas/mappers. `bootstrap.create_app` wires resources; `main` starts the service. Neither domain nor application imports Pydantic. See [ADR 0014](../../docs/adr/0014-layer-generation-around-a-framework-free-core.md) for structure and dependency rules.
+The package follows Lumera's feature-first FastAPI structure. Root `api/` owns capability routers/schemas/mappers and separate dependency accessors; `config/settings.py` owns environment parsing. `challenges/`, `hints/` and `coaching/` each own `domain/`, `application/{models,errors,interfaces,services}` and `infrastructure/ai/`. Provider schemas/mappers stay inside their capability. `shared/application/errors.py` holds only the already-common interruption error. `bootstrap.create_app` wires resources; `main` starts the service.
+
+Neither domain nor application imports Pydantic. [ADR 0017](../../docs/adr/0017-organize-python-api-by-capability.md) owns package placement; [ADR 0014](../../docs/adr/0014-layer-generation-around-a-framework-free-core.md) still owns plain core models and independent API/provider mappings. Challenge contracts/value validation are explicit public dependencies of hint/coaching cores; challenge acceptance rules and concrete adapters stay private to their owners. No empty future layers or compatibility import aliases are scaffolded.
 
 From repository root, install the pinned uv version then `uv sync --frozen --all-packages`. Start with `uv run --frozen --all-packages python -m ancora.main`; it binds `127.0.0.1:8001`, with no CORS or access logging. Swagger, ReDoc and OpenAPI HTTP routes are disabled. It requires Python >=3.13,<3.15. The versioned prompt is read from this repository checkout.
 
@@ -27,7 +29,7 @@ uv run --frozen --all-packages pyright apps/api/src apps/api/tests
 uv run --frozen --all-packages pytest apps/api/tests
 ```
 
-The root Tach graph enforces ADR 0014's layers and public interfaces. It also runs in `pnpm python:check` and the existing offline Python CI job. Architecture tests verify deliberately forbidden imports in temporary copies, while separate checks retain the framework-free core guarantee. See [Python conventions](../../docs/engineering/python-conventions.md#architecture-guard) before changing the graph.
+The root Tach graph enforces ADR 0017's capability/layer dependencies and public interfaces. It also runs in `pnpm python:check` and the existing offline Python CI job. Temporary-copy regressions reject cross-feature private access and outward imports; nested core discovery, application purity and site-packages-disabled imports preserve the framework-free guarantee. See [Python conventions](../../docs/engineering/python-conventions.md#import-enforcement) before changing the graph.
 
 For disposable browser integration only, run `uv run --frozen --all-packages python apps/api/tests/serve_synthetic.py` with both `ANCORA_SYNTHETIC_DATABASE=1` and `ANCORA_SYNTHETIC_PROVIDER=1` and a valid service token. This explicit test module injects a typed synthetic generator; it is outside the production package. No provider credentials are needed. Do not use its authored exercises as production content. No database dependencies or code-execution helpers exist here.
 

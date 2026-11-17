@@ -4,11 +4,56 @@ from typing import cast
 import httpx2
 import pytest
 from ancora.api.mappers.coaching import command_from_request
-from ancora.application.errors import ProviderInterrupted
-from ancora.domain.coaching.models import CoachingInvalid
-from ancora.infrastructure.llm.openai_coaching_provider import OpenAICoachingProvider
+from ancora.coaching.domain.models import CoachingInvalid
+from ancora.coaching.infrastructure.ai.openai_coaching_provider import (
+    OpenAICoachingProvider,
+)
+from ancora.shared.application.errors import ProviderInterrupted
 from synthetic_coaching import FEEDBACK, coaching_input
 from test_provider import provider_response
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "kind", ["refusal", "incomplete", "invalid", "429", "500", "network"]
+)
+async def test_should_never_retry_when_coaching_transport_or_structured_output_fails(
+    kind: str,
+) -> None:
+    calls = 0
+
+    def respond(request: httpx2.Request) -> httpx2.Response:
+        nonlocal calls
+        calls += 1
+        if kind == "network":
+            raise httpx2.ConnectError("synthetic-private-error", request=request)
+        if kind in ("429", "500"):
+            return httpx2.Response(
+                int(kind),
+                json={
+                    "error": {"message": "synthetic-private-error", "type": "synthetic"}
+                },
+            )
+        return httpx2.Response(
+            200,
+            json=provider_response(
+                "{}", incomplete=kind == "incomplete", refusal=kind == "refusal"
+            ),
+        )
+
+    provider = OpenAICoachingProvider(
+        "gpt-6-luna", "synthetic-key", transport=httpx2.MockTransport(respond)
+    )
+    try:
+        with pytest.raises(
+            ProviderInterrupted
+            if kind in ("429", "500", "network")
+            else CoachingInvalid
+        ):
+            await provider.generate(command_from_request(coaching_input()))
+    finally:
+        await provider.close()
+    assert calls == 1
 
 
 @pytest.mark.asyncio
@@ -52,46 +97,3 @@ async def test_should_send_only_selected_source_and_public_context_when_dispatch
     assert not hasattr(command.challenge, "check_cases")
     assert command.source == coaching_input().source
     assert not hasattr(command, "report")
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "kind", ["refusal", "incomplete", "invalid", "429", "500", "network"]
-)
-async def test_should_never_retry_when_coaching_transport_or_structured_output_fails(
-    kind: str,
-) -> None:
-    calls = 0
-
-    def respond(request: httpx2.Request) -> httpx2.Response:
-        nonlocal calls
-        calls += 1
-        if kind == "network":
-            raise httpx2.ConnectError("synthetic-private-error", request=request)
-        if kind in ("429", "500"):
-            return httpx2.Response(
-                int(kind),
-                json={
-                    "error": {"message": "synthetic-private-error", "type": "synthetic"}
-                },
-            )
-        return httpx2.Response(
-            200,
-            json=provider_response(
-                "{}", refusal=kind == "refusal", incomplete=kind == "incomplete"
-            ),
-        )
-
-    provider = OpenAICoachingProvider(
-        "gpt-6-luna", "synthetic-key", transport=httpx2.MockTransport(respond)
-    )
-    try:
-        with pytest.raises(
-            ProviderInterrupted
-            if kind in ("429", "500", "network")
-            else CoachingInvalid
-        ):
-            await provider.generate(command_from_request(coaching_input()))
-    finally:
-        await provider.close()
-    assert calls == 1

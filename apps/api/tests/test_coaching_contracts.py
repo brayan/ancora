@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import cast
 
 from ancora.api.schemas.coaching import CoachingFeedback, CoachingInput, CoachingOutput
-from ancora.infrastructure.llm.coaching_schemas import (
+from ancora.coaching.infrastructure.ai.schemas import (
     CoachingFeedback as ProviderFeedback,
 )
 from pydantic import BaseModel
