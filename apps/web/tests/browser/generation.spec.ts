@@ -8,6 +8,7 @@ import {
 } from '@ancora/schemas';
 import syntheticArtifacts from '../../../../evals/programming-practice/generation-v1.synthetic.json' with { type: 'json' };
 import { REFERENCE_CODE } from '../../server/programming-practice/fixture';
+import { createRequestFailureTracker } from './requestFailures';
 
 const origin = 'http://127.0.0.1:3000';
 const fixedRevision = 'synthetic-positive-even@1';
@@ -92,14 +93,16 @@ for (const concept of ['strings', 'dictionaries'] as const) {
     request,
   }) => {
     const browserErrors: string[] = [];
-    const failedRequests: string[] = [];
+    const network = createRequestFailureTracker();
     page.on('pageerror', (error) => browserErrors.push(error.message));
     page.on('console', (message) => {
       if (message.type() === 'error') {
         browserErrors.push(message.text());
       }
     });
-    page.on('requestfailed', (request) => failedRequests.push(request.url()));
+    page.on('request', network.started);
+    page.on('requestfinished', network.finished);
+    page.on('requestfailed', network.failed);
     await openGeneration(page);
     const draft = syntheticDraft(concept);
     const fixedSource = `# Synthetic retained ${concept} draft\n${REFERENCE_CODE}`;
@@ -129,6 +132,7 @@ for (const concept of ['strings', 'dictionaries'] as const) {
     await page.getByRole('button', { name: 'Check solution', exact: true }).click();
     await expect(page.getByText('5/5 cases passed', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Check solution', exact: true })).toBeEnabled();
+    network.prepareForNavigation();
     await page.reload();
     await expect(page.getByLabel('Python solution')).toHaveValue(draft.referenceSource);
     await expect(page.getByText('5/5 cases passed', { exact: true })).toBeVisible();
@@ -157,7 +161,7 @@ for (const concept of ['strings', 'dictionaries'] as const) {
     expect(reopened.challenge.revisionId).toBe(fixedRevision);
     expect(reopened.draft.source).toBe(fixedSource);
     expect(browserErrors).toEqual([]);
-    expect(failedRequests).toEqual([]);
+    expect(network.failures).toEqual([]);
   });
 }
 
