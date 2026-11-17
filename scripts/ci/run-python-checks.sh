@@ -15,17 +15,17 @@ fi
 case "$mode" in
   lint)
     uv run --frozen --all-packages ruff check .
-    uv run --frozen --all-packages sailtech-check-parameters apps/api apps/web/runner/harness.py apps/web/tests/python
-    uv run --frozen --all-packages sailtech-check-conditions apps/api apps/web/runner/harness.py apps/web/tests/python
-    uv run --frozen --all-packages sailtech-check-class-spacing apps/api apps/web/runner/harness.py apps/web/tests/python
-    uv run --frozen --all-packages sailtech-check-ordering apps/api apps/web/runner/harness.py apps/web/tests/python
+    uv run --frozen --all-packages sailtech-check-parameters backend web/runner/harness.py web/tests/python
+    uv run --frozen --all-packages sailtech-check-conditions backend web/runner/harness.py web/tests/python
+    uv run --frozen --all-packages sailtech-check-class-spacing backend web/runner/harness.py web/tests/python
+    uv run --frozen --all-packages sailtech-check-ordering backend web/runner/harness.py web/tests/python
     ;;
   format) uv run --frozen --all-packages ruff format --check . ;;
   typecheck) uv run --frozen --all-packages pyright ;;
   test) uv run --frozen --all-packages python -m pytest ;;
   architecture)
     uv run --frozen --all-packages tach check --exact
-    uv run --frozen --all-packages sailtech-check-domain-imports --source-root apps/api/src
+    uv run --frozen --all-packages sailtech-check-domain-imports --source-root backend/src
     ;;
   all)
     "$0" lint

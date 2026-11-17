@@ -44,4 +44,4 @@ The known original 0005 DDL is copied byte-for-byte into a synthetic migration-t
 - Live Chrome: entered a synthetic solution, saved, checked all six cases, reloaded and observed the same draft and saved attempt. Automated normal-flow console/network checks were clean; negative-path failures were deliberately injected by their tests.
 - Migrated the fresh practice database on port 5433. The stopped legacy container and original dirty checkout were not changed. All 10 prior SQL/snapshot files remain byte-for-byte unchanged; prior journal entries retain their original values.
 
-Browser screenshots contain only synthetic code and live under ignored `apps/web/test-results`. The migration tests use only disposable databases; no private learner data or live provider calls were used.
+Browser screenshots contain only synthetic code and live under ignored `web/test-results`. The migration tests use only disposable databases; no private learner data or live provider calls were used.

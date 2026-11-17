@@ -6,6 +6,8 @@ Package placement is superseded by [ADR 0017](0017-organize-python-api-by-capabi
 
 Date: 2026-11-14
 
+Root project placement and service/validation naming are superseded by [ADR 0018](0018-place-projects-at-root-and-use-operation-use-cases.md). Earlier trees below remain decision history; framework-free cores and HTTP/provider contracts retain their ownership.
+
 ## Context
 
 ADR 0013 introduced bounded challenge generation with a flat Python package. Its provider interface accepted Pydantic HTTP models, while the HTTP factory constructed infrastructure and applied challenge rules. The owner requested application services and interfaces, a root `api/` package inside the Python service, capability-specific routers, and no Pydantic in business logic.

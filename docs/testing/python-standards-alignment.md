@@ -1,5 +1,7 @@
 # Python standards alignment evidence
 
+This dated report retains paths at its tested commits. Current project placement and operation names follow [ADR 0018](../adr/0018-place-projects-at-root-and-use-operation-use-cases.md); see [root-layout verification](root-layout-use-cases.md) for the subsequent refactor.
+
 Verified locally on 2026-11-17 in a new worktree from main `dd4d5d842e30239c3262f0e4c59af6fd3ae88d39`, branch `chore/python-standards-alignment`. Environment: macOS, Node `26.0.0`, pnpm `10.8.0`, uv `0.11.18`, Python `3.13.13`, Google Chrome `157.0.8103.79` and Playwright `1.65.0`.
 
 The [combined results](#capability-layout-and-final-combined-verification) supersede the earlier phase's counts after the capability layout refactor. The alias and compact-configuration follow-ups record earlier package upgrades; [merged playbook adoption](#merged-playbook-adoption--2026-11-17) records the current pin.

@@ -1,6 +1,6 @@
 # Git Conventions
 
-Ancora follows the [shared Sailtech Git and PR convention](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/pull-request-and-commit-convention.md), the same canonical source used by the Sailtech monorepo. These rules apply repository-wide: web, the Python API, shared packages, tooling and documentation.
+Ancora follows the [shared Sailtech Git and PR convention](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/pull-request-and-commit-convention.md), the same canonical source used by the Sailtech monorepo. These rules apply repository-wide: web, the Python backend, shared packages, tooling and documentation.
 
 ## Branch Names
 

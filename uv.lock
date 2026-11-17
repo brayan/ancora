@@ -4,14 +4,14 @@ requires-python = ">=3.13, <3.15"
 
 [manifest]
 members = [
-    "ancora-api",
+    "ancora-backend",
     "ancora-python",
 ]
 
 [[package]]
-name = "ancora-api"
+name = "ancora-backend"
 version = "0.1.0"
-source = { editable = "apps/api" }
+source = { editable = "backend" }
 dependencies = [
     { name = "fastapi" },
     { name = "httpx2" },

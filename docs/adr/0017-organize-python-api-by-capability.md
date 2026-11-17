@@ -2,6 +2,8 @@
 
 Status: Accepted — owner requested Lumera/playbook structure alignment on 2026-11-17.
 
+Root project placement and service/validation naming are superseded by [ADR 0018](0018-place-projects-at-root-and-use-operation-use-cases.md). Earlier trees below remain decision history; framework-free cores and HTTP/provider contracts retain their ownership.
+
 ## Context
 
 ADR 0014 established plain domain/application models, application services, provider interfaces and separate HTTP/provider schemas. Generation, hints and coaching now span three package-wide layer trees, so changing one capability requires navigating each tree. The owner requested Lumera's feature-first FastAPI structure in the existing standards-alignment worktree and PR.

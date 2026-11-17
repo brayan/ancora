@@ -1,5 +1,5 @@
-# ADR 0017: exact capability boundaries; external domain imports are checked separately.
-source_roots = ["apps/api/src"]
+# ADR 0018: exact capability boundaries; external domain imports are checked separately.
+source_roots = ["backend/src"]
 exact = true
 root_module = "forbid"
 forbid_circular_dependencies = true
@@ -30,7 +30,7 @@ path = "ancora.challenges.application.interfaces"
 depends_on = ["ancora.challenges.application"]
 
 [[modules]]
-path = "ancora.challenges.application.services"
+path = "ancora.challenges.application.use_cases"
 depends_on = ["ancora.challenges.application", "ancora.challenges.application.interfaces", "ancora.challenges.domain"]
 
 [[modules]]
@@ -50,7 +50,7 @@ path = "ancora.hints.application.interfaces"
 depends_on = ["ancora.hints.application"]
 
 [[modules]]
-path = "ancora.hints.application.services"
+path = "ancora.hints.application.use_cases"
 depends_on = ["ancora.hints.application", "ancora.hints.application.interfaces", "ancora.hints.domain", "ancora.challenges.domain"]
 
 [[modules]]
@@ -70,7 +70,7 @@ path = "ancora.coaching.application.interfaces"
 depends_on = ["ancora.coaching.application"]
 
 [[modules]]
-path = "ancora.coaching.application.services"
+path = "ancora.coaching.application.use_cases"
 depends_on = ["ancora.coaching.application", "ancora.coaching.application.interfaces", "ancora.coaching.domain", "ancora.challenges.domain"]
 
 [[modules]]
@@ -79,11 +79,11 @@ depends_on = ["ancora.coaching.application", "ancora.coaching.domain", "ancora.s
 
 [[modules]]
 path = "ancora.api"
-depends_on = ["ancora.config", "ancora.shared.application", "ancora.challenges.application", "ancora.challenges.application.interfaces", "ancora.challenges.application.services", "ancora.challenges.domain", "ancora.hints.application", "ancora.hints.application.interfaces", "ancora.hints.application.services", "ancora.hints.domain", "ancora.coaching.application", "ancora.coaching.application.interfaces", "ancora.coaching.application.services", "ancora.coaching.domain"]
+depends_on = ["ancora.config", "ancora.shared.application", "ancora.challenges.application", "ancora.challenges.application.interfaces", "ancora.challenges.application.use_cases", "ancora.challenges.domain", "ancora.hints.application", "ancora.hints.application.interfaces", "ancora.hints.application.use_cases", "ancora.hints.domain", "ancora.coaching.application", "ancora.coaching.application.interfaces", "ancora.coaching.application.use_cases", "ancora.coaching.domain"]
 
 [[modules]]
 path = "ancora.bootstrap"
-depends_on = ["ancora.api", "ancora.config", "ancora.challenges.application.interfaces", "ancora.challenges.application.services", "ancora.challenges.infrastructure", "ancora.hints.application.interfaces", "ancora.hints.application.services", "ancora.hints.infrastructure", "ancora.coaching.application.interfaces", "ancora.coaching.application.services", "ancora.coaching.infrastructure"]
+depends_on = ["ancora.api", "ancora.config", "ancora.challenges.application.interfaces", "ancora.challenges.application.use_cases", "ancora.challenges.infrastructure", "ancora.hints.application.interfaces", "ancora.hints.application.use_cases", "ancora.hints.infrastructure", "ancora.coaching.application.interfaces", "ancora.coaching.application.use_cases", "ancora.coaching.infrastructure"]
 
 [[modules]]
 path = "ancora.main"
@@ -92,14 +92,14 @@ depends_on = []
 [[interfaces]]
 from = ["ancora.challenges.domain"]
 expose = ["models(\\..*)?"]
-visibility = ["ancora.hints.domain", "ancora.coaching.domain", "ancora.challenges.application", "ancora.challenges.application.services", "ancora.hints.application.services", "ancora.coaching.application.services", "ancora.api", "ancora.challenges.infrastructure"]
+visibility = ["ancora.hints.domain", "ancora.coaching.domain", "ancora.challenges.application", "ancora.challenges.application.use_cases", "ancora.hints.application.use_cases", "ancora.coaching.application.use_cases", "ancora.api", "ancora.challenges.infrastructure"]
 
 [[interfaces]]
 from = ["ancora.challenges.domain"]
 expose = ["errors(\\..*)?", "values(\\..*)?"]
-visibility = ["ancora.challenges.application.services", "ancora.hints.application.services", "ancora.coaching.application.services", "ancora.api", "ancora.challenges.infrastructure"]
+visibility = ["ancora.challenges.application.use_cases", "ancora.hints.application.use_cases", "ancora.coaching.application.use_cases", "ancora.api", "ancora.challenges.infrastructure"]
 
 [[interfaces]]
 from = ["ancora.challenges.domain"]
-expose = ["rules(\\..*)?"]
-visibility = ["ancora.challenges.application.services"]
+expose = ["draft_validation(\\..*)?"]
+visibility = ["ancora.challenges.application.use_cases"]

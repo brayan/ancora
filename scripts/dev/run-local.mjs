@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
-const runner = spawn(process.execPath, ['apps/web/scripts/run-runner.mjs'], {
+const runner = spawn(process.execPath, ['web/scripts/run-runner.mjs'], {
   cwd: root,
   stdio: 'inherit',
   env: {
@@ -15,7 +15,7 @@ const runner = spawn(process.execPath, ['apps/web/scripts/run-runner.mjs'], {
   },
 });
 
-const require = createRequire(path.join(root, 'apps/web/package.json'));
+const require = createRequire(path.join(root, 'web/package.json'));
 const webEnvironment = { ...process.env };
 for (const key of [
   'OPENAI_API_KEY',
@@ -30,7 +30,7 @@ const web = spawn(
   process.execPath,
   [require.resolve('next/dist/bin/next'), 'dev', '--hostname', '127.0.0.1', '--port', '3000'],
   {
-    cwd: path.join(root, 'apps/web'),
+    cwd: path.join(root, 'web'),
     stdio: 'inherit',
     env: webEnvironment,
   }

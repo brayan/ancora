@@ -30,7 +30,7 @@ async function fixture(files) {
 }
 
 function check(script, directory) {
-  return execute(process.execPath, [path.join(repository, 'apps/web/scripts', script)], {
+  return execute(process.execPath, [path.join(repository, 'web/scripts', script)], {
     cwd: directory,
   });
 }
@@ -124,10 +124,10 @@ test('should enforce SailTech size budgets when route and component files exceed
 
 test('should reject stale size exceptions when an oversized module was already repaired', async () => {
   const directory = await fixture({
-    'apps/web/app/page.tsx': 'export default function Page() { return null; }',
+    'web/app/page.tsx': 'export default function Page() { return null; }',
   });
-  // The real app lives two levels below its repository; mirror that placement for exception lookup.
-  const app = path.join(directory, 'apps/web');
+  // Mirror the root-level web project so exceptions resolve from the repository.
+  const app = path.join(directory, 'web');
   await mkdir(app, { recursive: true });
   const quality = path.join(directory, 'config/quality');
   await mkdir(quality, { recursive: true });
@@ -152,7 +152,7 @@ test('should ignore test and declaration sizes when only product modules have li
 });
 
 test('should reject malformed and duplicate exceptions when size policy entries lack a unique reason', async () => {
-  const directory = await fixture({ 'apps/web/app/page.tsx': 'export default function Page() {}' });
+  const directory = await fixture({ 'web/app/page.tsx': 'export default function Page() {}' });
   const quality = path.join(directory, 'config/quality');
   await mkdir(quality, { recursive: true });
   const allowlist = path.join(quality, 'typescript-size-guardrails-allowlist.txt');
@@ -166,7 +166,7 @@ test('should reject malformed and duplicate exceptions when size policy entries 
   ]) {
     await writeFile(allowlist, content);
     await assert.rejects(
-      check('check-typescript-size-guardrails.mjs', path.join(directory, 'apps/web')),
+      check('check-typescript-size-guardrails.mjs', path.join(directory, 'web')),
       (error) => {
         assert.match(error.stderr, message);
         return true;

@@ -20,19 +20,19 @@ package = false
 required-version = "==0.11.18"
 
 [tool.uv.workspace]
-members = ["apps/api"]
+members = ["backend"]
 
 [tool.uv.sources]
 sailtech-python-checks = { path = "config/quality/python/sailtech_python_checks-0.10.3-py3-none-any.whl" }
 
 [tool.pyright]
 include = [
-    "apps/api/src",
-    "apps/api/tests",
-    "apps/web/runner/harness.py",
-    "apps/web/tests/python",
+    "backend/src",
+    "backend/tests",
+    "web/runner/harness.py",
+    "web/tests/python",
 ]
-extraPaths = ["apps/api/src", "apps/web/runner"]
+extraPaths = ["backend/src", "web/runner"]
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.13"
@@ -46,7 +46,7 @@ useLibraryCodeForTypes = true
 
 [tool.ruff]
 target-version = "py313"
-include = ["apps/api/**/*.py", "apps/web/runner/harness.py", "apps/web/tests/python/**/*.py"]
+include = ["backend/**/*.py", "web/runner/harness.py", "web/tests/python/**/*.py"]
 
 [tool.ruff.lint]
 extend-select = [
@@ -66,8 +66,8 @@ max-statements = 50
 skip-magic-trailing-comma = false
 
 [tool.pytest.ini_options]
-testpaths = ["apps/api/tests", "apps/web/tests/python"]
-pythonpath = ["apps/api/src", "apps/web/runner"]
+testpaths = ["backend/tests", "web/tests/python"]
+pythonpath = ["backend/src", "web/runner"]
 addopts = "--strict-config --strict-markers -p no:tach"
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"
