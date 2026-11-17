@@ -1,10 +1,10 @@
 {
   "package": "sailtech-python-checks",
-  "version": "0.10.1",
+  "version": "0.10.3",
   "source_repository": "https://github.com/brayan/engineering-playbook",
-  "source_revision": "ee14579643fb0c5e9779731a8d117f3509b8c5e8",
+  "source_revision": "b524f009fcbb9be7c0d488d9fe336f6c5c094581",
   "source_directory": "scripts/python-conventions",
-  "wheel": "sailtech_python_checks-0.10.1-py3-none-any.whl",
-  "sha256": "b01ffe3091080e4b85ef57859de0ba0a21115e1582e77e176c6b19a41a07fdb9",
-  "upstream_commit": "https://github.com/brayan/engineering-playbook/commit/ee14579643fb0c5e9779731a8d117f3509b8c5e8"
+  "wheel": "sailtech_python_checks-0.10.3-py3-none-any.whl",
+  "sha256": "53d00d3463fbb8c93f0c9f99066c3f6c0f247d0ee640ea766873ca1fc67e71d6",
+  "upstream_commit": "https://github.com/brayan/engineering-playbook/commit/b524f009fcbb9be7c0d488d9fe336f6c5c094581"
 }

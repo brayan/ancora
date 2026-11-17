@@ -2,11 +2,11 @@
 
 Verified locally on 2026-11-17 in a new worktree from main `dd4d5d842e30239c3262f0e4c59af6fd3ae88d39`, branch `chore/python-standards-alignment`. Environment: macOS, Node `26.0.0`, pnpm `10.8.0`, uv `0.11.18`, Python `3.13.13`, Google Chrome `157.0.8103.79` and Playwright `1.65.0`.
 
-The [combined results](#capability-layout-and-final-combined-verification) supersede the earlier phase's counts after the capability layout refactor. The [alias-policy follow-up](#shared-type-alias-policy--2026-11-17) and [compact configuration follow-up](#compact-model-configuration--2026-11-17) record subsequent shared-package upgrades.
+The [combined results](#capability-layout-and-final-combined-verification) supersede the earlier phase's counts after the capability layout refactor. The alias and compact-configuration follow-ups record earlier package upgrades; [merged playbook adoption](#merged-playbook-adoption--2026-11-17) records the current pin.
 
 ## Scope and review
 
-The root workspace installs `sailtech-python-checks` with its compatible Tach extra, initially `0.9.5` and now `0.10.1` after the alias and compact-configuration follow-ups. [Artifact provenance](../../config/quality/python/README.md) records immutable source and SHA-256. Copied checker implementations/fixtures were removed; all existing enabled layout rules remain enforced alongside ordering, suppression rejection and the shared domain-import guard. Ruff adds shared naming, unused-argument and size rules without disabling existing checks. Pyright remains strict.
+The root workspace installs `sailtech-python-checks` with its compatible Tach extra, initially `0.9.5` and now `0.10.3` from the merged playbook. [Artifact provenance](../../config/quality/python/README.md) records immutable source and SHA-256. Copied checker implementations/fixtures were removed; all existing enabled layout rules remain enforced alongside ordering, suppression rejection and the shared domain-import guard. Ruff adds shared naming, unused-argument and size rules without disabling existing checks. Pyright remains strict.
 
 Source/tests follow dependency-aware ordering while retaining positional signatures/dataclass fields. Effectful keyword arguments are computed in their original order. An AST comparison identified function-body changes beyond keyword ordering for focused review: mapper argument preparation, provider setup, environment reads, intentional argument discards and the runner refactor. Contract/schema checks passed without regenerating artifacts. Domain/application remain framework-free; the exact first-party graph is unchanged.
 
@@ -92,3 +92,11 @@ The [first hosted playbook run](https://github.com/brayan/engineering-playbook/a
 - Relative documentation links, three module AST comparisons, the artifact digest and whitespace checks passed.
 
 No local Chrome rerun was added for this development-tool and AST-identical whitespace change. The preceding runtime evidence remains identified above; automatic CI still runs its browser lane for published changes. No provider calls ran, and CI remains provider-free.
+
+## Merged playbook adoption — 2026-11-17
+
+The current pin is **0.10.3** from merged [playbook PR #28](https://github.com/brayan/engineering-playbook/pull/28), mainline commit [`b524f009fcbb9be7c0d488d9fe336f6c5c094581`](https://github.com/brayan/engineering-playbook/commit/b524f009fcbb9be7c0d488d9fe336f6c5c094581). The two review fixes preserve reads of enclosing/control-flow bindings before alias reassignments, including defaults, annotations and class bases, at module scope and inside conditional suites. The compact `model_config` exception remains enabled.
+
+The exported merged source passed its lint/format/layout checks, strict Pyright and **359 pytest cases**, including **19 new binding-preservation regressions**. Two independent archive builds were byte-identical, with SHA-256 `53d00d3463fbb8c93f0c9f99066c3f6c0f247d0ee640ea766873ca1fc67e71d6`. Regression fixtures remain upstream; Ancora tests the installed artifact and command wiring. This follow-up changes development-policy provenance, the lock and documentation; maintained application/runner sources match the preceding commit.
+
+The [merged mainline workflow](https://github.com/brayan/engineering-playbook/actions/runs/44146054983) passed all four jobs at that source commit. Ancora's frozen `pnpm python:sync`, offline `pnpm python:check` (**214 cases**) and `pnpm repo:test:pr` passed, including 8 config, 20 quality/runner, 33 web unit, 48 disposable-PostgreSQL and 1 eval-scaffold case. Relative documentation links, wheel digest, runtime-source equality and whitespace checks passed. Browser validation remains in the automatic CI lane for the published head; no live provider calls ran.
