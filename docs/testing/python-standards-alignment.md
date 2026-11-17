@@ -2,11 +2,11 @@
 
 Verified locally on 2026-11-17 in a new worktree from main `dd4d5d842e30239c3262f0e4c59af6fd3ae88d39`, branch `chore/python-standards-alignment`. Environment: macOS, Node `26.0.0`, pnpm `10.8.0`, uv `0.11.18`, Python `3.13.13`, Google Chrome `157.0.8103.79` and Playwright `1.65.0`.
 
-The [combined results](#capability-layout-and-final-combined-verification) supersede the earlier phase's counts after the capability layout refactor. The [alias-policy follow-up](#shared-type-alias-policy--2026-11-17) records the subsequent shared-package upgrade.
+The [combined results](#capability-layout-and-final-combined-verification) supersede the earlier phase's counts after the capability layout refactor. The [alias-policy follow-up](#shared-type-alias-policy--2026-11-17) and [compact configuration follow-up](#compact-model-configuration--2026-11-17) record subsequent shared-package upgrades.
 
 ## Scope and review
 
-The root workspace installs `sailtech-python-checks` with its compatible Tach extra, initially `0.9.5` and now `0.10.0` after the alias-policy follow-up. [Artifact provenance](../../config/quality/python/README.md) records immutable source and SHA-256. Copied checker implementations/fixtures were removed; all existing enabled layout rules remain enforced alongside ordering, suppression rejection and the shared domain-import guard. Ruff adds shared naming, unused-argument and size rules without disabling existing checks. Pyright remains strict.
+The root workspace installs `sailtech-python-checks` with its compatible Tach extra, initially `0.9.5` and now `0.10.1` after the alias and compact-configuration follow-ups. [Artifact provenance](../../config/quality/python/README.md) records immutable source and SHA-256. Copied checker implementations/fixtures were removed; all existing enabled layout rules remain enforced alongside ordering, suppression rejection and the shared domain-import guard. Ruff adds shared naming, unused-argument and size rules without disabling existing checks. Pyright remains strict.
 
 Source/tests follow dependency-aware ordering while retaining positional signatures/dataclass fields. Effectful keyword arguments are computed in their original order. An AST comparison identified function-body changes beyond keyword ordering for focused review: mapper argument preparation, provider setup, environment reads, intentional argument discards and the runner refactor. Contract/schema checks passed without regenerating artifacts. Domain/application remain framework-free; the exact first-party graph is unchanged.
 
@@ -73,3 +73,22 @@ A preview found three spacing violations in the generation, hint and coaching de
 - `pnpm repo:test:pr`: passed context/conventions/contracts/types, 8 config cases, 20 quality/runner cases, 33 web unit cases, 48 disposable-PostgreSQL cases and 1 eval-scaffold case.
 
 The preceding **60/60 Chrome result** remains runtime evidence for the earlier combined refactor; Chrome was not rerun for this development-policy and AST-identical whitespace follow-up. CI uses the same installed checker and remains offline. No provider calls ran.
+
+## Compact model configuration — 2026-11-17
+
+The locked development artifact is now **0.10.1** from [engineering-playbook commit `ee14579643fb0c5e9779731a8d117f3509b8c5e8`](https://github.com/brayan/engineering-playbook/commit/ee14579643fb0c5e9779731a8d117f3509b8c5e8). Two isolated builds from that immutable archive were byte-identical, with SHA-256 `b01ffe3091080e4b85ef57859de0ba0a21115e1582e77e176c6b19a41a07fdb9` recorded in provenance and the lockfile.
+
+`PYORD005` permits zero or one blank line after a single-line class `model_config` before an annotated instance field. Multiline configuration and other declaration-kind transitions still require one separator. The rule uses existing syntactic roles without framework imports or inheritance inference; no suppression or local opt-out was added.
+
+Ancora removes four blank gaps in `ApiErrorResponse`, `DraftInvalidResponse`, `GenerationStatus` and `HintDraft`. The old package reported four `PYORD005` violations against those exact edits; the updated package accepts them. All three affected module ASTs are identical. Runtime dependencies, model fields/validation, canonical contracts, prompts and migrations are unchanged.
+
+Upstream local checks passed **340 package tests**, including 16 new configuration-spacing cases; **410 skill-helper tests**, **215 Kotlin tests** and installer fixtures; **81 Markdown files** and **7 documentation integration cases**. Actionlint and shell syntax passed. The upstream commit adds its own push/PR workflow for documentation, Python `3.10`/`3.13` and existing script fixtures; those are playbook checks, separate from Ancora's CI and test counts. Fixtures remain upstream.
+
+The [first hosted playbook run](https://github.com/brayan/engineering-playbook/actions/runs/44132680936) passed all four jobs at that exact source commit: Documentation, Python package (`3.10`), Python package (`3.13`), and Kotlin/skill fixtures.
+
+- `pnpm python:sync`: frozen installation of the `0.10.1` artifact passed.
+- `UV_OFFLINE=1 pnpm python:check`: passed all enabled policy checks, Ruff/formatting, strict Pyright, exact Tach/domain guards and **214 pytest cases**.
+- `pnpm repo:test:pr`: passed context/conventions/contracts/types, 8 config cases, 20 quality/runner cases, 33 web unit cases, 48 disposable-PostgreSQL cases and 1 eval-scaffold case.
+- Relative documentation links, three module AST comparisons, the artifact digest and whitespace checks passed.
+
+No local Chrome rerun was added for this development-tool and AST-identical whitespace change. The preceding runtime evidence remains identified above; automatic CI still runs its browser lane for published changes. No provider calls ran, and CI remains provider-free.

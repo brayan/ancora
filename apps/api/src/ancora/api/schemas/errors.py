@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class ApiErrorResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-
     error: Literal[
         "unauthorized",
         "origin_forbidden",
@@ -22,7 +21,6 @@ class ApiErrorResponse(BaseModel):
 
 class DraftInvalidResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-
     error: Literal["draft_invalid"]
     issues: Annotated[
         list[Annotated[str, Field(max_length=100, min_length=1)]],

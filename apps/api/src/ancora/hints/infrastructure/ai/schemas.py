@@ -11,7 +11,6 @@ def _content_units(value: str) -> str:
 
 class HintDraft(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
-
     content: Annotated[
         str,
         Field(max_length=1800, min_length=1, pattern=r"\S"),
