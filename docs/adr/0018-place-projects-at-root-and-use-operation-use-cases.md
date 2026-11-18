@@ -30,6 +30,23 @@ workflow. Provider interfaces retain `generate`; no forwarding service or
 compatibility wrapper remains. Constructors, provider allowances and interruption
 semantics retain their existing contracts.
 
+Do not create a use case whose only behavior is delegating one call and returning
+the same result. The consumer calls the existing public application interface or
+domain operation directly, within the exact import/public-interface graph.
+Forwarding services/helpers are not substitutes. Preserve required validation,
+authorization, scope, dispatch allowance and error semantics when removing a
+wrapper; direct delivery access to concrete infrastructure remains forbidden.
+The operation must require behavior beyond delegation. Do not invent validation,
+mapping or logging merely to justify a use-case class.
+
+The three generation operations retain meaningful behavior: challenge generation
+checks availability and draft consistency; hints validate progression, public
+case values, output and provenance; coaching validates bounded input, public case
+values, feedback and provenance. Their single provider dispatch does not make
+them forwarding wrappers. Configuration-status routes already read the public
+provider interfaces directly and do not need artificial read-status use cases.
+Pure domain checks remain functions owned by their domain modules.
+
 Rename domain validation modules according to the content they validate:
 `draft_validation.py`, `hint_validation.py` and `feedback_validation.py` in their
 respective capabilities. Keep the existing pure functions and private helpers.

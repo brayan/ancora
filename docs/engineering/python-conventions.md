@@ -29,6 +29,22 @@ Constructors follow the same parameter rule: `__init__(self, model, api_key, *, 
 
 ## Service architecture
 
+ADR 0018 owns operation use cases in `application/use_cases`. Do not add a class or
+function that only forwards one call and returns its result. The consumer calls
+the existing public application interface or domain operation directly, within
+Tach's declared visibility. Do not replace a forwarding use case with a forwarding
+service/helper or bypass required validation, policy, scope, dispatch allowance or
+error semantics. Delivery never calls a concrete infrastructure adapter.
+Do not invent validation, mapping or logging to make a forwarding class appear
+necessary; the operation must actually require behavior beyond delegation.
+
+Review responsibility rather than counting calls: generation, hint and coaching
+use cases validate acceptance/input/output around their provider dispatch, while
+status routes already read configuration through provider interfaces directly.
+Pure domain validation remains in intent-specific functions/modules. Shared
+[Python service conventions](https://github.com/brayan/engineering-playbook/blob/main/docs/backend/python-service-conventions.md)
+own the repo-neutral architecture guidance; this is Ancora's local integration.
+
 [ADR 0018](../adr/0018-place-projects-at-root-and-use-operation-use-cases.md) places `web/` and `backend/` at root and names application operations as use cases. [ADR 0017](../adr/0017-organize-python-api-by-capability.md) retains the feature-first layout: root `api/` and `config/`, with `challenges/`, `hints/` and `coaching/` each containing domain/application and `infrastructure/ai`. `shared/application` contains only the common provider-interruption error. Challenge contracts/value validation remain public feature-owned dependencies; acceptance rules and concrete adapters remain private. Create only packages with real content.
 
 [ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md) still owns plain core models and separate transport/provider mappings. Domain/application models are dataclasses; neither layer imports Pydantic, FastAPI, SDKs or transport DTOs. Operation use cases coordinate meaningful workflows through application-owned `interfaces`. `GenerateChallenge`, `GenerateHint` and `GenerateCoachingFeedback` expose `execute`; providers retain `generate`. Domain checks remain pure functions in `draft_validation`, `hint_validation` and `feedback_validation`. Each use case owns the former service orchestration directly, without a forwarding wrapper or duplicate service.
