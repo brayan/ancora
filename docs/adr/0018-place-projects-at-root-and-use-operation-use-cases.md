@@ -2,6 +2,9 @@
 
 Status: Accepted — owner requested the root layout, use cases and intent-specific validation modules on 2026-11-17.
 
+Entrypoint naming is superseded by [ADR 0019](0019-use-callable-python-use-cases.md):
+current operations implement `__call__`; the `execute` names below describe this decision's original implementation.
+
 ## Context
 
 The repository has two applications under `apps/`. The Python project is named

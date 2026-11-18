@@ -63,4 +63,4 @@ async def generate(
     dispatch allowance. No Python solutions execute here and no retries occur.
     Failures expose bounded codes; trusted server authentication precedes parsing.
     """
-    return response_from_result(await use_case.execute(command_from_request(payload)))
+    return response_from_result(await use_case(command_from_request(payload)))

@@ -29,6 +29,12 @@ Constructors follow the same parameter rule: `__init__(self, model, api_key, *, 
 
 ## Service architecture
 
+Under [ADR 0019](../adr/0019-use-callable-python-use-cases.md), `__call__` is the
+single operation entrypoint. Invoke instances directly with `use_case(command)`
+or `await use_case(command)` for the current asynchronous operations. Preserve
+constructor injection and typed commands/results. Do not retain forwarding
+`execute`, `run` or `call` aliases.
+
 ADR 0018 owns operation use cases in `application/use_cases`. Do not add a class or
 function that only forwards one call and returns its result. The consumer calls
 the existing public application interface or domain operation directly, within
@@ -47,7 +53,7 @@ own the repo-neutral architecture guidance; this is Ancora's local integration.
 
 [ADR 0018](../adr/0018-place-projects-at-root-and-use-operation-use-cases.md) places `web/` and `backend/` at root and names application operations as use cases. [ADR 0017](../adr/0017-organize-python-api-by-capability.md) retains the feature-first layout: root `api/` and `config/`, with `challenges/`, `hints/` and `coaching/` each containing domain/application and `infrastructure/ai`. `shared/application` contains only the common provider-interruption error. Challenge contracts/value validation remain public feature-owned dependencies; acceptance rules and concrete adapters remain private. Create only packages with real content.
 
-[ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md) still owns plain core models and separate transport/provider mappings. Domain/application models are dataclasses; neither layer imports Pydantic, FastAPI, SDKs or transport DTOs. Operation use cases coordinate meaningful workflows through application-owned `interfaces`. `GenerateChallenge`, `GenerateHint` and `GenerateCoachingFeedback` expose `execute`; providers retain `generate`. Domain checks remain pure functions in `draft_validation`, `hint_validation` and `feedback_validation`. Each use case owns the former service orchestration directly, without a forwarding wrapper or duplicate service.
+[ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md) still owns plain core models and separate transport/provider mappings. Domain/application models are dataclasses; neither layer imports Pydantic, FastAPI, SDKs or transport DTOs. Operation use cases coordinate meaningful workflows through application-owned `interfaces`. `GenerateChallenge`, `GenerateHint` and `GenerateCoachingFeedback` expose `__call__`; providers retain `generate`. Domain checks remain pure functions in `draft_validation`, `hint_validation` and `feedback_validation`. Each use case owns the former service orchestration directly, without a forwarding wrapper or duplicate service.
 
 API/provider Pydantic schemas validate their own untrusted boundaries and map explicitly to plain core values. Split routers and dependency accessors by capability, keep `Depends` in the root API, and document HTTP summaries, tags, response/error models and meaningful side effects. Wire/schema parity remains tested against canonical artifacts. `config/settings.py` parses environment configuration; `bootstrap.py` wires adapters/lifecycles; `main.py` starts Uvicorn. The import package is `ancora`, distribution `ancora-backend`, under `backend`.
 

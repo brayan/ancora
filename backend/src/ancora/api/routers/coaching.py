@@ -70,4 +70,4 @@ async def generate(
     backend never executes source or changes a verdict. Provider retries are off;
     failures expose bounded codes without source or provider exception details.
     """
-    return response_from_result(await use_case.execute(command_from_request(payload)))
+    return response_from_result(await use_case(command_from_request(payload)))

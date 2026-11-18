@@ -51,5 +51,5 @@ async def generate(
     Requires the trusted server's bearer token. Requests with an Origin header are
     rejected before parsing. Failures return bounded codes without input/provider text.
     """
-    result = await use_case.execute(command_from_request(payload))
+    result = await use_case(command_from_request(payload))
     return response_from_result(result)

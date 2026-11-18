@@ -73,7 +73,7 @@ async def test_should_generate_feedback_when_one_saved_source_and_public_context
 ):
     provider = SyntheticCoachingProvider()
     command = command_from_request(coaching_input())
-    result = await GenerateCoachingFeedback(provider).execute(command)
+    result = await GenerateCoachingFeedback(provider)(command)
 
     assert result.feedback == FEEDBACK
     assert provider.calls == [command]
@@ -96,14 +96,10 @@ async def test_should_reject_unknown_provenance_and_disabled_configuration_when_
 
     provider = WrongProvider()
     with pytest.raises(CoachingInvalid):
-        await GenerateCoachingFeedback(provider).execute(
-            command_from_request(coaching_input())
-        )
+        await GenerateCoachingFeedback(provider)(command_from_request(coaching_input()))
     provider.available = False
     with pytest.raises(CoachingUnavailable):
-        await GenerateCoachingFeedback(provider).execute(
-            command_from_request(coaching_input())
-        )
+        await GenerateCoachingFeedback(provider)(command_from_request(coaching_input()))
     assert len(provider.calls) == 1
 
 
@@ -181,7 +177,7 @@ async def test_should_skip_provider_when_aggregate_execution_counts_are_inconsis
     command = command_from_request(coaching_input())
     for passed, total in [(3, 2), (-1, 2), (1, 13), (True, 2)]:
         with pytest.raises(CoachingInvalid):
-            await GenerateCoachingFeedback(provider).execute(
+            await GenerateCoachingFeedback(provider)(
                 replace(
                     command,
                     evidence=replace(command.evidence, passed=passed, total=total),
@@ -198,7 +194,7 @@ async def test_should_skip_provider_when_source_is_empty_or_exceeds_wire_bounds(
     provider = SyntheticCoachingProvider()
     command = replace(command_from_request(coaching_input()), source=source)
     with pytest.raises(CoachingInvalid):
-        await GenerateCoachingFeedback(provider).execute(command)
+        await GenerateCoachingFeedback(provider)(command)
     assert provider.calls == []
 
 
@@ -220,7 +216,5 @@ async def test_should_withhold_feedback_when_output_is_blank_oversized_or_a_repl
 
     provider = InvalidProvider()
     with pytest.raises(CoachingInvalid):
-        await GenerateCoachingFeedback(provider).execute(
-            command_from_request(coaching_input())
-        )
+        await GenerateCoachingFeedback(provider)(command_from_request(coaching_input()))
     assert len(provider.calls) == 1

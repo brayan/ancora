@@ -54,7 +54,7 @@ async def test_should_generate_one_progressive_hint_when_previous_levels_are_sup
 ) -> None:
     provider = SyntheticHintProvider()
     command = command_from_request(hint_input(level))
-    result = await GenerateHint(provider).execute(command)
+    result = await GenerateHint(provider)(command)
     assert result.hint == Hint(level, HINT_TEXTS[level - 1])
     assert provider.calls == [command]
     assert not hasattr(command, "source")
@@ -98,7 +98,7 @@ async def test_should_reject_inconsistent_public_values_when_the_function_contra
         command, challenge=replace(command.challenge, public_cases=(invalid_case,))
     )
     with pytest.raises(HintInvalid):
-        await GenerateHint(provider).execute(command)
+        await GenerateHint(provider)(command)
     assert provider.calls == []
 
 
@@ -167,7 +167,7 @@ async def test_should_skip_provider_when_hint_progression_is_invalid(
         command_from_request(hint_input()), level=level, previous_hints=previous
     )
     with pytest.raises(HintInvalid):
-        await GenerateHint(provider).execute(command)
+        await GenerateHint(provider)(command)
     assert provider.calls == []
 
 
@@ -194,7 +194,7 @@ async def test_should_withhold_obvious_spoilers_when_provider_returns_invalid_co
 
     provider = SpoilerProvider()
     with pytest.raises(HintInvalid):
-        await GenerateHint(provider).execute(command_from_request(hint_input()))
+        await GenerateHint(provider)(command_from_request(hint_input()))
     assert len(provider.calls) == 1
 
 
@@ -213,10 +213,8 @@ async def test_should_withhold_repeated_or_mismatched_hint_when_provider_does_no
     provider = RepeatingProvider()
     for level in (1, 2):
         with pytest.raises(HintInvalid):
-            await GenerateHint(provider).execute(
-                command_from_request(hint_input(level))
-            )
+            await GenerateHint(provider)(command_from_request(hint_input(level)))
     provider.available = False
     with pytest.raises(HintsUnavailable):
-        await GenerateHint(provider).execute(command_from_request(hint_input()))
+        await GenerateHint(provider)(command_from_request(hint_input()))
     assert len(provider.calls) == 2

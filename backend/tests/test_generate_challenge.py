@@ -57,7 +57,7 @@ async def test_should_forward_correction_context_once_when_previous_draft_is_sup
         recent_exercises=("Synthetic earlier exercise",),
     )
 
-    await GenerateChallenge(provider).execute(correction)
+    await GenerateChallenge(provider)(correction)
     assert provider.commands == [correction]
 
 
@@ -76,7 +76,7 @@ async def test_should_preserve_interruption_when_provider_outcome_is_uncertain()
     original, command = provider_for_request()
     provider = InterruptedProvider(original.result)
     with pytest.raises(ProviderInterrupted):
-        await GenerateChallenge(provider).execute(command)
+        await GenerateChallenge(provider)(command)
     assert provider.commands == [command]
 
 
@@ -94,7 +94,7 @@ async def test_should_reject_invalid_reference_when_provider_returns_contract_mi
     )
 
     with pytest.raises(DraftInvalid, match="reference_contract_invalid"):
-        await GenerateChallenge(provider).execute(command)
+        await GenerateChallenge(provider)(command)
     assert provider.commands == [command]
 
 
@@ -108,7 +108,7 @@ async def test_should_reject_mismatched_challenge_when_provider_returns_other_co
     )
 
     with pytest.raises(DraftInvalid, match="request_mismatch"):
-        await GenerateChallenge(provider).execute(command)
+        await GenerateChallenge(provider)(command)
     assert provider.commands == [command]
 
 
@@ -118,7 +118,7 @@ async def test_should_return_validated_result_when_provider_returns_matching_cha
 ):
     provider, command = provider_for_request()
     use_case = GenerateChallenge(provider)
-    result = await use_case.execute(command)
+    result = await use_case(command)
 
     assert result is provider.result
     assert provider.commands == [command]
@@ -129,5 +129,5 @@ async def test_should_skip_dispatch_when_provider_is_unavailable() -> None:
     provider, command = provider_for_request()
     provider.available = False
     with pytest.raises(GenerationUnavailable):
-        await GenerateChallenge(provider).execute(command)
+        await GenerateChallenge(provider)(command)
     assert provider.commands == []
