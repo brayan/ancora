@@ -54,7 +54,7 @@ async def status(provider: HintProviderDependency) -> HintAvailability:
 )
 async def generate(
     payload: HintInput,
-    use_case: GenerateHintDependency,
+    generate_hint: GenerateHintDependency,
 ) -> HintOutput:
     """Make at most one paid dispatch for an explicitly requested hint level.
 
@@ -63,4 +63,4 @@ async def generate(
     dispatch allowance. No Python solutions execute here and no retries occur.
     Failures expose bounded codes; trusted server authentication precedes parsing.
     """
-    return response_from_result(await use_case(command_from_request(payload)))
+    return response_from_result(await generate_hint(command_from_request(payload)))

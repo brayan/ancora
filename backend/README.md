@@ -1,8 +1,8 @@
 # Ancora backend
 
-Use cases implement `__call__`; invoke an injected operation with
-`result = await use_case(command)`. [ADR 0019](../docs/adr/0019-use-callable-python-use-cases.md)
-owns this entrypoint convention. Providers retain `generate`.
+Use cases implement `__call__`. Name injected instances after their classes in
+`snake_case` and invoke them directly, as in `await generate_challenge(command)`.
+See [ADR 0019](../docs/adr/0019-use-callable-python-use-cases.md) for the convention.
 
 The backend lives in `backend`, imports as `ancora`, and is installed as the `ancora-backend` distribution. FastAPI owns bounded challenge generation, progressive hints and selected-attempt coaching. Next.js owns durable lifecycle, dispatch allowances and all database writes. Reference and learner Python execute only in the isolated browser runner; this service only parses reference AST and JSON cases.
 

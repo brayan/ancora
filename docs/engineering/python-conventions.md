@@ -30,10 +30,12 @@ Constructors follow the same parameter rule: `__init__(self, model, api_key, *, 
 ## Service architecture
 
 Under [ADR 0019](../adr/0019-use-callable-python-use-cases.md), `__call__` is the
-single operation entrypoint. Invoke instances directly with `use_case(command)`
-or `await use_case(command)` for the current asynchronous operations. Preserve
-constructor injection and typed commands/results. Do not retain forwarding
-`execute`, `run` or `call` aliases.
+single operation entrypoint. Name concrete instance variables and parameters
+after the class in `snake_case`, including in routes and tests. Invoke the
+instance directly, as in `await generate_challenge(command)`. Reserve `use_case`
+for code that handles operations generically. Preserve constructor injection and
+typed commands/results. Do not retain forwarding `execute`, `run` or `call`
+aliases.
 
 ADR 0018 owns operation use cases in `application/use_cases`. Do not add a class or
 function that only forwards one call and returns its result. The consumer calls

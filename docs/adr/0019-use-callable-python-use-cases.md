@@ -11,12 +11,17 @@ the rule against artificial delegation wrappers remains in force.
 
 ## Decision
 
-Use `__call__` as the single execution entrypoint. The three asynchronous
-operations implement `async def __call__` and callers use `await use_case(command)`:
+Use `__call__` as the single execution entrypoint for the three asynchronous
+operations.
 
 - `GenerateChallenge`: availability, draft acceptance and one generation dispatch.
 - `GenerateHint`: progression, case values, output and provenance validation.
 - `GenerateCoachingFeedback`: bounded input, case values, feedback and provenance.
+
+Name each concrete instance after its class in `snake_case`. For example, a
+`GenerateChallenge` instance is `generate_challenge` and the caller uses
+`await generate_challenge(command)`. Reserve `use_case` for code that handles
+operations generically.
 
 Preserve constructor-injected application interfaces and typed commands/results.
 FastAPI dependencies supply operation instances; routers map transport input,

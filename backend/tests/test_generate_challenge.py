@@ -117,8 +117,8 @@ async def test_should_return_validated_result_when_provider_returns_matching_cha
     None
 ):
     provider, command = provider_for_request()
-    use_case = GenerateChallenge(provider)
-    result = await use_case(command)
+    generate_challenge = GenerateChallenge(provider)
+    result = await generate_challenge(command)
 
     assert result is provider.result
     assert provider.commands == [command]
