@@ -57,7 +57,8 @@ async def test_should_forward_correction_context_once_when_previous_draft_is_sup
         recent_exercises=("Synthetic earlier exercise",),
     )
 
-    await GenerateChallenge(provider)(correction)
+    generate_challenge = GenerateChallenge(provider)
+    await generate_challenge(correction)
     assert provider.commands == [correction]
 
 
@@ -75,8 +76,9 @@ async def test_should_preserve_interruption_when_provider_outcome_is_uncertain()
 
     original, command = provider_for_request()
     provider = InterruptedProvider(original.result)
+    generate_challenge = GenerateChallenge(provider)
     with pytest.raises(ProviderInterrupted):
-        await GenerateChallenge(provider)(command)
+        await generate_challenge(command)
     assert provider.commands == [command]
 
 
@@ -92,9 +94,10 @@ async def test_should_reject_invalid_reference_when_provider_returns_contract_mi
             reference_source="def wrong(value: list[int]) -> list[int]:\n    return value\n",
         ),
     )
+    generate_challenge = GenerateChallenge(provider)
 
     with pytest.raises(DraftInvalid, match="reference_contract_invalid"):
-        await GenerateChallenge(provider)(command)
+        await generate_challenge(command)
     assert provider.commands == [command]
 
 
@@ -106,9 +109,10 @@ async def test_should_reject_mismatched_challenge_when_provider_returns_other_co
     provider.result = replace(
         provider.result, draft=replace(provider.result.draft, concept="strings")
     )
+    generate_challenge = GenerateChallenge(provider)
 
     with pytest.raises(DraftInvalid, match="request_mismatch"):
-        await GenerateChallenge(provider)(command)
+        await generate_challenge(command)
     assert provider.commands == [command]
 
 
@@ -128,6 +132,7 @@ async def test_should_return_validated_result_when_provider_returns_matching_cha
 async def test_should_skip_dispatch_when_provider_is_unavailable() -> None:
     provider, command = provider_for_request()
     provider.available = False
+    generate_challenge = GenerateChallenge(provider)
     with pytest.raises(GenerationUnavailable):
-        await GenerateChallenge(provider)(command)
+        await generate_challenge(command)
     assert provider.commands == []

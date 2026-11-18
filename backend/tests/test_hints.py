@@ -54,7 +54,8 @@ async def test_should_generate_one_progressive_hint_when_previous_levels_are_sup
 ) -> None:
     provider = SyntheticHintProvider()
     command = command_from_request(hint_input(level))
-    result = await GenerateHint(provider)(command)
+    generate_hint = GenerateHint(provider)
+    result = await generate_hint(command)
     assert result.hint == Hint(level, HINT_TEXTS[level - 1])
     assert provider.calls == [command]
     assert not hasattr(command, "source")
@@ -97,8 +98,9 @@ async def test_should_reject_inconsistent_public_values_when_the_function_contra
     command = replace(
         command, challenge=replace(command.challenge, public_cases=(invalid_case,))
     )
+    generate_hint = GenerateHint(provider)
     with pytest.raises(HintInvalid):
-        await GenerateHint(provider)(command)
+        await generate_hint(command)
     assert provider.calls == []
 
 
@@ -166,8 +168,9 @@ async def test_should_skip_provider_when_hint_progression_is_invalid(
     command = replace(
         command_from_request(hint_input()), level=level, previous_hints=previous
     )
+    generate_hint = GenerateHint(provider)
     with pytest.raises(HintInvalid):
-        await GenerateHint(provider)(command)
+        await generate_hint(command)
     assert provider.calls == []
 
 
@@ -193,8 +196,9 @@ async def test_should_withhold_obvious_spoilers_when_provider_returns_invalid_co
             return replace(result, hint=Hint(command.level, text))
 
     provider = SpoilerProvider()
+    generate_hint = GenerateHint(provider)
     with pytest.raises(HintInvalid):
-        await GenerateHint(provider)(command_from_request(hint_input()))
+        await generate_hint(command_from_request(hint_input()))
     assert len(provider.calls) == 1
 
 
@@ -211,10 +215,11 @@ async def test_should_withhold_repeated_or_mismatched_hint_when_provider_does_no
             return replace(result, hint=Hint(2, HINT_TEXTS[0]))
 
     provider = RepeatingProvider()
+    generate_hint = GenerateHint(provider)
     for level in (1, 2):
         with pytest.raises(HintInvalid):
-            await GenerateHint(provider)(command_from_request(hint_input(level)))
+            await generate_hint(command_from_request(hint_input(level)))
     provider.available = False
     with pytest.raises(HintsUnavailable):
-        await GenerateHint(provider)(command_from_request(hint_input()))
+        await generate_hint(command_from_request(hint_input()))
     assert len(provider.calls) == 2
