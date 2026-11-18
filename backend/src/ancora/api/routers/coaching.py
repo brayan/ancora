@@ -61,7 +61,7 @@ async def status(provider: CoachingProviderDependency) -> CoachingAvailability:
 )
 async def generate(
     payload: CoachingInput,
-    use_case: GenerateCoachingFeedbackDependency,
+    generate_coaching_feedback: GenerateCoachingFeedbackDependency,
 ) -> CoachingOutput:
     """Make one bounded call for an attempt explicitly shared through Next.js.
 
@@ -70,4 +70,5 @@ async def generate(
     backend never executes source or changes a verdict. Provider retries are off;
     failures expose bounded codes without source or provider exception details.
     """
-    return response_from_result(await use_case.execute(command_from_request(payload)))
+    result = await generate_coaching_feedback(command_from_request(payload))
+    return response_from_result(result)

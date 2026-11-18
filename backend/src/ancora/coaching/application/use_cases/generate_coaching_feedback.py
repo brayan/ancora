@@ -14,7 +14,7 @@ class GenerateCoachingFeedback:
     ) -> None:
         self._provider = provider
 
-    async def execute(
+    async def __call__(
         self,
         command: CoachingCommand,
     ) -> CoachingResult:

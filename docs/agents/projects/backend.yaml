@@ -2,6 +2,7 @@ name: backend
 status: implemented
 primary_paths: [backend]
 read_first:
+  - docs/adr/0019-use-callable-python-use-cases.md
   - docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md
   - CONTEXT.md
   - docs/adr/0011-focus-on-local-programming-practice.md

@@ -4,6 +4,9 @@ This change starts from main `59f862441a130470d0b1570861e13fb7c07cc4b0` in
 `refactor/root-layout-use-cases`. [ADR 0018](../adr/0018-place-projects-at-root-and-use-operation-use-cases.md)
 owns the accepted structure; older dated reports retain their historical paths.
 
+This is historical evidence for that refactor. [ADR 0019](../adr/0019-use-callable-python-use-cases.md)
+later replaces its `execute` entrypoint with callable use cases.
+
 ## Scope
 
 `web/` and `backend/` replace the two `apps/` projects. The Python distribution is

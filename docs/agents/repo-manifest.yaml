@@ -12,6 +12,7 @@ canonical_docs:
   business_problem: docs/product/business-problem.md
   programming_practice: docs/product/programming-practice.md
   root_layout: docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md
+  callable_use_cases: docs/adr/0019-use-callable-python-use-cases.md
   system_overview: docs/architecture/system-overview.md
   practice_persistence: docs/architecture/practice-persistence.md
   practice_assistance: docs/architecture/practice-assistance.md
@@ -101,4 +102,5 @@ adr_index:
   - docs/adr/0016-persist-selected-attempt-coaching.md
   - docs/adr/0017-organize-python-api-by-capability.md
   - docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md
+  - docs/adr/0019-use-callable-python-use-cases.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

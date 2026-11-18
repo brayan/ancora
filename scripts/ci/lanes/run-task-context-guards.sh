@@ -20,6 +20,7 @@ for file in AGENTS.md CONTEXT.md docs/agents/repo-manifest.yaml \
   docs/agents/projects/web.yaml docs/agents/projects/backend.yaml \
   docs/agents/projects/eval-runner.yaml docs/adr/0011-focus-on-local-programming-practice.md \
   docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md \
+  docs/adr/0019-use-callable-python-use-cases.md \
   docs/product/programming-practice.md docs/exec-plans/programming-practice.md \
   docs/architecture/runner-spike.md web/package.json web/runner/worker.mjs \
   web/runner/protocol.mjs backend/pyproject.toml backend/src/ancora/main.py \
