@@ -11,6 +11,7 @@ startup:
 canonical_docs:
   business_problem: docs/product/business-problem.md
   programming_practice: docs/product/programming-practice.md
+  root_layout: docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md
   system_overview: docs/architecture/system-overview.md
   practice_persistence: docs/architecture/practice-persistence.md
   practice_assistance: docs/architecture/practice-assistance.md
@@ -21,6 +22,7 @@ canonical_docs:
   python_condition_layout: docs/engineering/python-condition-layout.md
   python_policy_artifact: config/quality/python/README.md
   python_alignment_evidence: docs/testing/python-standards-alignment.md
+  root_layout_evidence: docs/testing/root-layout-use-cases.md
   continuous_integration: docs/engineering/continuous-integration.md
   runner_spike: docs/architecture/runner-spike.md
   architecture_decisions: docs/adr
@@ -37,8 +39,8 @@ canonical_docs:
   implementation_plan: docs/exec-plans/programming-practice.md
 accepted_stack:
   web: Next.js App Router, React and TypeScript
-  product: apps/web owns product orchestration and durable records
-  generation: Bounded FastAPI/Pydantic AI service in apps/api; no DB writes
+  product: web owns product orchestration and durable records
+  generation: Bounded FastAPI/Pydantic AI service in backend; no DB writes
   persistence: PostgreSQL and Drizzle; additive 0006–0010 with ledger preflight
   provider: OpenAI; explicit model configuration and separate manual-evaluation authorization
   identity: Local single-user; no login or accounts
@@ -80,10 +82,10 @@ command_surface:
 project_shards:
   - name: web
     file: docs/agents/projects/web.yaml
-    routes: [apps/web/**, packages/ui/**, packages/shared-types/**, packages/schemas/**, prompts/**, docs/frontend/**]
-  - name: api
-    file: docs/agents/projects/api.yaml
-    routes: [apps/api/**]
+    routes: [web/**, packages/ui/**, packages/shared-types/**, packages/schemas/**, prompts/**, docs/frontend/**]
+  - name: backend
+    file: docs/agents/projects/backend.yaml
+    routes: [backend/**]
   - name: eval-runner
     file: docs/agents/projects/eval-runner.yaml
     routes: [tools/eval-runner/**, evals/**]
@@ -98,4 +100,5 @@ adr_index:
   - docs/adr/0015-persist-bounded-progressive-hints.md
   - docs/adr/0016-persist-selected-attempt-coaching.md
   - docs/adr/0017-organize-python-api-by-capability.md
+  - docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

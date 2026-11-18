@@ -10,7 +10,7 @@ import { promisify } from 'node:util';
 const execute = promisify(execFile);
 const repository = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const fixtures = [];
-const scope = ['apps/api', 'apps/web/runner/harness.py', 'apps/web/tests/python'];
+const scope = ['backend', 'web/runner/harness.py', 'web/tests/python'];
 const commands = [
   ['ruff', 'check', '.'],
   ['sailtech-check-parameters', ...scope],
@@ -20,7 +20,7 @@ const commands = [
   ['ruff', 'format', '--check', '.'],
   ['pyright'],
   ['tach', 'check', '--exact'],
-  ['sailtech-check-domain-imports', '--source-root', 'apps/api/src'],
+  ['sailtech-check-domain-imports', '--source-root', 'backend/src'],
   ['python', '-m', 'pytest'],
 ];
 

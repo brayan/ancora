@@ -2,6 +2,8 @@
 
 Local Python programming practice. Next.js App Router, React and TypeScript provide a workspace backed by PostgreSQL/Drizzle. FastAPI/Pydantic AI generate complete challenges; a separate static origin runs Python in disposable Pyodide workers.
 
+Projects live at repository root: `web/` owns the Next.js product boundary and `backend/` owns the bounded Python API. See [ADR 0018](docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md) for use-case and validation-module naming.
+
 ## Local v1
 
 Choose a concept and difficulty, generate a challenge, validate its reference in the isolated runner, and explicitly open the ready revision. Drafts, immutable challenge revisions and exact attempts survive reloads. Failed generation preserves the current editor; pending validation can resume, and one correction is an explicit action. Confirmed solution reveal preserves your draft, records the first reveal and marks later attempts as assisted. Requested progressive hints are saved per revision and mark subsequent attempts; they send public challenge context and earlier hints, never your code. Selected-attempt coaching shares only the saved code you explicitly confirm, public context and an aggregate result; saved feedback leaves your draft and verdict intact. The fixed synthetic exercise remains available without a model. No login or accounts are required.
@@ -23,7 +25,7 @@ The new practice Compose project uses loopback port 5433 and its own volume. Exi
 
 Open http://127.0.0.1:3000/practice; the static runner is http://127.0.0.1:3001 and the Python service binds http://127.0.0.1:8001. Use the exact loopback hostname. The default development database matches the URL above; set DATABASE_URL for another reviewed database. `pnpm docker:down` stops the practice database without removing its volume.
 
-The Python backend lives in [apps/api](apps/api/README.md), with import package `ancora` and distribution `ancora-api`. Run it separately with `uv run --frozen --all-packages python -m ancora.main`. Its router metadata documents success/error contracts in-process; Swagger/OpenAPI HTTP endpoints remain disabled.
+The Python backend lives in [backend](backend/README.md), with import package `ancora` and distribution `ancora-backend`. Run it separately with `uv run --frozen --all-packages python -m ancora.main`. Its router metadata documents success/error contracts in-process; Swagger/OpenAPI HTTP endpoints remain disabled.
 
 For generation, export a random `PRACTICE_SERVICE_TOKEN` of at least 32 characters to the trusted web/Python servers, plus `PRACTICE_MODEL=gpt-6-luna`, `OPENAI_API_KEY` and `PRACTICE_GENERATION_ENABLED=1` for Python. Example files list the configuration; Python does not automatically load dotenv files. `pnpm dev` passes provider configuration only to Python and removes credentials from the static runner environment. Without generation configuration, the fixed exercise still works. Enable hint requests independently with `PRACTICE_HINTS_ENABLED=1` in Python. Generating or requesting hints is an explicit paid model action; CI uses a synthetic provider and needs no OpenAI key.
 
@@ -52,6 +54,7 @@ Database/browser test wrappers create disposable PostgreSQL containers with tmpf
 - [Progressive hints](docs/architecture/progressive-hints.md)
 - [Selected-attempt coaching](docs/architecture/selected-attempt-coaching.md)
 - [Python conventions](docs/engineering/python-conventions.md)
+- [Root-layout and use-case verification](docs/testing/root-layout-use-cases.md)
 - [Continuous integration](docs/engineering/continuous-integration.md)
 - [Persistence contract and migration review](docs/architecture/practice-persistence.md)
 - [Product specification](docs/product/programming-practice.md)

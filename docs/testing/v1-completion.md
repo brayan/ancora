@@ -1,5 +1,7 @@
 # Local V1 Completion
 
+This dated report retains paths at its tested commits. Current project placement and operation names follow [ADR 0018](../adr/0018-place-projects-at-root-and-use-operation-use-cases.md); see [root-layout verification](root-layout-use-cases.md) for the subsequent refactor.
+
 The owner authorized this completion pass from merged `main` (`bf8634f`, PR #12). The local loop includes generated challenges, isolated Python execution, immutable revisions, saved drafts/attempts, recent history, reveal, progressive hints and selected-attempt coaching. ADRs 0011–0016 remain authoritative. This is local software verification, not a public-deployment or model-quality approval.
 
 Verified on 2026-11-16 UTC in a fresh macOS arm64 worktree with Node 26.0.0, pnpm 10.8.0, Python 3.13.13, uv 0.11.18 and Google Chrome 157.0.8103.79. Local Node satisfies the supported 22+ range; CI's exact Node 22/Linux environment was not reproduced here.

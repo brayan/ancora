@@ -17,7 +17,7 @@ Do not introduce Clean Architecture, MVVM, or framework-agnostic layer folders s
 ## Target Shape
 
 ```txt
-apps/web/
+web/
   app/
   features/
   components/
@@ -114,5 +114,5 @@ Ancora is a learning product, not a marketing site. App screens should be quiet,
 - Preserve route URLs and API contracts during structural moves.
 - Move one feature at a time when migrating.
 - Keep `app/` thin as behavior grows.
-- Do not add a top-level `src/` layer to `apps/web`.
+- Do not add a top-level `src/` layer to `web`.
 - `pnpm web:lint` enforces naming, import direction, architecture and size budgets. `pnpm code:check` also checks shared scripts and formatting. See [code quality conventions](../engineering/code-quality-conventions.md).

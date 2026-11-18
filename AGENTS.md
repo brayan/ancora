@@ -12,7 +12,12 @@ Use the [engineering-playbook](https://github.com/brayan/engineering-playbook) a
 4. Build small slices. Do not scaffold empty services or architecture layers. Docs-only tasks must not add executable code, dependencies or migrations.
 5. Follow docs/engineering/code-quality-conventions.md: braces for every TS/JS control-flow body, contextual blank-line grouping, and the shared naming/structure rules. Apply task-owned self-review before narrow checks; formatting does not replace paragraph review.
 6. Python follows docs/engineering/python-conventions.md: typed source/tests, strict Pyright, Ruff and pytest from the locked uv workspace. The pinned `sailtech-python-checks` wheel under `config/quality/python` owns parameter/condition/class-spacing and dependency-aware ordering checks in `python:lint`. Definitions with 2+ parameters use one per line and a trailing comma; extract multiline conditions into named predicates. Preserve positional contracts and expression evaluation order when sorting declarations/keywords. Keep module alias groups at their earliest dependency-safe position, without blank gaps except explicit section comments. No suppression comments or ordering opt-outs. Apply contextual paragraphs and shared test naming. Do not copy checker source/fixtures or require a sibling checkout.
-7. ADR 0017 owns the feature-first Python layout: root `api/` and `config/`, with `challenges`, `hints` and `coaching` each owning domain/application and `infrastructure/ai`. ADR 0014's framework-free models, application services and application-owned `interfaces` still apply; Pydantic stays at API/infrastructure boundaries. Shared contains proven common behavior only. `python:architecture` enforces exact capability/layer dependencies and public interfaces plus shared external-domain checks; never run `tach sync` in CI. Pytest checks every nested application package and imports the entire core without site packages.
+7. ADR 0018 owns root `web`/`backend` placement and operation use cases; ADR 0017 retains feature ownership. The Python layout has root `api/` and `config/`, with `challenges`, `hints` and `coaching` each owning domain/application and `infrastructure/ai`. ADR 0014's framework-free models and application-owned `interfaces` still apply; Pydantic stays at API/infrastructure boundaries. Use cases live in `application/use_cases`; domain validation uses intent-specific module names. Shared contains proven common behavior only. `python:architecture` enforces exact capability/layer dependencies and public interfaces plus shared external-domain checks; never run `tach sync` in CI. Pytest checks every nested application package and imports the entire core without site packages.
+
+Never add an application use case, service or helper solely to forward one call. Use existing
+public application interfaces or domain operations directly when no application
+behavior is added, preserving required policy/validation and exact Tach visibility.
+The Python conventions and ADR 0018 own the detailed criteria.
 
 ## Git conventions
 
@@ -21,7 +26,7 @@ Follow docs/engineering/git-conventions.md for branch names, commit subjects and
 ## Architecture
 
 - Next.js App Router, React and TypeScript own UI/product orchestration.
-- FastAPI/Pydantic AI in `apps/api` (Python package `ancora`, distribution `ancora-api`) own bounded programming generation and requested progressive hints and selected-attempt coaching. ADRs 0013/0015/0016 own generation/CI and assistance details.
+- FastAPI/Pydantic AI in `backend` (Python package `ancora`, distribution `ancora-backend`) own bounded programming generation and requested progressive hints and selected-attempt coaching. ADRs 0013/0015/0016 own generation/CI and assistance details.
 - PostgreSQL/Drizzle remain the single durable-store/migration owner. No Python database writer.
 - No authentication, accounts, Sources, decks/cards or RAG in the current product.
 - Generated/submitted Python runs only in the isolated browser runner, never in server/host Python.

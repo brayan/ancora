@@ -15,20 +15,20 @@ importers:
         specifier: 3.6.2
         version: 3.6.2
 
-  apps/web:
+  web:
     dependencies:
       '@ancora/config':
         specifier: workspace:*
-        version: link:../../packages/config
+        version: link:../packages/config
       '@ancora/schemas':
         specifier: workspace:*
-        version: link:../../packages/schemas
+        version: link:../packages/schemas
       '@ancora/shared-types':
         specifier: workspace:*
-        version: link:../../packages/shared-types
+        version: link:../packages/shared-types
       '@ancora/ui':
         specifier: workspace:*
-        version: link:../../packages/ui
+        version: link:../packages/ui
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@types/pg@8.20.0)(pg@8.21.0)

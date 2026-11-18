@@ -59,7 +59,7 @@ not-found.tsx
 
 ## Imports
 
-- Prefer `@/` imports inside `apps/web` so feature boundaries remain visible after file moves.
+- Prefer `@/` imports inside `web` so feature boundaries remain visible after file moves.
 - Update import specifiers whenever files are renamed.
 - Do not add feature-level barrel files just to shorten imports.
 - Shared package imports should remain explicit, such as `@ancora/ui` or `@ancora/shared-types`.

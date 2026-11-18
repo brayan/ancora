@@ -1,6 +1,6 @@
 name: web
 status: implemented
-primary_paths: [apps/web]
+primary_paths: [web]
 related_paths: [packages/ui, packages/shared-types, packages/schemas]
 read_first:
   - docs/engineering/code-quality-conventions.md
