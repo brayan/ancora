@@ -1,8 +1,8 @@
 from ancora.challenges.domain.errors import DraftInvalid
 from ancora.challenges.domain.values import validate_case_value
 from ancora.coaching.application.errors import CoachingUnavailable
-from ancora.coaching.application.interfaces.coaching_provider import CoachingProvider
 from ancora.coaching.application.models import CoachingCommand, CoachingResult
+from ancora.coaching.application.ports.coaching_provider import CoachingProvider
 from ancora.coaching.domain.feedback_validation import validate_feedback
 from ancora.coaching.domain.models import CoachingInvalid
 

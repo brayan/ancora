@@ -9,7 +9,9 @@ from ancora.challenges.domain.values import parse_case_value
 from ancora.challenges.infrastructure.ai import schemas
 
 
-def draft_to_domain(draft: schemas.ChallengeDraft) -> models.ChallengeDraft:
+def map_provider_draft_to_challenge_draft(
+    draft: schemas.ChallengeDraft,
+) -> models.ChallengeDraft:
     _validate_runner_payload(draft)
     contract = draft.function_contract
 
@@ -43,7 +45,9 @@ def draft_to_domain(draft: schemas.ChallengeDraft) -> models.ChallengeDraft:
     )
 
 
-def draft_from_domain(draft: models.ChallengeDraft) -> schemas.ChallengeDraft:
+def map_challenge_draft_to_provider_draft(
+    draft: models.ChallengeDraft,
+) -> schemas.ChallengeDraft:
     contract = draft.function_contract
 
     def example(case: models.ExampleCase) -> dict[str, str]:
@@ -85,7 +89,9 @@ def draft_from_domain(draft: models.ChallengeDraft) -> schemas.ChallengeDraft:
     return payload
 
 
-def request_from_command(command: GenerationCommand) -> schemas.GeneratorInput:
+def map_generation_command_to_generator_input(
+    command: GenerationCommand,
+) -> schemas.GeneratorInput:
     request = command.request
     return schemas.GeneratorInput.model_validate(
         {
@@ -98,7 +104,7 @@ def request_from_command(command: GenerationCommand) -> schemas.GeneratorInput:
                 "targetMinutes": request.target_minutes,
                 "preferences": request.preferences,
             },
-            "previous": draft_from_domain(command.previous)
+            "previous": map_challenge_draft_to_provider_draft(command.previous)
             if command.previous
             else None,
             "feedback": list(command.feedback),

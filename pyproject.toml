@@ -67,7 +67,7 @@ skip-magic-trailing-comma = false
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests", "web/tests/python"]
-pythonpath = ["backend/src", "web/runner"]
+pythonpath = ["backend/src", "backend/tests", "web/runner"]
 addopts = "--strict-config --strict-markers -p no:tach"
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"

@@ -2,7 +2,7 @@
 
 import asyncio
 
-from ancora.api.schemas.coaching import CoachingInput
+from ancora.coaching.api.schemas import CoachingInput
 from ancora.coaching.application.models import (
     CoachingCommand,
     CoachingProvenance,

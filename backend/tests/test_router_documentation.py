@@ -1,7 +1,7 @@
 import pytest
-from ancora.api.schemas.errors import ApiErrorResponse, DraftInvalidResponse
 from ancora.bootstrap import create_app
 from ancora.config.settings import Settings
+from ancora.shared.api.schemas import ApiErrorResponse, DraftInvalidResponse
 from fastapi.testclient import TestClient
 from synthetic import SyntheticChallengeProvider
 

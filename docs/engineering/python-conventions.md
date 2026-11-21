@@ -1,6 +1,6 @@
 # Python conventions
 
-Ancora adopts the engineering playbook’s [code conventions](https://github.com/brayan/engineering-playbook/blob/b524f009fcbb9be7c0d488d9fe336f6c5c094581/docs/engineering/python-code-conventions.md), [typing standard](https://github.com/brayan/engineering-playbook/blob/b524f009fcbb9be7c0d488d9fe336f6c5c094581/docs/engineering/python-typing-standard.md) and [project tooling](https://github.com/brayan/engineering-playbook/blob/b524f009fcbb9be7c0d488d9fe336f6c5c094581/docs/engineering/python-project-tooling.md). Those documents own shared rules; this page owns local integration. Shared [contextual paragraph spacing](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/code-paragraph-spacing.md) and [test naming](https://github.com/brayan/engineering-playbook/blob/main/docs/testing/test-naming-convention.md) apply alongside automated checks.
+Ancora adopts the engineering playbook’s [code conventions](https://github.com/brayan/engineering-playbook/blob/b6de917c5280f7ee0ab6cf0a8ca2512ed9291477/docs/engineering/python-code-conventions.md), [typing standard](https://github.com/brayan/engineering-playbook/blob/b524f009fcbb9be7c0d488d9fe336f6c5c094581/docs/engineering/python-typing-standard.md) and [project tooling](https://github.com/brayan/engineering-playbook/blob/b6de917c5280f7ee0ab6cf0a8ca2512ed9291477/docs/engineering/python-project-tooling.md). Those documents own shared rules; this page owns local integration. Shared [contextual paragraph spacing](https://github.com/brayan/engineering-playbook/blob/main/docs/engineering/code-paragraph-spacing.md) and [test naming](https://github.com/brayan/engineering-playbook/blob/main/docs/testing/test-naming-convention.md) apply alongside automated checks.
 
 ## Workspace and policy artifact
 
@@ -20,7 +20,7 @@ The packaged commands enforce:
 - Multiline `if`/`elif` conditions become meaningful named predicates, preserving short-circuit behavior. See [condition integration](python-condition-layout.md).
 - Class declaration spacing and separators between declaration kinds follow shared lexical rules. Single-line class `model_config` may directly precede annotated fields (`PYORD005`); multiline configuration keeps its separator.
 - Dependency-aware declaration/class order, public functions before helpers, alphabetical tests, keyword-only parameters, explicit call keywords, enum members and supported static dictionary constant keys.
-- Module alias groups precede unrelated definitions when dependencies permit (`PYORD011`); adjacent aliases have no blank gaps except explicit section-comment groups (`PYORD012`). Required getters/classes stay before their aliases. Reads of enclosing/control-flow bindings retain their position before later alias assignments, both at module scope and within conditional suites; unknown bindings are not treated as forward references to repair. The [shared rule](https://github.com/brayan/engineering-playbook/blob/b524f009fcbb9be7c0d488d9fe336f6c5c094581/docs/engineering/python-code-conventions.md#module-type-alias-groups) owns section boundaries and scope.
+- Module alias groups precede unrelated definitions when dependencies permit (`PYORD011`); adjacent aliases have no blank gaps except explicit section-comment groups (`PYORD012`). Required getters/classes stay before their aliases. Reads of enclosing/control-flow bindings retain their position before later alias assignments, both at module scope and within conditional suites; unknown bindings are not treated as forward references to repair. The [shared rule](https://github.com/brayan/engineering-playbook/blob/b6de917c5280f7ee0ab6cf0a8ca2512ed9291477/docs/engineering/python-code-conventions.md#module-type-alias-groups) owns section boundaries and scope.
 - No suppression comments, ordering baselines or per-file ordering opt-outs. Fix or restructure the source.
 
 Preserve positional APIs and dataclass constructor field sequences. Dependencies precede consumers. Precompute effectful arguments in their original evaluation order before sorting call keywords. Review framework validators, dictionary iteration and enum values before moving declarations. The checker reports violations without executing or rewriting source; passing it does not prove behavioral equivalence. Formatting does not replace contextual paragraph review.
@@ -55,17 +55,37 @@ Pure domain validation remains in intent-specific functions/modules. Shared
 [Python service conventions](https://github.com/brayan/engineering-playbook/blob/main/docs/backend/python-service-conventions.md)
 own the repo-neutral architecture guidance; this is Ancora's local integration.
 
-[ADR 0018](../adr/0018-place-projects-at-root-and-use-operation-use-cases.md) places `web/` and `backend/` at root and names application operations as use cases. [ADR 0017](../adr/0017-organize-python-api-by-capability.md) retains the feature-first layout: root `api/` and `config/`, with `challenges/`, `hints/` and `coaching/` each containing domain/application and `infrastructure/ai`. `shared/application` contains only the common provider-interruption error. Challenge contracts/value validation remain public feature-owned dependencies; acceptance rules and concrete adapters remain private. Create only packages with real content.
+[ADR 0020](../adr/0020-publish-python-feature-contracts.md) gives each of
+`challenges`, `hints` and `coaching` its own FastAPI router, schemas, dependencies,
+mappers and HTTP error translations under `api/`. `shared/api` owns common
+transport behavior and wire primitives. `config/settings.py` parses configuration,
+`bootstrap.py` mounts routers and owns concrete resources, and `main.py` starts
+Uvicorn. Feature tests are flat under `backend/tests/<feature>`; service-wide
+startup, contract and import-graph checks live at the test root.
 
-[ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md) still owns plain core models and separate transport/provider mappings. Domain/application models are dataclasses; neither layer imports Pydantic, FastAPI, SDKs or transport DTOs. Operation use cases coordinate meaningful workflows through application-owned `interfaces`. `GenerateChallenge`, `GenerateHint` and `GenerateCoachingFeedback` expose `__call__`; providers retain `generate`. Domain checks remain pure functions in `draft_validation`, `hint_validation` and `feedback_validation`. Each use case owns the former service orchestration directly, without a forwarding wrapper or duplicate service.
-
-API/provider Pydantic schemas validate their own untrusted boundaries and map explicitly to plain core values. Split routers and dependency accessors by capability, keep `Depends` in the root API, and document HTTP summaries, tags, response/error models and meaningful side effects. Wire/schema parity remains tested against canonical artifacts. `config/settings.py` parses environment configuration; `bootstrap.py` wires adapters/lifecycles; `main.py` starts Uvicorn. The import package is `ancora`, distribution `ancora-backend`, under `backend`.
+[ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md) owns the
+plain core and separate HTTP/provider mappings. Provider protocols live in the
+consuming feature's `application/ports` and describe capabilities such as
+`HintProvider`. APIs and adapters use typed `map_<source>_to_<destination>`
+functions for conversions. Where a draft has the same class name in two layers,
+`wire_draft` and `provider_draft` identify the distinct representations.
+Use cases call their ports directly and pure validation remains in its domain
+module. Canonical wire artifacts live in `packages/schemas`.
 
 Next.js remains the sole durable-record/migration owner. Python never writes the product database or executes reference/learner solutions. Provider configuration is explicit and framework retries cannot expand dispatch allowances. [ADR 0016](../adr/0016-persist-selected-attempt-coaching.md) also requires affirmative sharing of saved code.
 
 ### Import enforcement
 
-`pnpm python:architecture` runs `tach check --exact`, then `sailtech-check-domain-imports --source-root backend/src`. Root [tach.toml](../../tach.toml) owns first-party modules, exact dependencies and public interfaces. Only bootstrap wires the API/infrastructure siblings. Root modules, unused edges, cycles, forbidden directions and private cross-feature imports fail; `TYPE_CHECKING` counts. `main.py` uses the `ancora.bootstrap:create_app` import string; Tach models static imports. Structural provider implementations need not import their `Protocol`. Never run `tach sync` in CI or add edges just to silence a failure.
+`pnpm python:architecture` runs `tach check --exact` and the shared external
+domain guard. [tach.toml](../../tach.toml) owns exact module edges. Each feature
+API has its own boundary. [feature-interfaces.toml](../../feature-interfaces.toml)
+owns cross-feature symbol visibility. Consumer imports are direct from the
+owning modules. Pytest checks published and private siblings, aliased and
+type-only imports, layer direction, independence of shared code and cycles
+within and between features using the resolved Tach graph. Only bootstrap
+wires concrete adapters. The locked Tach analyzes static imports, so
+`main.py` uses the existing Uvicorn import string and startup tests exercise
+that boundary. Never run `tach sync` in CI.
 
 The shared domain command discovers all three nested domain directories and uses compatible locked Tach to reject third-party imports, including under `TYPE_CHECKING`, regardless of exclusions. Syntax/backend failures fail closed. Ancora separately discovers every nested application package, restricts imports to standard-library/core modules, requires absolute layer imports and imports the entire core without site packages. A discovery regression prevents folder moves from making these checks vacuous. Temporary-project regressions cover each domain, cross-feature application/adapter imports and private challenge rules. Pytest disables Tach’s optional impact-selection plugin (`-p no:tach`) to retain the full offline suite.
 

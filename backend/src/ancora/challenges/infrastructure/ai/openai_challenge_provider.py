@@ -21,8 +21,8 @@ from ancora.challenges.application.models import (
 )
 from ancora.challenges.domain.errors import DraftInvalid
 from ancora.challenges.infrastructure.ai.mappers import (
-    draft_to_domain,
-    request_from_command,
+    map_generation_command_to_generator_input,
+    map_provider_draft_to_challenge_draft,
 )
 from ancora.challenges.infrastructure.ai.schemas import ChallengeDraft
 from ancora.shared.application.errors import ProviderInterrupted
@@ -86,11 +86,13 @@ class OpenAIChallengeProvider:
         try:
             async with asyncio.timeout(65.0):
                 outcome = await self._agent.run(
-                    request_from_command(command).model_dump_json(by_alias=True),
+                    map_generation_command_to_generator_input(command).model_dump_json(
+                        by_alias=True
+                    ),
                     usage_limits=UsageLimits(request_limit=1, tool_calls_limit=0),
                 )
             return GenerationResult(
-                draft=draft_to_domain(outcome.output),
+                draft=map_provider_draft_to_challenge_draft(outcome.output),
                 model=ModelProvenance(
                     name=self.model,
                     prompt_version="programming-practice-v1",
