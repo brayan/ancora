@@ -5,6 +5,9 @@ Status: Accepted — owner requested the root layout, use cases and intent-speci
 Entrypoint naming is superseded by [ADR 0019](0019-use-callable-python-use-cases.md):
 current operations implement `__call__`; the `execute` names below describe this decision's original implementation.
 
+[ADR 0020](0020-publish-python-feature-contracts.md) places HTTP code inside
+features and names consumer-owned ports.
+
 ## Context
 
 The repository has two applications under `apps/`. The Python project is named

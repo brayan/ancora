@@ -1,0 +1,31 @@
+# This interface-only view groups modules by feature. tach.toml owns exact edges.
+source_roots = ["backend/src"]
+ignore_type_checking_imports = false
+
+[[modules]]
+path = "ancora.*"
+
+[[interfaces]]
+expose = []
+
+[[interfaces]]
+from = ['^ancora\.shared$']
+expose = ['.*']
+
+# Composition can wire private adapters. Shared code and features cannot.
+[[interfaces]]
+visibility = ["ancora.bootstrap"]
+expose = ['.*']
+
+[[interfaces]]
+from = ['^ancora\.challenges$']
+expose = [
+    '^api\.schemas\.(FunctionContract|Requirement)$',
+    '^domain\.errors\.DraftInvalid$',
+    '^domain\.models\.(ExampleCase|FunctionContract|Parameter|Technique)$',
+    '^domain\.values\.validate_case_value$',
+]
+
+[[interfaces]]
+from = ['^ancora\.hints$']
+expose = ['^api\.schemas\.HintChallenge$']

@@ -9,44 +9,36 @@ from ancora.challenges.domain.values import parse_case_value
 from ancora.challenges.infrastructure.ai import schemas
 
 
-def draft_to_domain(draft: schemas.ChallengeDraft) -> models.ChallengeDraft:
-    _validate_runner_payload(draft)
-    contract = draft.function_contract
-
-    def example(case: schemas.GeneratedCase) -> models.ExampleCase:
-        case_input = parse_case_value(case.input_json, contract.parameter.type)
-        expected = parse_case_value(case.expected_json, contract.returns)
-        return models.ExampleCase(expected=expected, id=case.id, input=case_input)
-
-    function_contract = models.FunctionContract(
-        name=contract.name,
-        parameter=models.Parameter(contract.parameter.name, contract.parameter.type),
-        returns=contract.returns,
-    )
-    requirements = tuple(draft.requirements)
-    constraints = tuple(draft.constraints)
-    public_cases = tuple(example(case) for case in draft.public_cases)
-    check_cases = tuple(example(case) for case in draft.check_cases)
-    return models.ChallengeDraft(
-        check_cases=check_cases,
-        concept=draft.concept,
-        constraints=constraints,
-        difficulty=draft.difficulty,
-        function_contract=function_contract,
-        objective=draft.objective,
-        public_cases=public_cases,
-        reference_source=draft.reference_source,
-        requirements=requirements,
-        statement=draft.statement,
-        technique=draft.technique,
-        title=draft.title,
+def map_application_generation_command_to_provider_input(
+    command: GenerationCommand,
+) -> schemas.GeneratorInput:
+    request = command.request
+    return schemas.GeneratorInput.model_validate(
+        {
+            "schemaVersion": 1,
+            "request": {
+                "language": request.language,
+                "concept": request.concept,
+                "difficulty": request.difficulty,
+                "goal": request.goal,
+                "targetMinutes": request.target_minutes,
+                "preferences": request.preferences,
+            },
+            "previous": map_domain_challenge_draft_to_provider(command.previous)
+            if command.previous
+            else None,
+            "feedback": list(command.feedback),
+            "recentExercises": list(command.recent_exercises),
+        }
     )
 
 
-def draft_from_domain(draft: models.ChallengeDraft) -> schemas.ChallengeDraft:
+def map_domain_challenge_draft_to_provider(
+    draft: models.ChallengeDraft,
+) -> schemas.ChallengeDraft:
     contract = draft.function_contract
 
-    def example(case: models.ExampleCase) -> dict[str, str]:
+    def map_domain_case_to_provider(case: models.ExampleCase) -> dict[str, str]:
         return {
             "id": case.id,
             "inputJson": json.dumps(
@@ -76,8 +68,12 @@ def draft_from_domain(draft: models.ChallengeDraft) -> schemas.ChallengeDraft:
             "requirements": list(draft.requirements),
             "constraints": list(draft.constraints),
             "technique": draft.technique,
-            "publicCases": [example(case) for case in draft.public_cases],
-            "checkCases": [example(case) for case in draft.check_cases],
+            "publicCases": [
+                map_domain_case_to_provider(case) for case in draft.public_cases
+            ],
+            "checkCases": [
+                map_domain_case_to_provider(case) for case in draft.check_cases
+            ],
             "referenceSource": draft.reference_source,
         }
     )
@@ -85,25 +81,41 @@ def draft_from_domain(draft: models.ChallengeDraft) -> schemas.ChallengeDraft:
     return payload
 
 
-def request_from_command(command: GenerationCommand) -> schemas.GeneratorInput:
-    request = command.request
-    return schemas.GeneratorInput.model_validate(
-        {
-            "schemaVersion": 1,
-            "request": {
-                "language": request.language,
-                "concept": request.concept,
-                "difficulty": request.difficulty,
-                "goal": request.goal,
-                "targetMinutes": request.target_minutes,
-                "preferences": request.preferences,
-            },
-            "previous": draft_from_domain(command.previous)
-            if command.previous
-            else None,
-            "feedback": list(command.feedback),
-            "recentExercises": list(command.recent_exercises),
-        }
+def map_provider_challenge_draft_to_domain(
+    draft: schemas.ChallengeDraft,
+) -> models.ChallengeDraft:
+    _validate_runner_payload(draft)
+    contract = draft.function_contract
+
+    def map_provider_case_to_domain(case: schemas.GeneratedCase) -> models.ExampleCase:
+        case_input = parse_case_value(case.input_json, contract.parameter.type)
+        expected = parse_case_value(case.expected_json, contract.returns)
+        return models.ExampleCase(expected=expected, id=case.id, input=case_input)
+
+    function_contract = models.FunctionContract(
+        name=contract.name,
+        parameter=models.Parameter(contract.parameter.name, contract.parameter.type),
+        returns=contract.returns,
+    )
+    requirements = tuple(draft.requirements)
+    constraints = tuple(draft.constraints)
+    public_cases = tuple(
+        map_provider_case_to_domain(case) for case in draft.public_cases
+    )
+    check_cases = tuple(map_provider_case_to_domain(case) for case in draft.check_cases)
+    return models.ChallengeDraft(
+        check_cases=check_cases,
+        concept=draft.concept,
+        constraints=constraints,
+        difficulty=draft.difficulty,
+        function_contract=function_contract,
+        objective=draft.objective,
+        public_cases=public_cases,
+        reference_source=draft.reference_source,
+        requirements=requirements,
+        statement=draft.statement,
+        technique=draft.technique,
+        title=draft.title,
     )
 
 

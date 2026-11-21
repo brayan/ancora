@@ -2,6 +2,7 @@ name: backend
 status: implemented
 primary_paths: [backend]
 read_first:
+  - docs/adr/0020-publish-python-feature-contracts.md
   - docs/adr/0019-use-callable-python-use-cases.md
   - docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md
   - CONTEXT.md
@@ -17,9 +18,9 @@ read_first:
   - docs/architecture/selected-attempt-coaching.md
   - docs/adr/0016-persist-selected-attempt-coaching.md
   - docs/adr/0015-persist-bounded-progressive-hints.md
-role: Feature-first FastAPI/Pydantic AI challenge generation, progressive hints and selected-attempt coaching; root API/config with per-capability plain cores and AI infrastructure.
+role: Feature-first FastAPI/Pydantic AI challenge generation, progressive hints and selected-attempt coaching; feature APIs, plain cores and private AI adapters with shared HTTP transport.
 allowed_work:
-  - Framework-free domain/application use cases and application-owned provider interfaces
+  - Framework-free domain/application use cases and application-owned provider ports
   - API capability routers and independent API/infrastructure Pydantic mappings
   - Complete typed challenge generation and structural/contract validation
   - Bounded correction under the Next.js-owned durable allowance

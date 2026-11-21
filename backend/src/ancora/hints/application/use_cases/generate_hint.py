@@ -1,8 +1,8 @@
 from ancora.challenges.domain.errors import DraftInvalid
 from ancora.challenges.domain.values import validate_case_value
 from ancora.hints.application.errors import HintsUnavailable
-from ancora.hints.application.interfaces.hint_provider import HintProvider
 from ancora.hints.application.models import HintCommand, HintResult
+from ancora.hints.application.ports.hint_provider import HintProvider
 from ancora.hints.domain.hint_validation import validate_hint
 from ancora.hints.domain.models import Hint, HintInvalid
 

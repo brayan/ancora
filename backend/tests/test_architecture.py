@@ -141,11 +141,11 @@ def test_should_reject_graph_when_declared_dependencies_form_a_cycle(
     configuration.write_text(
         configuration.read_text().replace(
             'path = "ancora.config"\ndepends_on = []',
-            'path = "ancora.config"\ndepends_on = ["ancora.api"]',
+            'path = "ancora.config"\ndepends_on = ["ancora.bootstrap"]',
         )
     )
     settings = architecture_project / "backend/src/ancora/config/settings.py"
-    settings.write_text(settings.read_text() + "\nimport ancora.api.app\n")
+    settings.write_text(settings.read_text() + "\nimport ancora.bootstrap\n")
 
     outcome = check_architecture(architecture_project)
     assert outcome.returncode == 1, outcome.stdout + outcome.stderr
@@ -155,32 +155,35 @@ def test_should_reject_graph_when_declared_dependencies_form_a_cycle(
 @pytest.mark.parametrize(
     ("source", "forbidden_import"),
     [
-        ("challenges/domain/models.py", "import ancora.api.app"),
-        ("challenges/domain/models.py", "from ...api import app"),
+        ("challenges/domain/models.py", "import ancora.challenges.api.router"),
+        ("challenges/domain/models.py", "from ..api import router"),
         (
             "challenges/application/models.py",
             "import ancora.challenges.infrastructure.ai.schemas",
         ),
-        ("api/app.py", "import ancora.challenges.infrastructure.ai.schemas"),
+        (
+            "challenges/api/router.py",
+            "import ancora.challenges.infrastructure.ai.schemas",
+        ),
         (
             "challenges/infrastructure/ai/schemas.py",
-            "import ancora.api.schemas.generation",
+            "import ancora.challenges.api.schemas",
         ),
-        ("api/app.py", "import ancora.bootstrap"),
+        ("challenges/api/router.py", "import ancora.bootstrap"),
         (
             "challenges/infrastructure/ai/schemas.py",
             "import ancora.challenges.application.use_cases.generate_challenge",
         ),
         (
             "challenges/application/models.py",
-            "from typing import TYPE_CHECKING\nif TYPE_CHECKING:\n    import ancora.api.app",
+            "from typing import TYPE_CHECKING\nif TYPE_CHECKING:\n    import ancora.challenges.api.router",
         ),
         (
             "hints/domain/hint_validation.py",
             "from ancora.challenges.domain import draft_validation",
         ),
         (
-            "api/app.py",
+            "challenges/api/router.py",
             "from ancora.challenges.domain.draft_validation import validate_draft",
         ),
         (
@@ -224,7 +227,7 @@ def test_should_reject_source_when_it_is_outside_governed_modules(
     architecture_project: Path,
 ) -> None:
     (architecture_project / "backend/src/ungoverned.py").write_text(
-        "import ancora.api.app\n"
+        "import ancora.challenges.api.router\n"
     )
     outcome = check_architecture(architecture_project)
     assert outcome.returncode == 1, outcome.stdout + outcome.stderr

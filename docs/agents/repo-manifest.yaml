@@ -12,6 +12,7 @@ canonical_docs:
   business_problem: docs/product/business-problem.md
   programming_practice: docs/product/programming-practice.md
   root_layout: docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md
+  feature_contracts: docs/adr/0020-publish-python-feature-contracts.md
   callable_use_cases: docs/adr/0019-use-callable-python-use-cases.md
   system_overview: docs/architecture/system-overview.md
   practice_persistence: docs/architecture/practice-persistence.md
@@ -92,7 +93,7 @@ project_shards:
     routes: [tools/eval-runner/**, evals/**]
   - name: scripts-ci
     file: docs/agents/projects/scripts-ci.yaml
-    routes: [scripts/**, docker/**, infra/**, config/**, packages/config/**, docs/**, package.json, Makefile, pnpm-workspace.yaml, pyproject.toml, uv.lock, tach.toml, .python-version, .github/**]
+    routes: [scripts/**, docker/**, infra/**, config/**, packages/config/**, docs/**, package.json, Makefile, pnpm-workspace.yaml, pyproject.toml, uv.lock, tach.toml, feature-interfaces.toml, .python-version, .github/**]
 adr_index:
   - docs/adr/0011-focus-on-local-programming-practice.md
   - docs/adr/0012-persist-fixed-practice-with-additive-migrations.md
@@ -103,4 +104,5 @@ adr_index:
   - docs/adr/0017-organize-python-api-by-capability.md
   - docs/adr/0018-place-projects-at-root-and-use-operation-use-cases.md
   - docs/adr/0019-use-callable-python-use-cases.md
+  - docs/adr/0020-publish-python-feature-contracts.md
 historical_adrs: docs/adr/0001 through 0010 are retained; ADR 0011 defines current ownership.

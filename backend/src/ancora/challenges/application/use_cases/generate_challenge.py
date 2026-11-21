@@ -1,10 +1,10 @@
 """One provider dispatch followed by deterministic challenge acceptance rules."""
 
 from ancora.challenges.application.errors import GenerationUnavailable
-from ancora.challenges.application.interfaces.challenge_generation_provider import (
+from ancora.challenges.application.models import GenerationCommand, GenerationResult
+from ancora.challenges.application.ports.challenge_generation_provider import (
     ChallengeGenerationProvider,
 )
-from ancora.challenges.application.models import GenerationCommand, GenerationResult
 from ancora.challenges.domain.draft_validation import validate_draft
 
 
