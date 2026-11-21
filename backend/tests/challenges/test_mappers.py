@@ -3,10 +3,10 @@ from dataclasses import replace
 
 import pytest
 from ancora.challenges.api.mappers import (
-    map_challenge_draft_to_wire_draft,
+    map_domain_challenge_draft_to_http,
     map_generation_result_to_generator_output,
     map_generator_input_to_generation_command,
-    map_wire_draft_to_challenge_draft,
+    map_http_challenge_draft_to_domain,
 )
 from ancora.challenges.application.models import GenerationResult, ModelProvenance
 from ancora.challenges.domain.errors import DraftInvalid
@@ -16,14 +16,14 @@ from synthetic import draft_for, generation_input
 
 
 def test_should_bound_runner_envelope_when_native_cases_are_encoded_for_http() -> None:
-    draft = map_wire_draft_to_challenge_draft(draft_for(generation_input("strings")))
+    draft = map_http_challenge_draft_to_domain(draft_for(generation_input("strings")))
     cases = tuple(
         replace(case, expected="😀" * 800, input="😀" * 800)
         for case in draft.public_cases + draft.check_cases
     )
     draft = replace(draft, check_cases=cases[2:], public_cases=cases[:2])
     with pytest.raises(DraftInvalid, match="runner_payload_too_large"):
-        map_challenge_draft_to_wire_draft(draft)
+        map_domain_challenge_draft_to_http(draft)
 
 
 @pytest.mark.parametrize(
@@ -34,24 +34,24 @@ def test_should_preserve_challenge_meaning_when_crossing_both_boundaries(
 ) -> None:
     request = generation_input(concept)
     draft = draft_for(request)
-    domain_draft = map_wire_draft_to_challenge_draft(draft)
+    domain_draft = map_http_challenge_draft_to_domain(draft)
     provider_draft = provider_schemas.ChallengeDraft.model_validate(
         draft.model_dump(by_alias=True)
     )
 
     assert (
-        provider_mappers.map_provider_draft_to_challenge_draft(provider_draft)
+        provider_mappers.map_provider_challenge_draft_to_domain(provider_draft)
         == domain_draft
     )
     assert (
-        map_wire_draft_to_challenge_draft(
-            map_challenge_draft_to_wire_draft(domain_draft)
+        map_http_challenge_draft_to_domain(
+            map_domain_challenge_draft_to_http(domain_draft)
         )
         == domain_draft
     )
     assert (
-        provider_mappers.map_provider_draft_to_challenge_draft(
-            provider_mappers.map_challenge_draft_to_provider_draft(domain_draft)
+        provider_mappers.map_provider_challenge_draft_to_domain(
+            provider_mappers.map_domain_challenge_draft_to_provider(domain_draft)
         )
         == domain_draft
     )
@@ -78,7 +78,7 @@ def test_should_preserve_correction_context_when_preparing_provider_request() ->
     ) == payload.request.model_dump(by_alias=True)
     assert provider_request.previous is not None
     assert (
-        provider_mappers.map_provider_draft_to_challenge_draft(
+        provider_mappers.map_provider_challenge_draft_to_domain(
             provider_request.previous
         )
         == command.previous
@@ -95,12 +95,12 @@ def test_should_preserve_unicode_and_dictionary_order_when_cases_are_serialized(
         update={"input_json": '{"z":2,"á":1}', "expected_json": '{"z":2,"á":1}'}
     )
     draft = draft.model_copy(update={"public_cases": [draft.public_cases[0], first]})
-    domain_draft = map_wire_draft_to_challenge_draft(draft)
-    wire_draft = map_challenge_draft_to_wire_draft(domain_draft)
+    domain_draft = map_http_challenge_draft_to_domain(draft)
+    wire_draft = map_domain_challenge_draft_to_http(domain_draft)
 
     assert list(json.loads(wire_draft.public_cases[1].input_json)) == ["z", "á"]
     assert list(json.loads(wire_draft.public_cases[1].expected_json)) == ["z", "á"]
-    assert map_wire_draft_to_challenge_draft(wire_draft) == domain_draft
+    assert map_http_challenge_draft_to_domain(wire_draft) == domain_draft
 
 
 def test_should_validate_boundary_output_when_application_returns_bad_metadata() -> (
@@ -108,7 +108,7 @@ def test_should_validate_boundary_output_when_application_returns_bad_metadata()
 ):
     from pydantic import ValidationError
 
-    draft = map_wire_draft_to_challenge_draft(draft_for(generation_input()))
+    draft = map_http_challenge_draft_to_domain(draft_for(generation_input()))
     provenance = ModelProvenance(
         "openai", "synthetic-offline", "programming-practice-v1"
     )

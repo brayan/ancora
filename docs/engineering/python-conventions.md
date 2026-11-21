@@ -66,9 +66,11 @@ startup, contract and import-graph checks live at the test root.
 [ADR 0014](../adr/0014-layer-generation-around-a-framework-free-core.md) owns the
 plain core and separate HTTP/provider mappings. Provider protocols live in the
 consuming feature's `application/ports` and describe capabilities such as
-`HintProvider`. APIs and adapters use typed `map_<source>_to_<destination>`
-functions for conversions. Where a draft has the same class name in two layers,
-`wire_draft` and `provider_draft` identify the distinct representations.
+`HintProvider`. When a mapper converts the same concept between representations,
+name the concept once and show both roles, as in
+`map_http_challenge_draft_to_domain` and `map_domain_challenge_draft_to_provider`.
+When the types serve different purposes, name both, as in
+`map_generator_input_to_generation_command`.
 Use cases call their ports directly and pure validation remains in its domain
 module. Canonical wire artifacts live in `packages/schemas`.
 

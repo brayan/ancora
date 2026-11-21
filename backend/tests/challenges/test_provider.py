@@ -5,7 +5,7 @@ import httpx2
 import pytest
 from ancora.challenges.api.mappers import (
     map_generator_input_to_generation_command,
-    map_wire_draft_to_challenge_draft,
+    map_http_challenge_draft_to_domain,
 )
 from ancora.challenges.domain.errors import DraftInvalid
 from ancora.challenges.infrastructure.ai.openai_challenge_provider import (
@@ -38,7 +38,7 @@ async def test_should_dispatch_one_structured_request_when_output_is_valid() -> 
     finally:
         await generator.close()
 
-    assert outcome.draft == map_wire_draft_to_challenge_draft(draft)
+    assert outcome.draft == map_http_challenge_draft_to_domain(draft)
     assert outcome.model.name == "gpt-4.1"
     assert outcome.model.prompt_version == "programming-practice-v1"
     assert len(requests) == 1

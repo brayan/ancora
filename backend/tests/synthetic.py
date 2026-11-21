@@ -4,7 +4,7 @@ import asyncio
 import json
 from dataclasses import replace
 
-from ancora.challenges.api.mappers import map_wire_draft_to_challenge_draft
+from ancora.challenges.api.mappers import map_http_challenge_draft_to_domain
 from ancora.challenges.api.schemas import ChallengeDraft, GeneratorInput
 from ancora.challenges.application.models import (
     GenerationCommand,
@@ -167,7 +167,7 @@ class SyntheticChallengeProvider:
             )
         return GenerationResult(
             draft=replace(
-                map_wire_draft_to_challenge_draft(draft),
+                map_http_challenge_draft_to_domain(draft),
                 difficulty=command.request.difficulty,
             ),
             model=ModelProvenance("openai", self.model, "programming-practice-v1"),

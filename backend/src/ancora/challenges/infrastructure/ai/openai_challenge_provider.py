@@ -22,7 +22,7 @@ from ancora.challenges.application.models import (
 from ancora.challenges.domain.errors import DraftInvalid
 from ancora.challenges.infrastructure.ai.mappers import (
     map_generation_command_to_generator_input,
-    map_provider_draft_to_challenge_draft,
+    map_provider_challenge_draft_to_domain,
 )
 from ancora.challenges.infrastructure.ai.schemas import ChallengeDraft
 from ancora.shared.application.errors import ProviderInterrupted
@@ -92,7 +92,7 @@ class OpenAIChallengeProvider:
                     usage_limits=UsageLimits(request_limit=1, tool_calls_limit=0),
                 )
             return GenerationResult(
-                draft=map_provider_draft_to_challenge_draft(outcome.output),
+                draft=map_provider_challenge_draft_to_domain(outcome.output),
                 model=ModelProvenance(
                     name=self.model,
                     prompt_version="programming-practice-v1",
