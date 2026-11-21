@@ -31,7 +31,7 @@ def map_domain_challenge_draft_to_http(
 ) -> schemas.ChallengeDraft:
     contract = draft.function_contract
 
-    def example(case: models.ExampleCase) -> dict[str, str]:
+    def map_domain_case_to_http(case: models.ExampleCase) -> dict[str, str]:
         return {
             "id": case.id,
             "inputJson": json.dumps(
@@ -61,8 +61,10 @@ def map_domain_challenge_draft_to_http(
             "requirements": list(draft.requirements),
             "constraints": list(draft.constraints),
             "technique": draft.technique,
-            "publicCases": [example(case) for case in draft.public_cases],
-            "checkCases": [example(case) for case in draft.check_cases],
+            "publicCases": [
+                map_domain_case_to_http(case) for case in draft.public_cases
+            ],
+            "checkCases": [map_domain_case_to_http(case) for case in draft.check_cases],
             "referenceSource": draft.reference_source,
         }
     )
@@ -76,7 +78,7 @@ def map_http_challenge_draft_to_domain(
     _validate_runner_payload(draft)
     contract = draft.function_contract
 
-    def example(case: schemas.GeneratedCase) -> models.ExampleCase:
+    def map_http_case_to_domain(case: schemas.GeneratedCase) -> models.ExampleCase:
         case_input = parse_case_value(case.input_json, contract.parameter.type)
         expected = parse_case_value(case.expected_json, contract.returns)
         return models.ExampleCase(expected=expected, id=case.id, input=case_input)
@@ -88,8 +90,8 @@ def map_http_challenge_draft_to_domain(
     )
     requirements = tuple(draft.requirements)
     constraints = tuple(draft.constraints)
-    public_cases = tuple(example(case) for case in draft.public_cases)
-    check_cases = tuple(example(case) for case in draft.check_cases)
+    public_cases = tuple(map_http_case_to_domain(case) for case in draft.public_cases)
+    check_cases = tuple(map_http_case_to_domain(case) for case in draft.check_cases)
     return models.ChallengeDraft(
         check_cases=check_cases,
         concept=draft.concept,

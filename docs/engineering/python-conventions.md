@@ -70,7 +70,10 @@ consuming feature's `application/ports` and describe capabilities such as
 name. When they represent the same concept, name it once, as in
 `map_http_challenge_draft_to_domain` and `map_domain_challenge_draft_to_provider`.
 When types serve different roles within one operation, name the operation once
-and include both roles, as in `map_http_generation_input_to_application_command`.
+and include both roles, as in `map_http_generation_input_to_application_command`
+and `map_application_generation_command_to_provider_input`. Apply the same
+convention to named helpers inside mappers, as in `map_provider_case_to_domain`.
+
 Use cases call their ports directly and pure validation remains in its domain
 module. Canonical wire artifacts live in `packages/schemas`.
 
