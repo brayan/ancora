@@ -4,7 +4,26 @@ from ancora.hints.application.models import HintCommand, HintResult
 from ancora.hints.domain.models import HintChallenge
 
 
-def map_hint_input_to_hint_command(payload: schemas.HintInput) -> HintCommand:
+def map_application_hint_result_to_http_output(
+    result: HintResult,
+) -> schemas.HintOutput:
+    return schemas.HintOutput.model_validate(
+        {
+            "schemaVersion": 1,
+            "hint": {"level": result.hint.level, "content": result.hint.content},
+            "model": {
+                "provider": result.model.provider,
+                "name": result.model.name,
+                "promptVersion": result.model.prompt_version,
+                "schemaVersion": 1,
+            },
+        }
+    )
+
+
+def map_http_hint_input_to_application_command(
+    payload: schemas.HintInput,
+) -> HintCommand:
     challenge = payload.challenge
     contract = challenge.function_contract
     function_contract = FunctionContract(
@@ -29,19 +48,4 @@ def map_hint_input_to_hint_command(payload: schemas.HintInput) -> HintCommand:
     previous_hints = tuple(payload.previous_hints)
     return HintCommand(
         challenge=public_challenge, level=payload.level, previous_hints=previous_hints
-    )
-
-
-def map_hint_result_to_hint_output(result: HintResult) -> schemas.HintOutput:
-    return schemas.HintOutput.model_validate(
-        {
-            "schemaVersion": 1,
-            "hint": {"level": result.hint.level, "content": result.hint.content},
-            "model": {
-                "provider": result.model.provider,
-                "name": result.model.name,
-                "promptVersion": result.model.prompt_version,
-                "schemaVersion": 1,
-            },
-        }
     )

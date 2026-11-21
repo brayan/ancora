@@ -4,8 +4,8 @@ from typing import cast
 import httpx2
 import pytest
 from ancora.challenges.api.mappers import (
-    map_generator_input_to_generation_command,
     map_http_challenge_draft_to_domain,
+    map_http_generation_input_to_application_command,
 )
 from ancora.challenges.domain.errors import DraftInvalid
 from ancora.challenges.infrastructure.ai.openai_challenge_provider import (
@@ -33,7 +33,7 @@ async def test_should_dispatch_one_structured_request_when_output_is_valid() -> 
     )
     try:
         outcome = await generator.generate(
-            map_generator_input_to_generation_command(request)
+            map_http_generation_input_to_application_command(request)
         )
     finally:
         await generator.close()
@@ -100,7 +100,7 @@ async def test_should_never_retry_when_provider_rejects_or_interrupts(
     try:
         with pytest.raises(expected):
             await generator.generate(
-                map_generator_input_to_generation_command(generation_input())
+                map_http_generation_input_to_application_command(generation_input())
             )
     finally:
         await generator.close()

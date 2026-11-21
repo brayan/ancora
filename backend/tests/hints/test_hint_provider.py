@@ -3,7 +3,7 @@ from typing import cast
 
 import httpx2
 import pytest
-from ancora.hints.api.mappers import map_hint_input_to_hint_command
+from ancora.hints.api.mappers import map_http_hint_input_to_application_command
 from ancora.hints.domain.models import HintInvalid
 from ancora.hints.infrastructure.ai.openai_hint_provider import OpenAIHintProvider
 from ancora.shared.application.errors import ProviderInterrupted
@@ -46,7 +46,9 @@ async def test_should_never_retry_when_hint_transport_or_structured_output_fails
         with pytest.raises(
             ProviderInterrupted if kind in ("429", "500", "network") else HintInvalid
         ):
-            await provider.generate(map_hint_input_to_hint_command(hint_input()))
+            await provider.generate(
+                map_http_hint_input_to_application_command(hint_input())
+            )
     finally:
         await provider.close()
     assert calls == 1
@@ -69,7 +71,9 @@ async def test_should_send_only_public_context_when_dispatching_a_structured_hin
         "gpt-6-luna", "synthetic-key", transport=httpx2.MockTransport(respond)
     )
     try:
-        result = await provider.generate(map_hint_input_to_hint_command(hint_input(2)))
+        result = await provider.generate(
+            map_http_hint_input_to_application_command(hint_input(2))
+        )
     finally:
         await provider.close()
     assert result.hint.level == 2 and result.hint.content == HINT_TEXTS[1]
@@ -80,7 +84,7 @@ async def test_should_send_only_public_context_when_dispatching_a_structured_hin
     assert body["max_output_tokens"] == 1200
     assert "synthetic-key" not in requests[0].content.decode()
     # No source fields exist in the typed command serialized as provider input.
-    command = map_hint_input_to_hint_command(hint_input(2))
+    command = map_http_hint_input_to_application_command(hint_input(2))
     assert not hasattr(command.challenge, "reference_source")
     assert not hasattr(command.challenge, "check_cases")
     assert command.previous_hints == (HINT_TEXTS[0],)

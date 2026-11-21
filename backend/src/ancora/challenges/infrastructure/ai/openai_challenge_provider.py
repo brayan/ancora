@@ -21,7 +21,7 @@ from ancora.challenges.application.models import (
 )
 from ancora.challenges.domain.errors import DraftInvalid
 from ancora.challenges.infrastructure.ai.mappers import (
-    map_generation_command_to_generator_input,
+    map_application_generation_command_to_provider_input,
     map_provider_challenge_draft_to_domain,
 )
 from ancora.challenges.infrastructure.ai.schemas import ChallengeDraft
@@ -86,9 +86,9 @@ class OpenAIChallengeProvider:
         try:
             async with asyncio.timeout(65.0):
                 outcome = await self._agent.run(
-                    map_generation_command_to_generator_input(command).model_dump_json(
-                        by_alias=True
-                    ),
+                    map_application_generation_command_to_provider_input(
+                        command
+                    ).model_dump_json(by_alias=True),
                     usage_limits=UsageLimits(request_limit=1, tool_calls_limit=0),
                 )
             return GenerationResult(

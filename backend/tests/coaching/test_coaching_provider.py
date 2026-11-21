@@ -3,7 +3,7 @@ from typing import cast
 
 import httpx2
 import pytest
-from ancora.coaching.api.mappers import map_coaching_input_to_coaching_command
+from ancora.coaching.api.mappers import map_http_coaching_input_to_application_command
 from ancora.coaching.domain.models import CoachingInvalid
 from ancora.coaching.infrastructure.ai.openai_coaching_provider import (
     OpenAICoachingProvider,
@@ -51,7 +51,7 @@ async def test_should_never_retry_when_coaching_transport_or_structured_output_f
             else CoachingInvalid
         ):
             await provider.generate(
-                map_coaching_input_to_coaching_command(coaching_input())
+                map_http_coaching_input_to_application_command(coaching_input())
             )
     finally:
         await provider.close()
@@ -84,7 +84,7 @@ async def test_should_send_only_selected_source_and_public_context_when_dispatch
     )
     try:
         result = await provider.generate(
-            map_coaching_input_to_coaching_command(coaching_input())
+            map_http_coaching_input_to_application_command(coaching_input())
         )
     finally:
         await provider.close()
@@ -96,7 +96,7 @@ async def test_should_send_only_selected_source_and_public_context_when_dispatch
     assert body["max_output_tokens"] == 2000
     assert "synthetic-key" not in requests[0].content.decode()
     # Only the deliberately shared saved source is present; raw reports are absent.
-    command = map_coaching_input_to_coaching_command(coaching_input())
+    command = map_http_coaching_input_to_application_command(coaching_input())
     assert not hasattr(command.challenge, "reference_source")
     assert not hasattr(command.challenge, "check_cases")
     assert command.source == coaching_input().source

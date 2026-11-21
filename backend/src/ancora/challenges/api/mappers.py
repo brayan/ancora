@@ -9,6 +9,23 @@ from ancora.challenges.domain.errors import DraftInvalid
 from ancora.challenges.domain.values import parse_case_value
 
 
+def map_application_generation_result_to_http_output(
+    result: GenerationResult,
+) -> schemas.GeneratorOutput:
+    return schemas.GeneratorOutput.model_validate(
+        {
+            "schemaVersion": 1,
+            "draft": map_domain_challenge_draft_to_http(result.draft),
+            "model": {
+                "provider": result.model.provider,
+                "name": result.model.name,
+                "promptVersion": result.model.prompt_version,
+                "schemaVersion": 1,
+            },
+        }
+    )
+
+
 def map_domain_challenge_draft_to_http(
     draft: models.ChallengeDraft,
 ) -> schemas.ChallengeDraft:
@@ -53,50 +70,6 @@ def map_domain_challenge_draft_to_http(
     return payload
 
 
-def map_generation_result_to_generator_output(
-    result: GenerationResult,
-) -> schemas.GeneratorOutput:
-    return schemas.GeneratorOutput.model_validate(
-        {
-            "schemaVersion": 1,
-            "draft": map_domain_challenge_draft_to_http(result.draft),
-            "model": {
-                "provider": result.model.provider,
-                "name": result.model.name,
-                "promptVersion": result.model.prompt_version,
-                "schemaVersion": 1,
-            },
-        }
-    )
-
-
-def map_generator_input_to_generation_command(
-    payload: schemas.GeneratorInput,
-) -> GenerationCommand:
-    request = payload.request
-    generation_request = models.GenerationRequest(
-        concept=request.concept,
-        difficulty=request.difficulty,
-        goal=request.goal,
-        language=request.language,
-        preferences=request.preferences,
-        target_minutes=request.target_minutes,
-    )
-    previous = (
-        map_http_challenge_draft_to_domain(payload.previous)
-        if payload.previous
-        else None
-    )
-    feedback = tuple(payload.feedback)
-    recent_exercises = tuple(payload.recent_exercises)
-    return GenerationCommand(
-        feedback=feedback,
-        previous=previous,
-        recent_exercises=recent_exercises,
-        request=generation_request,
-    )
-
-
 def map_http_challenge_draft_to_domain(
     draft: schemas.ChallengeDraft,
 ) -> models.ChallengeDraft:
@@ -130,6 +103,33 @@ def map_http_challenge_draft_to_domain(
         statement=draft.statement,
         technique=draft.technique,
         title=draft.title,
+    )
+
+
+def map_http_generation_input_to_application_command(
+    payload: schemas.GeneratorInput,
+) -> GenerationCommand:
+    request = payload.request
+    generation_request = models.GenerationRequest(
+        concept=request.concept,
+        difficulty=request.difficulty,
+        goal=request.goal,
+        language=request.language,
+        preferences=request.preferences,
+        target_minutes=request.target_minutes,
+    )
+    previous = (
+        map_http_challenge_draft_to_domain(payload.previous)
+        if payload.previous
+        else None
+    )
+    feedback = tuple(payload.feedback)
+    recent_exercises = tuple(payload.recent_exercises)
+    return GenerationCommand(
+        feedback=feedback,
+        previous=previous,
+        recent_exercises=recent_exercises,
+        request=generation_request,
     )
 
 

@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 from ancora.bootstrap import create_app
 from ancora.config.settings import Settings
-from ancora.hints.api.mappers import map_hint_input_to_hint_command
+from ancora.hints.api.mappers import map_http_hint_input_to_application_command
 from ancora.hints.application.errors import HintsUnavailable
 from ancora.hints.application.models import HintCommand, HintResult
 from ancora.hints.application.use_cases.generate_hint import GenerateHint
@@ -53,7 +53,7 @@ async def test_should_generate_one_progressive_hint_when_previous_levels_are_sup
     level: int,
 ) -> None:
     provider = SyntheticHintProvider()
-    command = map_hint_input_to_hint_command(hint_input(level))
+    command = map_http_hint_input_to_application_command(hint_input(level))
     generate_hint = GenerateHint(provider)
     result = await generate_hint(command)
     assert result.hint == Hint(level, HINT_TEXTS[level - 1])
@@ -91,7 +91,7 @@ async def test_should_reject_inconsistent_public_values_when_the_function_contra
     None
 ):
     provider = SyntheticHintProvider()
-    command = map_hint_input_to_hint_command(hint_input())
+    command = map_http_hint_input_to_application_command(hint_input())
     invalid_case = replace(
         command.challenge.public_cases[0], input="synthetic-wrong-type"
     )
@@ -166,7 +166,7 @@ async def test_should_skip_provider_when_hint_progression_is_invalid(
 ) -> None:
     provider = SyntheticHintProvider()
     command = replace(
-        map_hint_input_to_hint_command(hint_input()),
+        map_http_hint_input_to_application_command(hint_input()),
         level=level,
         previous_hints=previous,
     )
@@ -200,7 +200,7 @@ async def test_should_withhold_obvious_spoilers_when_provider_returns_invalid_co
     provider = SpoilerProvider()
     generate_hint = GenerateHint(provider)
     with pytest.raises(HintInvalid):
-        await generate_hint(map_hint_input_to_hint_command(hint_input()))
+        await generate_hint(map_http_hint_input_to_application_command(hint_input()))
     assert len(provider.calls) == 1
 
 
@@ -220,8 +220,10 @@ async def test_should_withhold_repeated_or_mismatched_hint_when_provider_does_no
     generate_hint = GenerateHint(provider)
     for level in (1, 2):
         with pytest.raises(HintInvalid):
-            await generate_hint(map_hint_input_to_hint_command(hint_input(level)))
+            await generate_hint(
+                map_http_hint_input_to_application_command(hint_input(level))
+            )
     provider.available = False
     with pytest.raises(HintsUnavailable):
-        await generate_hint(map_hint_input_to_hint_command(hint_input()))
+        await generate_hint(map_http_hint_input_to_application_command(hint_input()))
     assert len(provider.calls) == 2

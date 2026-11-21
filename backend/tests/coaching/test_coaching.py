@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from ancora.bootstrap import create_app
-from ancora.coaching.api.mappers import map_coaching_input_to_coaching_command
+from ancora.coaching.api.mappers import map_http_coaching_input_to_application_command
 from ancora.coaching.application.errors import CoachingUnavailable
 from ancora.coaching.application.models import CoachingCommand, CoachingResult
 from ancora.coaching.application.use_cases.generate_coaching_feedback import (
@@ -72,7 +72,7 @@ async def test_should_generate_feedback_when_one_saved_source_and_public_context
     None
 ):
     provider = SyntheticCoachingProvider()
-    command = map_coaching_input_to_coaching_command(coaching_input())
+    command = map_http_coaching_input_to_application_command(coaching_input())
     generate_coaching_feedback = GenerateCoachingFeedback(provider)
     result = await generate_coaching_feedback(command)
 
@@ -97,7 +97,7 @@ async def test_should_reject_unknown_provenance_and_disabled_configuration_when_
 
     provider = WrongProvider()
     generate_coaching_feedback = GenerateCoachingFeedback(provider)
-    command = map_coaching_input_to_coaching_command(coaching_input())
+    command = map_http_coaching_input_to_application_command(coaching_input())
     with pytest.raises(CoachingInvalid):
         await generate_coaching_feedback(command)
     provider.available = False
@@ -177,7 +177,7 @@ async def test_should_skip_provider_when_aggregate_execution_counts_are_inconsis
     None
 ):
     provider = SyntheticCoachingProvider()
-    command = map_coaching_input_to_coaching_command(coaching_input())
+    command = map_http_coaching_input_to_application_command(coaching_input())
     generate_coaching_feedback = GenerateCoachingFeedback(provider)
     for passed, total in [(3, 2), (-1, 2), (1, 13), (True, 2)]:
         with pytest.raises(CoachingInvalid):
@@ -197,7 +197,7 @@ async def test_should_skip_provider_when_source_is_empty_or_exceeds_wire_bounds(
 ) -> None:
     provider = SyntheticCoachingProvider()
     command = replace(
-        map_coaching_input_to_coaching_command(coaching_input()), source=source
+        map_http_coaching_input_to_application_command(coaching_input()), source=source
     )
     generate_coaching_feedback = GenerateCoachingFeedback(provider)
     with pytest.raises(CoachingInvalid):
@@ -225,6 +225,6 @@ async def test_should_withhold_feedback_when_output_is_blank_oversized_or_a_repl
     generate_coaching_feedback = GenerateCoachingFeedback(provider)
     with pytest.raises(CoachingInvalid):
         await generate_coaching_feedback(
-            map_coaching_input_to_coaching_command(coaching_input())
+            map_http_coaching_input_to_application_command(coaching_input())
         )
     assert len(provider.calls) == 1

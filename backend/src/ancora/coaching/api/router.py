@@ -5,8 +5,8 @@ from ancora.coaching.api.dependencies import (
     GenerateCoachingFeedbackDependency,
 )
 from ancora.coaching.api.mappers import (
-    map_coaching_input_to_coaching_command,
-    map_coaching_result_to_coaching_output,
+    map_application_coaching_result_to_http_output,
+    map_http_coaching_input_to_application_command,
 )
 from ancora.coaching.api.schemas import (
     CoachingAvailability,
@@ -76,6 +76,6 @@ async def generate(
     failures expose bounded codes without source or provider exception details.
     """
     result = await generate_coaching_feedback(
-        map_coaching_input_to_coaching_command(payload)
+        map_http_coaching_input_to_application_command(payload)
     )
-    return map_coaching_result_to_coaching_output(result)
+    return map_application_coaching_result_to_http_output(result)

@@ -1,8 +1,8 @@
 import pytest
 from ancora.bootstrap import create_app
 from ancora.challenges.api.mappers import (
-    map_generator_input_to_generation_command,
     map_http_challenge_draft_to_domain,
+    map_http_generation_input_to_application_command,
 )
 from ancora.challenges.api.schemas import (
     ChallengeDraft,
@@ -140,7 +140,7 @@ def test_should_reject_conflicting_examples_when_same_input_has_different_result
     with pytest.raises(DraftInvalid, match="case_contradiction"):
         validate_draft(
             map_http_challenge_draft_to_domain(draft),
-            map_generator_input_to_generation_command(request).request,
+            map_http_generation_input_to_application_command(request).request,
         )
 
 
@@ -164,7 +164,7 @@ def test_should_reject_duplicate_ids_when_public_and_check_cases_overlap() -> No
     with pytest.raises(DraftInvalid, match="case_ids_invalid"):
         validate_draft(
             map_http_challenge_draft_to_domain(draft),
-            map_generator_input_to_generation_command(request).request,
+            map_http_generation_input_to_application_command(request).request,
         )
 
 
@@ -178,7 +178,7 @@ def test_should_reject_missing_empty_boundary_when_examples_only_have_values() -
     with pytest.raises(DraftInvalid, match="boundary_case_missing"):
         validate_draft(
             map_http_challenge_draft_to_domain(draft),
-            map_generator_input_to_generation_command(request).request,
+            map_http_generation_input_to_application_command(request).request,
         )
 
 
@@ -222,7 +222,7 @@ def test_should_reject_oversized_runner_payload_when_individual_cases_fit_bounds
     with pytest.raises(DraftInvalid, match="runner_payload_too_large"):
         validate_draft(
             map_http_challenge_draft_to_domain(draft),
-            map_generator_input_to_generation_command(request).request,
+            map_http_generation_input_to_application_command(request).request,
         )
 
 
@@ -257,7 +257,7 @@ def test_should_reject_reference_contradictions_without_execution(
     with pytest.raises(DraftInvalid, match=issue):
         validate_draft(
             map_http_challenge_draft_to_domain(draft),
-            map_generator_input_to_generation_command(request).request,
+            map_http_generation_input_to_application_command(request).request,
         )
 
 

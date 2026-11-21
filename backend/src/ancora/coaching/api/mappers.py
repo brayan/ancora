@@ -4,7 +4,28 @@ from ancora.coaching.application.models import CoachingCommand, CoachingResult
 from ancora.coaching.domain.models import CoachingChallenge, CoachingEvidence
 
 
-def map_coaching_input_to_coaching_command(
+def map_application_coaching_result_to_http_output(
+    result: CoachingResult,
+) -> schemas.CoachingOutput:
+    return schemas.CoachingOutput.model_validate(
+        {
+            "schemaVersion": 1,
+            "feedback": {
+                "summary": result.feedback.summary,
+                "observations": list(result.feedback.observations),
+                "nextStep": result.feedback.next_step,
+            },
+            "model": {
+                "provider": result.model.provider,
+                "name": result.model.name,
+                "promptVersion": result.model.prompt_version,
+                "schemaVersion": 1,
+            },
+        }
+    )
+
+
+def map_http_coaching_input_to_application_command(
     payload: schemas.CoachingInput,
 ) -> CoachingCommand:
     challenge = payload.challenge
@@ -36,25 +57,4 @@ def map_coaching_input_to_coaching_command(
     )
     return CoachingCommand(
         challenge=public_challenge, evidence=evidence, source=payload.source
-    )
-
-
-def map_coaching_result_to_coaching_output(
-    result: CoachingResult,
-) -> schemas.CoachingOutput:
-    return schemas.CoachingOutput.model_validate(
-        {
-            "schemaVersion": 1,
-            "feedback": {
-                "summary": result.feedback.summary,
-                "observations": list(result.feedback.observations),
-                "nextStep": result.feedback.next_step,
-            },
-            "model": {
-                "provider": result.model.provider,
-                "name": result.model.name,
-                "promptVersion": result.model.prompt_version,
-                "schemaVersion": 1,
-            },
-        }
     )

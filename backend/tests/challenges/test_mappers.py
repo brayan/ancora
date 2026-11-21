@@ -3,10 +3,10 @@ from dataclasses import replace
 
 import pytest
 from ancora.challenges.api.mappers import (
+    map_application_generation_result_to_http_output,
     map_domain_challenge_draft_to_http,
-    map_generation_result_to_generator_output,
-    map_generator_input_to_generation_command,
     map_http_challenge_draft_to_domain,
+    map_http_generation_input_to_application_command,
 )
 from ancora.challenges.application.models import GenerationResult, ModelProvenance
 from ancora.challenges.domain.errors import DraftInvalid
@@ -68,9 +68,9 @@ def test_should_preserve_correction_context_when_preparing_provider_request() ->
             "recent_exercises": ["Earlier synthetic challenge"],
         }
     )
-    command = map_generator_input_to_generation_command(payload)
-    provider_request = provider_mappers.map_generation_command_to_generator_input(
-        command
+    command = map_http_generation_input_to_application_command(payload)
+    provider_request = (
+        provider_mappers.map_application_generation_command_to_provider_input(command)
     )
 
     assert provider_request.request.model_dump(
@@ -114,4 +114,4 @@ def test_should_validate_boundary_output_when_application_returns_bad_metadata()
     )
     result = GenerationResult(draft, replace(provenance, name=""))
     with pytest.raises(ValidationError):
-        map_generation_result_to_generator_output(result)
+        map_application_generation_result_to_http_output(result)

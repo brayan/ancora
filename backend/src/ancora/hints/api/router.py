@@ -2,8 +2,8 @@ from fastapi import APIRouter
 
 from ancora.hints.api.dependencies import GenerateHintDependency, HintProviderDependency
 from ancora.hints.api.mappers import (
-    map_hint_input_to_hint_command,
-    map_hint_result_to_hint_output,
+    map_application_hint_result_to_http_output,
+    map_http_hint_input_to_application_command,
 )
 from ancora.hints.api.schemas import HintAvailability, HintInput, HintOutput
 from ancora.shared.api.responses import TRUSTED_SERVER_RESPONSES
@@ -68,6 +68,6 @@ async def generate(
     dispatch allowance. No Python solutions execute here and no retries occur.
     Failures expose bounded codes; trusted server authentication precedes parsing.
     """
-    return map_hint_result_to_hint_output(
-        await generate_hint(map_hint_input_to_hint_command(payload))
+    return map_application_hint_result_to_http_output(
+        await generate_hint(map_http_hint_input_to_application_command(payload))
     )

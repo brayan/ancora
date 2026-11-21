@@ -9,6 +9,30 @@ from ancora.challenges.domain.values import parse_case_value
 from ancora.challenges.infrastructure.ai import schemas
 
 
+def map_application_generation_command_to_provider_input(
+    command: GenerationCommand,
+) -> schemas.GeneratorInput:
+    request = command.request
+    return schemas.GeneratorInput.model_validate(
+        {
+            "schemaVersion": 1,
+            "request": {
+                "language": request.language,
+                "concept": request.concept,
+                "difficulty": request.difficulty,
+                "goal": request.goal,
+                "targetMinutes": request.target_minutes,
+                "preferences": request.preferences,
+            },
+            "previous": map_domain_challenge_draft_to_provider(command.previous)
+            if command.previous
+            else None,
+            "feedback": list(command.feedback),
+            "recentExercises": list(command.recent_exercises),
+        }
+    )
+
+
 def map_domain_challenge_draft_to_provider(
     draft: models.ChallengeDraft,
 ) -> schemas.ChallengeDraft:
@@ -51,30 +75,6 @@ def map_domain_challenge_draft_to_provider(
     )
     _validate_runner_payload(payload)
     return payload
-
-
-def map_generation_command_to_generator_input(
-    command: GenerationCommand,
-) -> schemas.GeneratorInput:
-    request = command.request
-    return schemas.GeneratorInput.model_validate(
-        {
-            "schemaVersion": 1,
-            "request": {
-                "language": request.language,
-                "concept": request.concept,
-                "difficulty": request.difficulty,
-                "goal": request.goal,
-                "targetMinutes": request.target_minutes,
-                "preferences": request.preferences,
-            },
-            "previous": map_domain_challenge_draft_to_provider(command.previous)
-            if command.previous
-            else None,
-            "feedback": list(command.feedback),
-            "recentExercises": list(command.recent_exercises),
-        }
-    )
 
 
 def map_provider_challenge_draft_to_domain(

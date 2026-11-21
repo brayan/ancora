@@ -2,8 +2,8 @@ from dataclasses import replace
 
 import pytest
 from ancora.challenges.api.mappers import (
-    map_generator_input_to_generation_command,
     map_http_challenge_draft_to_domain,
+    map_http_generation_input_to_application_command,
 )
 from ancora.challenges.application.errors import GenerationUnavailable
 from ancora.challenges.application.models import (
@@ -40,7 +40,7 @@ class RecordingProvider:
 
 def provider_for_request() -> tuple[RecordingProvider, GenerationCommand]:
     payload = generation_input()
-    command = map_generator_input_to_generation_command(payload)
+    command = map_http_generation_input_to_application_command(payload)
     result = GenerationResult(
         map_http_challenge_draft_to_domain(draft_for(payload)),
         ModelProvenance("openai", "synthetic-offline", "programming-practice-v1"),

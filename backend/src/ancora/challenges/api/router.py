@@ -5,8 +5,8 @@ from ancora.challenges.api.dependencies import (
     GenerationProvider,
 )
 from ancora.challenges.api.mappers import (
-    map_generation_result_to_generator_output,
-    map_generator_input_to_generation_command,
+    map_application_generation_result_to_http_output,
+    map_http_generation_input_to_application_command,
 )
 from ancora.challenges.api.schemas import (
     GenerationStatus,
@@ -81,6 +81,6 @@ async def generate(
     rejected before parsing. Failures return bounded codes without input/provider text.
     """
     result = await generate_challenge(
-        map_generator_input_to_generation_command(payload)
+        map_http_generation_input_to_application_command(payload)
     )
-    return map_generation_result_to_generator_output(result)
+    return map_application_generation_result_to_http_output(result)
